@@ -66,7 +66,21 @@ public class sorting_2 {
     }
 
     //RECURSIVE INSERTION SORT
-
+    public static void recursiveInsertionSort(int arr[], int start) {
+        int n = arr.length;
+        int pos = start - 1;
+        //BASE CASE
+        if (start >= n) return;
+        //LOGIC
+        int current = arr[start];
+        while (pos >= 0 && arr[pos] > current) {
+            arr[pos + 1] = arr[pos];
+            pos--;
+        }
+        arr[++pos] = current;
+        //RECURSIVE CALL
+        recursiveInsertionSort(arr, start + 1);
+    }
 
     //QUICK SORT
     public static void quickSort(int arr[], int start, int end) {
