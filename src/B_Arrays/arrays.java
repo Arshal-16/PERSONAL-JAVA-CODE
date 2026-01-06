@@ -1,9 +1,6 @@
 package B_Arrays;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class arrays {
@@ -132,26 +129,26 @@ public class arrays {
 
     // MOVE ZEROES TO END WITHOUT CHANGING THE ORDER OF INTEGERS IN ARRAY
     public static void zeroesToEnd(int arr[]) {
-       //pointer for first 0 in arr
-        int j=-1;
-        for(int i=0;i<arr.length;i++){
-            if(arr[i]==0){
-                j=i;
+        //pointer for first 0 in arr
+        int j = -1;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == 0) {
+                j = i;
                 break;
             }
         }
         //if no zeroes present
-        if(j==-1){
+        if (j == -1) {
             return;
         }
-        for(int i=j+1;i<arr.length;i++){
-            if(arr[i]!=0){
+        for (int i = j + 1; i < arr.length; i++) {
+            if (arr[i] != 0) {
                 // arr[i] is the first non zero integer that comes after first zero(es),
                 // we will put it to start of arr
                 // without disturbing the original order
                 //swap
-                arr[j]=arr[i];
-                arr[i]=0;
+                arr[j] = arr[i];
+                arr[i] = 0;
                 //increment j so it again points to first zero in array
                 j++;
                 //like this all non-zero digits will come to start in order when i reaches n-1 value
@@ -161,7 +158,92 @@ public class arrays {
             }
         }
     }
-    
-        ///////////////////////////////// MEDIUM ////////////////////////////////////
 
+    //FIND UNION SET OF TWO SORTED ARRAYS
+    public ArrayList<Integer> findUnion(int[] arr1, int[] arr2, int n, int m) {
+        // List to store union elements
+        ArrayList<Integer> Union = new ArrayList<>();
+
+        // Initialize pointers
+        int i = 0, j = 0;
+
+        // Iterate while both arrays have elements
+        while (i < n && j < m) {
+            // If element in arr1 is smaller
+            if (arr1[i] < arr2[j]) {
+                // Add if empty or not duplicate
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
+                    Union.add(arr1[i]);
+                i++;  // Move pointer in arr1
+            }
+            // If element in arr2 is smaller
+            else if (arr2[j] < arr1[i]) {
+                // Add if empty or not duplicate
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j])
+                    Union.add(arr2[j]);
+                j++;  // Move pointer in arr2
+            } else {
+                // Elements are equal, add once if not duplicate
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
+                    Union.add(arr1[i]);
+                i++;
+                j++;  // Move both pointers
+            }
+        }
+
+        // Append remaining elements from arr1
+        while (i < n) {
+            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
+                Union.add(arr1[i]);
+            i++;
+        }
+
+        // Append remaining elements from arr2
+        while (j < m) {
+            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j])
+                Union.add(arr2[j]);
+            j++;
+        }
+
+        // Return the union list
+        return Union;
     }
+
+    //COUNT
+    public static int countOne(int arr[]) {
+        int maxCount = 0;
+        int count = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != 0) {
+                count++;
+                maxCount = Math.max(maxCount, count);
+            } else {
+                count = 0;
+            }
+        }
+        return maxCount;
+    }
+
+    //LENGTH OF LONGEST SUBARRAY WITH SUM K
+    public static int longestSubArray(int arr[], int k) {
+        //prefix array
+        int prefix[] = new int[arr.length];
+        prefix[0] = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            prefix[i] = prefix[i - 1] + arr[i];
+        }
+        int maxLength=0;
+        for(int start=0;start<arr.length;start++){
+            for(int end=start;end<arr.length;end++){
+                int sum= start==0?prefix[end]:prefix[end]-prefix[start-1];
+                if(sum==k){
+                    maxLength= Math.max(maxLength,end-start+1);
+                }
+            }
+        }
+        return maxLength;
+    }
+
+    ///////////////////////////////// MEDIUM ////////////////////////////////////
+
+}
