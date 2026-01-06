@@ -89,14 +89,79 @@ public class arrays {
 
     //REMOVE DUPLICATE ELEMENTS IN ASC SORTED ARRAY
     public static void remDuplicate(int arr[]) {
-       int pos=0;
-       for(int i=1;i<arr.length;i++){
-           if(arr[pos]!=arr[i]){
-               arr[++pos]=arr[i];
-           }
-       }
+        int pos = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[pos] != arr[i]) {
+                arr[++pos] = arr[i];
+            }
+        }
     }
 
-    ///////////////////////////////// MEDIUM ////////////////////////////////////
+    //LEFT ROTATE AN ARRAY BY ONE
+    public static void leftRotate(int arr[]) {
+        int temp = arr[0];
+        for (int i = 0; i < arr.length - 1; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[arr.length - 1] = temp;
+    }
 
-}
+    // ROTATE ARRAY BY K ELEMENTS
+    public static void rotateArray(int arr[], int k) {
+        k %= arr.length;
+        //LEFT ROTATE BY K PLACES
+        revArr(arr, 0, k - 1);
+        revArr(arr, k, arr.length - 1);
+        revArr(arr, 0, arr.length - 1);
+
+        //RIGHT ROTATE BY K PLACES
+        revArr(arr, 0, arr.length - 1);
+        revArr(arr, 0, k - 1);
+        revArr(arr, k, arr.length - 1);
+    }
+
+    public static void revArr(int arr[], int start, int end) {
+        while (start < end) {
+            int temp = arr[start];
+            arr[start] = arr[end];
+            arr[end] = temp;
+            start++;
+            end--;
+        }
+    }
+
+    // MOVE ZEROES TO END WITHOUT CHANGING THE ORDER OF INTEGERS IN ARRAY
+    public static void zeroesToEnd(int arr[]) {
+       //pointer for first 0 in arr
+        int j=-1;
+        for(int i=0;i<arr.length;i++){
+            if(arr[i]==0){
+                j=i;
+                break;
+            }
+        }
+        //if no zeroes present
+        if(j==-1){
+            return;
+        }
+        for(int i=j+1;i<arr.length;i++){
+            if(arr[i]!=0){
+                // arr[i] is the first non zero integer that comes after first zero(es),
+                // we will put it to start of arr
+                // without disturbing the original order
+                //swap
+                arr[j]=arr[i];
+                arr[i]=0;
+                //increment j so it again points to first zero in array
+                j++;
+                //like this all non-zero digits will come to start in order when i reaches n-1 value
+                // (zeroes will automatically move to end)
+
+
+            }
+        }
+    }
+    
+        ///////////////////////////////// MEDIUM ////////////////////////////////////
+
+    }
