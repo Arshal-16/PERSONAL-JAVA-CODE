@@ -172,20 +172,17 @@ public class arrays {
             // If element in arr1 is smaller
             if (arr1[i] < arr2[j]) {
                 // Add if empty or not duplicate
-                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
-                    Union.add(arr1[i]);
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i]) Union.add(arr1[i]);
                 i++;  // Move pointer in arr1
             }
             // If element in arr2 is smaller
             else if (arr2[j] < arr1[i]) {
                 // Add if empty or not duplicate
-                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j])
-                    Union.add(arr2[j]);
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j]) Union.add(arr2[j]);
                 j++;  // Move pointer in arr2
             } else {
                 // Elements are equal, add once if not duplicate
-                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
-                    Union.add(arr1[i]);
+                if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i]) Union.add(arr1[i]);
                 i++;
                 j++;  // Move both pointers
             }
@@ -193,15 +190,13 @@ public class arrays {
 
         // Append remaining elements from arr1
         while (i < n) {
-            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i])
-                Union.add(arr1[i]);
+            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr1[i]) Union.add(arr1[i]);
             i++;
         }
 
         // Append remaining elements from arr2
         while (j < m) {
-            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j])
-                Union.add(arr2[j]);
+            if (Union.isEmpty() || Union.get(Union.size() - 1) != arr2[j]) Union.add(arr2[j]);
             j++;
         }
 
@@ -405,6 +400,135 @@ public class arrays {
         return longestSeq;
 
     }
+
+    //SET MATRIX ZERO
+    public static void setZero(int arr[][]) {
+        if (arr == null) return;
+        int rows = arr.length, cols = arr[0].length;
+
+        HashSet<Integer> rowZero = new HashSet<>();
+        HashSet<Integer> colZero = new HashSet<>();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (arr[row][col] == 0) {
+                    rowZero.add(row);
+                    colZero.add(col);
+                }
+            }
+        }
+
+        for (int row : rowZero) {
+            for (int i = 0; i < cols; i++) {
+                arr[row][i] = 0;
+            }
+        }
+
+        for (int col : colZero) {
+            for (int i = 0; i < rows; i++) {
+                arr[i][col] = 0;
+            }
+        }
+        /*
+        SOLN WITH CONST SPACE COMPLEXITY
+         public static void setZero(int[][] arr) {
+    if (arr == null || arr.length == 0 || arr[0].length == 0) return;
+
+    int rows = arr.length, cols = arr[0].length;
+    boolean firstRowZero = false, firstColZero = false;
+
+    // Check first row
+    for (int j = 0; j < cols; j++) {
+        if (arr[0][j] == 0) {
+            firstRowZero = true;
+            break;
+        }
+    }
+
+    // Check first column
+    for (int i = 0; i < rows; i++) {
+        if (arr[i][0] == 0) {
+            firstColZero = true;
+            break;
+        }
+    }
+
+    // Mark rows & columns
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {
+            if (arr[i][j] == 0) {
+                arr[i][0] = 0;
+                arr[0][j] = 0;
+            }
+        }
+    }
+
+    // Zero rows
+    for (int i = 1; i < rows; i++) {
+        if (arr[i][0] == 0) {
+            for (int j = 1; j < cols; j++) {
+                arr[i][j] = 0;
+            }
+        }
+    }
+
+    // Zero columns
+    for (int j = 1; j < cols; j++) {
+        if (arr[0][j] == 0) {
+            for (int i = 1; i < rows; i++) {
+                arr[i][j] = 0;
+            }
+        }
+    }
+
+    // Zero first row & column
+    if (firstRowZero) {
+        for (int j = 0; j < cols; j++) arr[0][j] = 0;
+    }
+    if (firstColZero) {
+        for (int i = 0; i < rows; i++) arr[i][0] = 0;
+    }
+}
+         */
+    }
+
+    //ROTATE MATRIX BY 90 DEGREE CLOCKWISE
+    public static void rotateMatrix(int arr[][]) {
+        if (arr == null || arr.length != arr[0].length) return;
+
+        int rows = arr.length;
+        int cols = arr[0].length;
+
+        //TRANSPOSE THE MATRIX (ROWS AND COLS INTERCHANGED
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                // this if will prevent double swapping, which will otherwise null the effect of swapping
+                // if dont want to use if, start col from row+1
+                if (row > col) {
+                    //swap (i,j) to (j,i)
+                    int temp = arr[row][col];
+                    arr[row][col] = arr[col][row];
+                    arr[col][row] = temp;
+                }
+            }
+        }
+        //REVERSE ALL ROWS
+        for (int row = 0; row < rows; row++) {
+            int start = 0, end = cols - 1;
+            while (start < end) {
+                int temp = arr[row][start];
+                arr[row][start] = arr[row][end];
+                arr[row][end] = temp;
+                start++;
+                end--;
+
+            }
+        }
+    }
+
+
+
+
     ///////////////////////////////// HARD ////////////////////////////////////
 
 }
