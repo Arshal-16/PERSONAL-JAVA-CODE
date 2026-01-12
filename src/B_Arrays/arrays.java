@@ -526,7 +526,95 @@ public class arrays {
         }
     }
 
+    //SPIRAL MATRIX
+    public static void printSpiralMatrix(int arr[][]) {
+        if (arr == null || arr.length == 0) return;
 
+        int leftStart = 0, rightStart = arr[0].length - 1, topStart = 0, bottomStart = arr.length - 1;
+
+        while (leftStart <= rightStart && topStart <= bottomStart) {
+            //printing top part
+            for (int start = leftStart; start <= rightStart; start++) {
+                System.out.print(arr[topStart][start] + " ");
+            }
+            //printing right part, topStart+1 because last ele of first row will already be printed
+            for (int start = topStart + 1; start < bottomStart; start++) {
+                System.out.print(arr[start][rightStart] + " ");
+            }
+
+            if (topStart != bottomStart) {
+                //printing bottom part, leftStart-1 because last ele of last col will already be printed
+                for (int start = rightStart; start >= leftStart; start--) {
+                    System.out.print(arr[bottomStart][start] + " ");
+                }
+            }
+
+
+            if (leftStart != rightStart) {
+                //printing left part
+                for (int start = bottomStart - 1; start > topStart; start--) {
+                    System.out.print(arr[start][leftStart] + " ");
+                }
+            }
+
+            topStart++;
+            bottomStart--;
+            leftStart++;
+            rightStart--;
+
+        }
+    }
+
+    //COUNT SUBARRAYS WITH GIVEN SUM
+    public static int countSubarrays(int nums[],int target){
+
+        //better than prefix array approach because here space complexity will be O(1) and T.C. will be same
+        /*
+          // Size of the array
+        int n = arr.length;
+
+        // Initialize count of subarrays
+        int count = 0;
+
+        // Traverse all possible start indices
+        for (int i = 0; i < n; i++) {
+            // Initialize sum for current subarray
+            int sum = 0;
+
+            // Traverse all possible end indices from start
+            for (int j = i; j < n; j++) {
+                // Add current element to sum
+                sum += arr[j];
+
+                // If sum equals target, increment count
+                if (sum == target) {
+                    count++;
+                }
+            }
+        }
+
+        // Return total count of subarrays
+        return count;
+        */
+
+
+       int count =0,sum=0;
+       HashMap<Integer,Integer> hm = new HashMap<>();
+       // (value,frequency)
+        // Mental Model: “I am standing before the array with sum = 0 in my pocket.”
+        hm.put(0,1);// this will help when the subarray starts from index 0, ex:[1,2] and target is 3
+
+       for(int num:nums ){
+           sum+=num;
+
+       int remainder= sum-target;
+       if(hm.containsKey(remainder)){
+           count+= hm.get(remainder);
+       }
+           hm.put(sum, hm.getOrDefault(sum,0)+1);
+       }
+       return count;
+    }
 
 
     ///////////////////////////////// HARD ////////////////////////////////////
