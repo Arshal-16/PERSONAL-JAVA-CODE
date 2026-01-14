@@ -93,18 +93,18 @@ public class binarySearch {
     }
 
     // LAST OCCURRENCE OF ELEMENT IN SORTED ARRAY
-    public static int lastOccurrence(int arr[], int target){
-        int start=0,end=arr.length-1,idx=-1;
+    public static int lastOccurrence(int arr[], int target) {
+        int start = 0, end = arr.length - 1, idx = -1;
 
-        while(start<=end){
-            int mid= start +(end-start)/2;
-            if(arr[mid]==target){
-                idx=mid;
-                start=mid+1;
-            }else if(arr[mid]>target){
-                end=mid-1;
-            }else{
-                start=mid+1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid] == target) {
+                idx = mid;
+                start = mid + 1;
+            } else if (arr[mid] > target) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
         return idx;
@@ -127,24 +127,105 @@ public class binarySearch {
                 start = mid + 1;
             }
         }
-        start=0;end=arr.length-1;
+        start = 0;
+        end = arr.length - 1;
 
         //finding last occurrence
-        while(start<=end){
+        while (start <= end) {
             int mid = start + (end - start) / 2;
-            if(arr[mid]==key){
-                lastOcc=mid;
-                start=mid+1;
-            }else if(arr[mid]>key){
-                end=mid-1;
-            }else{
-                start=mid+1;
+            if (arr[mid] == key) {
+                lastOcc = mid;
+                start = mid + 1;
+            } else if (arr[mid] > key) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
-        if(firstOcc==-1) return 0;
-        return lastOcc-firstOcc+1;
+        if (firstOcc == -1) return 0;
+        return lastOcc - firstOcc + 1;
 
     }
+
+    //SEARCH ELEMENT IN ROTATED SORTED ARRAY (NO DUPLICATES ARE PRESENT)
+    public static int searchInRotated(int arr[], int target) {
+        int start = 0, end = arr.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid] == target) return mid;
+            if (arr[start] <= arr[mid]) {
+                //left part is sorted
+                if (target >= arr[start] && target < arr[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else {
+                //right part is sorted
+                if (target > arr[mid] && target <= arr[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return -1;
+
+    }
+
+    //SEARCH ELEMENT IN ROTATED SORTED ARRAY (DUPLICATES ARE PRESENT)
+    public static boolean searchInSortedDup(int arr[], int target) {
+        int start = 0, end = arr.length - 1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid] == target) return true;
+            if (arr[mid] == arr[start] && arr[mid] == arr[end]) {
+                start++;
+                end--;
+                continue;
+            }
+            //if left part is sorted
+            if (arr[start] <= arr[mid]) {
+                if (target >= arr[start] && target < arr[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            }
+            //if right part is sorted
+            else {
+                if (target > arr[mid] && target <= arr[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
+        }
+        return false;
+    }
+
+    //MINIMUM IN ROTATED SORTED ARRAY
+    public static int minInRotatedSorted(int arr[]) {
+        int start = 0, end = arr.length - 1, min = Integer.MAX_VALUE;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+                //left half is sorted
+            if (arr[start] <= arr[mid]) {
+                min = Math.min(min, arr[start]);
+                //after taking min discard the sorted half and search in remaining half
+                start = mid + 1;
+
+            }
+            //right half is sorted
+            else {
+                min = Math.min(min, arr[mid]);
+                end = mid - 1;
+            }
+        }
+        return min;
+    }
+
 
 
 
