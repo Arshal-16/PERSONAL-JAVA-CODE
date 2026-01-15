@@ -210,7 +210,7 @@ public class binarySearch {
 
         while (start <= end) {
             int mid = start + (end - start) / 2;
-                //left half is sorted
+            //left half is sorted
             if (arr[start] <= arr[mid]) {
                 min = Math.min(min, arr[start]);
                 //after taking min discard the sorted half and search in remaining half
@@ -226,8 +226,38 @@ public class binarySearch {
         return min;
     }
 
+    //HOW MANY TIMES ARRAY HAS BEEN ROTATED
+    public static int timesRotated(int arr[]) {
+        int start = 0, end = arr.length - 1;
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid] <= arr[end]) {
+                end = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return start;
+    }
 
+    //FIND SINGLE ELEMENT IN SORTED ARRAY
+    public static int findSingleElement(int arr[]) {
+        //edge cases
+        int n = arr.length;
+        if (arr.length == 1) return arr[0];
+        if (arr[0] != arr[1]) return arr[0];
+        if (arr[n - 2] != arr[n - 1]) return arr[n - 1];
 
+        int start = 1, end = arr.length - 2;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (arr[mid - 1] != arr[mid] && arr[mid + 1] != arr[mid]) return arr[mid];
+            if ((mid % 2 == 0 && arr[mid] == arr[mid + 1]) || (mid % 2 == 1 && arr[mid - 1] == arr[mid]))
+                start = mid + 1;
+            else end = mid - 1;
+        }
+        return -1;
+    }
 
     /////////////// BS ON ANSWERS ////////////////////
 
