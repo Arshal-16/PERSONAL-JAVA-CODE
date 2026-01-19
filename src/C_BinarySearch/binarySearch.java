@@ -3,6 +3,32 @@ package C_BinarySearch;
 import java.util.ArrayList;
 
 public class binarySearch {
+
+    /*
+    BS NOTE:
+    Use start <= end
+    When you are searching for an answer that may be exactly at start or end
+    Classic search for a value
+    Floor / ceiling
+    Last valid value
+    First invalid value
+    You shrink a closed range: [start, end]
+
+    Use start < end
+     When you are converging to a single index
+    Finding a boundary
+    Lower bound / upper bound
+    Peak / minimum / maximum
+    Binary search on answer (monotonic predicate)
+    You shrink an open-ended range until one value remains
+
+    If stuck, ask yourself:
+    “Am I searching or converging?”
+    Searching → <=
+    Converging → <
+     */
+
+
     /// //////////// BS ON 1D ARRAYS //////////////////
 
     //IMPLEMENT LOWER BOUND
@@ -260,29 +286,51 @@ public class binarySearch {
     }
 
     //FIND PEAK ELEMENT
-    public static int peakElement(int arr[]){
-        if(arr.length==1 || arr[0]>arr[1]) return 0;
+    public static int peakElement(int arr[]) {
+        if (arr.length == 1 || arr[0] > arr[1]) return 0;
 
-        if(arr[arr.length-1]>arr[arr.length-2]) return arr.length-1;
+        if (arr[arr.length - 1] > arr[arr.length - 2]) return arr.length - 1;
 
-        int start =1,end=arr.length-2;
+        int start = 1, end = arr.length - 2;
 
-        while(start<=end){
-            int mid=(start+end)/2;
-            if(arr[mid]>=arr[mid-1]&&arr[mid]>=arr[mid+1]){
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (arr[mid] >= arr[mid - 1] && arr[mid] >= arr[mid + 1]) {
                 return mid;
-            }else if(arr[mid]>arr[mid-1]){
-                start=mid+1;
-            }else if(arr[mid]>arr[mid+1]){
-                end=mid-1;
-            }else{
-                start=mid+1;
+            } else if (arr[mid] > arr[mid - 1]) {
+                start = mid + 1;
+            } else if (arr[mid] > arr[mid + 1]) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
         return -1;
     }
 
-    /////////////// BS ON ANSWERS ////////////////////
+    /// //////////// BS ON ANSWERS ////////////////////
+
+    //FIND SQUARE ROOT USING BINARY SEARCH
+    public static int floorSqrt(int n) {
+        if (n < 0) return -1;
+        if (n == 0) return 0;
+        // sqrt will lie between 1 and n so we can apply binary search
+        int start = 1, end = n, ans = 0;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            // used long to prevent overflow
+            if ((long) mid * mid <= n) {
+                ans = mid;
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return ans;
+    }
+
+
+
 
 
     /////////////// BS ON 2D ARRAYS //////////////////
