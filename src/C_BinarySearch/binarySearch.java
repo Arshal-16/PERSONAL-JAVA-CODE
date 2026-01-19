@@ -329,8 +329,60 @@ public class binarySearch {
         return ans;
     }
 
+    //FIND Nth ROOT OF M
+    public static int nthRoot(int n, int m) {
+        if (m < 0) return -1;
+        if (m == 0) return 0;
 
+        int start = 1, end = m;
 
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            long value = power(mid, n, m);
+
+            if (value == m) {
+                return mid;
+            } else if (value < m) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return -1;
+    }
+    //DONT USE Math.pow use this fn
+    public static long power(int base, int exp, int limit) {
+        long result = 1;
+        for (int i = 0; i < exp; i++) {
+            result *= base;
+            if (result > limit) return result; // stop early
+        }
+        return result;
+    }
+
+    //KOKO EATING BANANAS
+    public static int bananasPerHour(int arr[], int h){
+        int start=1,end=arr[0],ans=1;
+        for(int num:arr){
+            if(num>end) end=num;
+        }
+
+        while(start<=end){
+            int mid= start+ (end-start)/2;
+            int timeToEat=0;
+            for(int num:arr){
+                timeToEat+= (int)Math.ceil((double)num/mid);
+            }
+            if(timeToEat<=h){
+                ans=mid;
+                end=mid-1;
+            }else{
+                start=mid+1;
+            }
+        }
+        return ans;
+    }
 
 
     /////////////// BS ON 2D ARRAYS //////////////////
