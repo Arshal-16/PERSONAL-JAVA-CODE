@@ -384,6 +384,65 @@ public class binarySearch {
         return ans;
     }
 
+    //MINIMUM DAYS TO MAKE M BOUQUETS
+    public static int makeBouquets(int arr[], int k, int m){
+        if((long)m*k>arr.length) return -1;
+
+        int start=1,ans=-1;
+        int end=arr[0];
+        for(int num:arr){
+            if(num>end){
+                end=num;
+            }
+        }
+
+        while(start<=end){
+            int days=start+(end-start)/2;
+            int bouquetsMade=0;
+            int count=0;
+            for(int num:arr){
+                if(days>=num){
+                    count++;
+                    if(count>=k){
+                        bouquetsMade++;
+                        count=0;
+                    }
+                }else{
+                    count=0;
+                }
+            }
+            if(bouquetsMade>=m){
+                ans=days;
+                end=days-1;
+            }else{
+                start=days+1;
+            }
+        }
+        return ans;
+    }
+
+    //FIND THE SMALLEST DIVISOR GIVEN A THRESHOLD
+    public static int smallestDivisor(int arr[],int limit){
+        int start=1,end=arr[0],ans=-1;
+        for(int num:arr){
+            if(num>end) end=num;
+        }
+        while(start<=end){
+            int mid=start+(end-start)/2;
+            int divResult=0;
+            for(int num:arr){
+                divResult+= (int)Math.ceil((double) num/mid);
+            }
+            if(divResult<=limit){
+                ans=mid;
+                end=mid-1;
+            }else{
+                start=mid+1;
+            }
+        }
+        return ans;
+    }
+
 
     /////////////// BS ON 2D ARRAYS //////////////////
 }
