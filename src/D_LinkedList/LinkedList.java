@@ -11,10 +11,10 @@ public class LinkedList {
         }
     }
 
-    public  Node Head, Tail;
-    int size=0;
+    public Node Head, Tail;
+    int size = 0;
 
-    ////////////// methods ///////////////////
+    /// /////////// methods ///////////////////
     //addFirst
     public void addFirst(int data) {
         //Step 1:create New Node
@@ -33,32 +33,32 @@ public class LinkedList {
     }
 
     //addLast
-    public void addLast(int data){
+    public void addLast(int data) {
         //Step 1:create new node
         Node newNode = new Node(data);
 
-        if(Head==null){
-            Head=Tail=newNode;
+        if (Head == null) {
+            Head = Tail = newNode;
             size++;
             return;
         }
         //Step 2:link next of prev tail to this new node
-        Tail.next=newNode;
+        Tail.next = newNode;
         //Step 3:reinitialize the tail
-        Tail=newNode;
+        Tail = newNode;
         size++;
     }
 
     //print a LinkedList
-    public void print(){
-        if(Head==null){
+    public void print() {
+        if (Head == null) {
             System.out.println("Linked List is empty.");
             return;
         }
         Node temp = Head;
-        while(temp!=null){
-            System.out.print(temp.data+" ");
-            temp=temp.next;
+        while (temp != null) {
+            System.out.print(temp.data + " ");
+            temp = temp.next;
         }
     }
 
@@ -106,6 +106,137 @@ public class LinkedList {
         }
         size++;
     }
+
+    //removeFirst()
+    public void removeFirst() {
+        if (size == 0) {
+            return;
+        }
+        if (size == 1) {
+            Head = Tail = null;
+        } else {
+            Head = Head.next;
+        }
+        size--;
+    }
+
+    //removeLast()
+    public void removeLast() {
+        if (size == 0) return;
+        if (size == 1) {
+            Head = Tail = null;
+        } else {
+            Node temp = Head;
+            while (temp.next != Tail) {
+                temp = temp.next;
+            }
+            temp.next = null;
+            Tail = temp;
+        }
+        size--;
+    }
+
+    //search(key) iterative
+    public int search(int key) {
+        if (size == 0) return -1;
+        Node temp = Head;
+        for (int idx = 0; idx < size; idx++) {
+            if (temp.data == key) return idx;
+            temp = temp.next;
+        }
+        /*
+        More robust:
+        int idx=0;
+        while(temp!=null){
+            if(temp.data==key) return idx;
+            temp=temp.next;
+            idx++;
+        }
+        */
+        return -1;
+    }
+
+    //search recursive
+    public int search(Node head, int key) {
+        //base case
+        if (head == null) return -1;
+        //main logic
+        if (head.data == key) return 0;
+        //recursion
+        int next = search(head.next, key);
+        return next != -1 ? next + 1 : next;
+    }
+
+    //reverse the linked list
+    public void reverse() {
+        if (Head == null) return;
+
+        Node prev = null;
+        Node current = Tail = Head;
+        Node next;
+
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        Head = prev;
+    }
+
+    //merge sort on linked list ( T.C = O(NlogN) and S.C. = O(1))
+    public Node mergeSort(Node head) {
+        //base case
+        if (head == null || head.next == null) return head;
+        //find mid
+        Node mid = getMid(head);
+        Node rightHead = mid.next;
+        mid.next = null;
+        //ms left and right
+        Node newLeftHead = mergeSort(head);
+        Node newRightHead = mergeSort(rightHead);
+        //merge sorted left and right parts
+        return merge(newLeftHead, newRightHead);
+    }
+
+    public Node getMid(Node head) {
+        Node slow = head;
+        Node fast = head.next;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    public Node merge(Node leftHead, Node rightHead){
+       // -1 is used as a dummy node , later it will be removed
+        Node mergedLL = new Node(-1);
+        Node temp = mergedLL;
+        while(leftHead!=null && rightHead!=null){
+            if(leftHead.data<rightHead.data){
+                temp.next=leftHead;
+                temp=temp.next;
+                leftHead = leftHead.next;
+            }else{
+                temp.next=rightHead;
+                temp=temp.next;
+                rightHead = rightHead.next;
+            }
+        }
+        while (leftHead!=null){
+            temp.next=leftHead;
+            temp=temp.next;
+            leftHead = leftHead.next;
+        }
+        while(rightHead!=null){
+            temp.next=rightHead;
+            temp=temp.next;
+            rightHead = rightHead.next;
+        }
+        return mergedLL.next;
+    }
+
 
 
 }
