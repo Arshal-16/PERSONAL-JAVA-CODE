@@ -209,34 +209,80 @@ public class LinkedList {
         return slow;
     }
 
-    public Node merge(Node leftHead, Node rightHead){
-       // -1 is used as a dummy node , later it will be removed
+    public Node merge(Node leftHead, Node rightHead) {
+        // -1 is used as a dummy node , later it will be removed
         Node mergedLL = new Node(-1);
         Node temp = mergedLL;
-        while(leftHead!=null && rightHead!=null){
-            if(leftHead.data<rightHead.data){
-                temp.next=leftHead;
-                temp=temp.next;
+        while (leftHead != null && rightHead != null) {
+            if (leftHead.data < rightHead.data) {
+                temp.next = leftHead;
+                temp = temp.next;
                 leftHead = leftHead.next;
-            }else{
-                temp.next=rightHead;
-                temp=temp.next;
+            } else {
+                temp.next = rightHead;
+                temp = temp.next;
                 rightHead = rightHead.next;
             }
         }
-        while (leftHead!=null){
-            temp.next=leftHead;
-            temp=temp.next;
+        while (leftHead != null) {
+            temp.next = leftHead;
+            temp = temp.next;
             leftHead = leftHead.next;
         }
-        while(rightHead!=null){
-            temp.next=rightHead;
-            temp=temp.next;
+        while (rightHead != null) {
+            temp.next = rightHead;
+            temp = temp.next;
             rightHead = rightHead.next;
         }
         return mergedLL.next;
     }
 
+    /////////////////////////////////////////////////////////////////////////////
 
+
+    /// ////// MEDIUM PROBLEMS OF LL /////////////////
+
+    // REVERSE THE LL ITERATIVE
+    public Node reverseIterative(Node head) {
+        if (head == null || head.next == null) return head;
+        Node prev = null, current = head, next;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        head = prev;
+        return head;
+
+    }
+
+    //REVERSE THE LL RECURSIVE
+    public Node reverseRecursive(Node head){
+        //base case
+        if(head==null || head.next== null) return head;
+        //recursive call
+        Node newHead = reverseRecursive(head.next);
+
+        Node front = head.next;
+        front.next = head;
+        head.next = null;
+        return newHead;
+
+    }
+
+    //DETECT A CYCLE IN LINKED LIST
+    public boolean isCycle(Node head){
+        if(head==null || head.next == null) return false;
+
+        Node slow,fast;
+        slow=fast=head;
+        while(fast!=null&&fast.next!=null){
+            slow=slow.next; //+1
+            fast=fast.next.next; //+2
+            if(slow==fast) return true;
+        }
+        return false;
+    }
 
 }
