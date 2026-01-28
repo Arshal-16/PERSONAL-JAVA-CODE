@@ -258,9 +258,9 @@ public class LinkedList {
     }
 
     //REVERSE THE LL RECURSIVE
-    public Node reverseRecursive(Node head){
+    public Node reverseRecursive(Node head) {
         //base case
-        if(head==null || head.next== null) return head;
+        if (head == null || head.next == null) return head;
         //recursive call
         Node newHead = reverseRecursive(head.next);
 
@@ -272,17 +272,113 @@ public class LinkedList {
     }
 
     //DETECT A CYCLE IN LINKED LIST
-    public boolean isCycle(Node head){
-        if(head==null || head.next == null) return false;
+    public boolean isCycle(Node head) {
+        if (head == null || head.next == null) return false;
 
-        Node slow,fast;
-        slow=fast=head;
-        while(fast!=null&&fast.next!=null){
-            slow=slow.next; //+1
-            fast=fast.next.next; //+2
-            if(slow==fast) return true;
+        Node slow, fast;
+        slow = fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next; //+1
+            fast = fast.next.next; //+2
+            if (slow == fast) return true;
         }
         return false;
     }
+
+    //STARTING POINT OF LOOP IN LL
+    public Node loopStart(Node head) {
+        if (head == null || head.next == null) return null;
+        boolean flag = false;
+        Node slow, fast;
+        slow = fast = head;
+        //floyd's cycle detection
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow == fast){
+                flag = true;
+                break;
+            }
+        }
+        if (!flag) return null;
+
+        //finding starting point of cycle
+        slow = head;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        //slow and fast both will be pointing to start of cycle
+        return slow;
+    }
+
+    //LENGTH OF LOOP IN LINKED LIST
+    public int loopLength(Node head){
+        if (head == null || head.next == null) return 0;
+        boolean flag = false;
+        Node slow, fast;
+        slow = fast = head;
+        //floyd's cycle detection
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow == fast){
+                flag = true;
+                break;
+            }
+        }
+        if (!flag) return 0;
+        //finding starting point of cycle
+        slow = head;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        //slow and fast both will be pointing to start of cycle
+        Node temp= slow;
+        //length 1 because slow is also a node of cycle
+        int length= 1;
+        while(temp.next!=slow){
+            temp=temp.next;
+            length++;
+        }
+        return length;
+    }
+
+    //CHECK IF THE GIVEN LL IS PALINDROME
+    public boolean isPalindrome(Node head){
+        if(head==null || head.next==null) return true;
+
+        // finding mid of ll
+        Node slow,fast;
+        slow=fast=head;
+        while(fast!=null && fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        //(for odd size LL slow will point to mid, for even size LL slow will point to second mid of LL)
+        // now reverse the second half
+        Node current,prev,next;
+        current=slow;
+        prev=null;
+        while(current!=null){
+            next=current.next;
+            current.next=prev;
+            prev=current;
+            current=next;
+        }
+        Node rightHead=prev;
+        Node leftHead= head;
+
+        // checking if palindrome
+        while(rightHead!=null && leftHead!=null){
+            if(rightHead.data!=leftHead.data) return false;
+            rightHead=rightHead.next;
+            leftHead=leftHead.next;
+        }
+        return true;
+    }
+
+
 
 }
