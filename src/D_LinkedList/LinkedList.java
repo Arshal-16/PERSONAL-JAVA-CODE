@@ -295,7 +295,7 @@ public class LinkedList {
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
-            if (slow == fast){
+            if (slow == fast) {
                 flag = true;
                 break;
             }
@@ -313,7 +313,7 @@ public class LinkedList {
     }
 
     //LENGTH OF LOOP IN LINKED LIST
-    public int loopLength(Node head){
+    public int loopLength(Node head) {
         if (head == null || head.next == null) return 0;
         boolean flag = false;
         Node slow, fast;
@@ -322,7 +322,7 @@ public class LinkedList {
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
-            if (slow == fast){
+            if (slow == fast) {
                 flag = true;
                 break;
             }
@@ -335,50 +335,105 @@ public class LinkedList {
             fast = fast.next;
         }
         //slow and fast both will be pointing to start of cycle
-        Node temp= slow;
+        Node temp = slow;
         //length 1 because slow is also a node of cycle
-        int length= 1;
-        while(temp.next!=slow){
-            temp=temp.next;
+        int length = 1;
+        while (temp.next != slow) {
+            temp = temp.next;
             length++;
         }
         return length;
     }
 
     //CHECK IF THE GIVEN LL IS PALINDROME
-    public boolean isPalindrome(Node head){
-        if(head==null || head.next==null) return true;
+    public boolean isPalindrome(Node head) {
+        if (head == null || head.next == null) return true;
 
         // finding mid of ll
-        Node slow,fast;
-        slow=fast=head;
-        while(fast!=null && fast.next!=null){
-            slow=slow.next;
-            fast=fast.next.next;
+        Node slow, fast;
+        slow = fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
         }
         //(for odd size LL slow will point to mid, for even size LL slow will point to second mid of LL)
         // now reverse the second half
-        Node current,prev,next;
-        current=slow;
-        prev=null;
-        while(current!=null){
-            next=current.next;
-            current.next=prev;
-            prev=current;
-            current=next;
+        Node current, prev, next;
+        current = slow;
+        prev = null;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
         }
-        Node rightHead=prev;
-        Node leftHead= head;
+        Node rightHead = prev;
+        Node leftHead = head;
 
         // checking if palindrome
-        while(rightHead!=null && leftHead!=null){
-            if(rightHead.data!=leftHead.data) return false;
-            rightHead=rightHead.next;
-            leftHead=leftHead.next;
+        while (rightHead != null && leftHead != null) {
+            if (rightHead.data != leftHead.data) return false;
+            rightHead = rightHead.next;
+            leftHead = leftHead.next;
         }
         return true;
     }
 
+    //SEGREGATE EVEN AND ODD NODES IN A LL
+    public Node segregateEvenOdd(Node head) {
+        if (head == null || head.next == null) return head;
+
+        Node OddHead = head;
+        Node EvenHead = head.next;
+        Node tempOdd = OddHead;
+        Node tempEven = EvenHead;
+        Node evenTail = tempEven;
+
+        while (tempEven != null && tempEven.next != null) {
+            //step 1
+            tempOdd.next = tempOdd.next.next;
+            //step 2
+            tempEven.next = tempEven.next.next;
+            //step 3
+            evenTail = tempEven;
+            tempEven = tempEven.next;
+            tempOdd = tempOdd.next;
+        }
+        evenTail.next = OddHead;
+        tempOdd.next = null;
+
+        return EvenHead;
+    }
+
+    //REMOVE Nth NODE FROM THE END OF LL
+    public Node deleteNthFromLast(Node head, int n) {
+        if (head == null) return null;
+
+        Node fast = head;
+        Node slow = head;
+
+        // Move fast n steps ahead
+        for (int i = 0; i < n; i++) {
+            if (fast == null) return head; // n > size
+            fast = fast.next;
+        }
+
+        // If fast is null, we need to delete the head
+        if (fast == null) {
+            return head.next;
+        }
+
+        // Move both pointers until fast reaches the last node
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        // Delete nth node from end, ( slow will be just behind the node we want to delete)
+        slow.next = slow.next.next;
+
+        return head;
+    }
 
 
 }
