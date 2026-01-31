@@ -435,5 +435,75 @@ public class LinkedList {
         return head;
     }
 
+    //DELETE THE MIDDLE NODE OF THE LINKED LIST
+    public Node deleteMiddle(Node head) {
+        if (head == null || head.next == null) return null;
+        Node slow = head;
+        Node fast = head;
+        Node behindMiddle = head;
+        while (fast != null && fast.next != null) {
+            behindMiddle = slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        behindMiddle.next = behindMiddle.next.next;
+        return head;
+    }
+
+    //SORT THE LL (MERGE SORT)
+    public Node sortLL(Node head) {
+
+        //base case
+        if (head == null || head.next == null) return head;
+
+        // LEFT-HEAD---LEFT-PART------RIGHT-HEAD---RIGHT-PART
+        Node leftHead = head;
+        //finding Middle
+        Node mid = head;
+        Node fast = head.next;
+        while (fast != null && fast.next != null) {
+            mid = mid.next;
+            fast = fast.next.next;
+        }
+        Node rightHead = mid.next;
+        mid.next = null;
+
+        // SORT LEFT AND RIGHT PARTS
+        leftHead = sortLL(leftHead);
+        rightHead = sortLL(rightHead);
+
+        // MERGE THE SORTED PARTS
+       return mergeLL(leftHead,rightHead);
+    }
+
+    public Node mergeLL(Node leftHead,Node rightHead){
+        Node newHead = new Node(-1);
+        Node temp = newHead;
+
+        while (leftHead != null && rightHead != null) {
+            if (leftHead.data <= rightHead.data) {
+                temp.next = leftHead;
+                leftHead = leftHead.next;
+            } else {
+                temp.next = rightHead;
+                rightHead = rightHead.next;
+            }
+            temp = temp.next;
+        }
+        while (leftHead!=null){
+            temp.next = leftHead;
+            leftHead = leftHead.next;
+            temp = temp.next;
+        }
+        while(rightHead!=null){
+            temp.next = rightHead;
+            rightHead = rightHead.next;
+            temp = temp.next;
+        }
+        return newHead.next;
+    }
+
+    //
+
 
 }
