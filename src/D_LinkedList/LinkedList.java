@@ -473,10 +473,10 @@ public class LinkedList {
         rightHead = sortLL(rightHead);
 
         // MERGE THE SORTED PARTS
-       return mergeLL(leftHead,rightHead);
+        return mergeLL(leftHead, rightHead);
     }
 
-    public Node mergeLL(Node leftHead,Node rightHead){
+    public Node mergeLL(Node leftHead, Node rightHead) {
         Node newHead = new Node(-1);
         Node temp = newHead;
 
@@ -490,12 +490,12 @@ public class LinkedList {
             }
             temp = temp.next;
         }
-        while (leftHead!=null){
+        while (leftHead != null) {
             temp.next = leftHead;
             leftHead = leftHead.next;
             temp = temp.next;
         }
-        while(rightHead!=null){
+        while (rightHead != null) {
             temp.next = rightHead;
             rightHead = rightHead.next;
             temp = temp.next;
@@ -503,7 +503,86 @@ public class LinkedList {
         return newHead.next;
     }
 
-    //
+    //LL CONTAINS ONLY 0'S, 1'S, AND 2'S, SORT THE LL  BY REARRANGING THE LINKS
+    public Node reLinkLL(Node head) {
+        if (head == null || head.next == null) return head;
+
+        // Dummy heads
+        Node zeroHead = new Node(-1);
+        Node oneHead = new Node(-1);
+        Node twoHead = new Node(-1);
+
+        // Tails
+        Node zero = zeroHead;
+        Node one = oneHead;
+        Node two = twoHead;
+
+        Node temp = head;
+
+        while (temp != null) {
+            Node nextNode = temp.next;   // save next
+            temp.next = null;            // detach node
+
+            if (temp.data == 0) {
+                zero.next = temp;
+                zero = zero.next;
+            } else if (temp.data == 1) {
+                one.next = temp;
+                one = one.next;
+            } else {
+                two.next = temp;
+                two = two.next;
+            }
+
+            temp = nextNode;
+        }
+
+        // connect the lists
+        zero.next = (oneHead.next != null) ? oneHead.next : twoHead.next;
+        one.next = twoHead.next;
+
+        // decide correct head
+        if (zeroHead.next != null) return zeroHead.next;
+        if (oneHead.next != null) return oneHead.next;
+        return twoHead.next;
+    }
+    //concept learned "Detach before reattach"
+
+    //FIND INTERSECTION OF TWO LL
+    public Node findIntersection(Node headA, Node headB) {
+        if (headA == null || headB == null) return null;
+
+        //finding size of both LL
+        int sizeA = 0;
+        Node temp = headA;
+        while (temp != null) {
+            sizeA++;
+            temp = temp.next;
+        }
+        int sizeB = 0;
+        temp = headB;
+        while (temp != null) {
+            sizeB++;
+            temp = temp.next;
+        }
+        //make bigger LL size equal to size of smaller LL
+        if (sizeA >= sizeB) {
+            for (int i = 1; i <= sizeA - sizeB; i++) {
+                headA = headA.next;
+            }
+        } else {
+            for (int i = 1; i <= sizeB - sizeA; i++) {
+                headB = headB.next;
+            }
+        }
+        //now move both heads by 1 , both of them will become null together
+        while (headA != null) {
+            if (headA == headB) return headA;
+            headA = headA.next;
+            headB = headB.next;
+        }
+        return null; // no intersection
+    }
 
 
 }
