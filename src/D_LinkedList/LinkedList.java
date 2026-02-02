@@ -584,5 +584,82 @@ public class LinkedList {
         return null; // no intersection
     }
 
+    //ADD 1 TO A NUMBER REPRESENTED BY LL
+    public Node addOneToNum(Node head) {
+        //base case
+        if (head == null) return null;
+        //reverse the LL
+        head = reverseLL(head);
+
+        int carry = 1;
+        Node temp = head;
+        while (temp != null) {
+            int newCurrNum = temp.data + carry;
+            carry = 0;
+            if (newCurrNum == 10) {
+                carry = 1;
+                newCurrNum = 0;
+            }
+            temp.data = newCurrNum;
+            if (temp.next == null && carry == 1) {
+                Node newNode = new Node(1);
+                temp.next = newNode;
+                break;
+            }
+            temp = temp.next;
+        }
+        return reverseLL(head);
+    }
+
+    public Node reverseLL(Node head) {
+        Node prev = null;
+        Node current = head;
+        Node next;
+
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        head = prev;
+        return head;
+    }
+
+
+    //ADD TWO NUMBERS REPRESENTED AS LINKED LISTS
+    public Node addTwoNum(Node headA, Node headB) {
+        if (headA == null) return headB;
+        if (headB == null) return headA;
+
+        headA = reverseLL(headA);
+        headB = reverseLL(headB);
+
+        Node dummy = new Node(0);
+        Node curr = dummy;
+
+        int carry = 0;
+
+        while (headA != null || headB != null || carry != 0) {
+            int sum = carry;
+
+            if (headA != null) {
+                sum += headA.data;
+                headA = headA.next;
+            }
+
+            if (headB != null) {
+                sum += headB.data;
+                headB = headB.next;
+            }
+
+            carry = sum / 10;
+            curr.next = new Node(sum % 10);
+            curr = curr.next;
+        }
+
+        return reverseLL(dummy.next);
+    }
+
 
 }
