@@ -626,7 +626,6 @@ public class LinkedList {
         return head;
     }
 
-
     //ADD TWO NUMBERS REPRESENTED AS LINKED LISTS
     public Node addTwoNum(Node headA, Node headB) {
         if (headA == null) return headB;
@@ -660,6 +659,5 @@ public class LinkedList {
 
         return reverseLL(dummy.next);
     }
-
 
 }
