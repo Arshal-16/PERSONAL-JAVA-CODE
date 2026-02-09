@@ -157,30 +157,96 @@ public class StackAndQueue {
     }
 
 
-        /// ////////////// QUESTIONS /////////////////////
-        //NEXT GREATER ELEMENT
-        //(APPROACH: MONOTONIC DECREASING STACK :ELEMENTS IN THE STACK (BOTTOM → TOP) ARE ALWAYS IN DECREASING ORDER)
-        public int[] nextGreaterElement(int nums[]) {
-            //edge case
-            if (nums == null || nums.length == 0) return new int[0];
+    /// ////////////// QUESTIONS /////////////////////
 
-            //main concept
-            Stack<Integer> s = new Stack<>();  //in this we will push indx of elements
-            int result[] = new int[nums.length];
-            for (int i = nums.length - 1; i >= 0; i--) {
-                //removing indx of all elements which are smaller than curr ele
-                while (!s.isEmpty() && nums[i] >= nums[s.peek()]) {
-                    s.pop();
-                }
-                result[i] = s.isEmpty() ? -1 : nums[s.peek()];
-                //adding current ele to stack
-                s.push(i);
+    //NEXT GREATER ELEMENT
+    //(APPROACH: MONOTONIC DECREASING STACK :ELEMENTS IN THE STACK (BOTTOM → TOP) ARE ALWAYS IN DECREASING ORDER)
+    public int[] nextGreaterElement(int nums[]) {
+        //edge case
+        if (nums == null || nums.length == 0) return new int[0];
+
+        //main concept
+        Stack<Integer> s = new Stack<>();  //in this we will push indx of elements
+        int result[] = new int[nums.length];
+        for (int i = nums.length - 1; i >= 0; i--) {
+            //removing indx of all elements which are smaller than curr ele
+            while (!s.isEmpty() && nums[i] >= nums[s.peek()]) {
+                s.pop();
             }
-            // result[i] will store the next greater element of ele at nums[i]
-
-            return result;
-
+            result[i] = s.isEmpty() ? -1 : nums[s.peek()];
+            //adding current ele to stack
+            s.push(i);
         }
+        // result[i] will store the next greater element of ele at nums[i]
 
+        return result;
 
     }
+
+    //BALANCED PARENTHESIS
+    public boolean isBalanced(String str) {
+        if (str == null || str.length() == 0) return true;
+        Stack<Character> s = new Stack<>();
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (ch == '{' || ch == '(' || ch == '[') {
+                s.push(ch);
+            } else if (s.isEmpty()) return false;
+            else if (ch == '}' && s.peek() != '{') return false;
+            else if (ch == ']' && s.peek() != '[') return false;
+            else if (ch == ')' && s.peek() != '(') return false;
+            else s.pop();
+        }
+        if (!s.isEmpty()) return false;
+        return true;
+    }
+
+    //IMPLEMENTING MIN STACK
+    class MinStack {
+        // Initialize a stack
+        private Stack<int[]> st;
+
+        // Empty Constructor
+        public MinStack() {
+            st = new Stack<>();
+        }
+
+        // Method to push a value in stack
+        public void push(int value) {
+            // If stack is empty
+            if (st.isEmpty()) {
+                // Push current value as minimum
+                st.push(new int[]{value, value});
+                return;
+            }
+
+            // Update the current minimum
+            int mini = Math.min(getMin(), value);
+
+            // Add the pair to the stack
+            st.push(new int[]{value, mini});
+        }
+
+        // Method to pop a value from stack
+        public void pop() {
+            // Using in-built pop method
+            st.pop();
+        }
+
+        // Method to get the top of stack
+        public int top() {
+            // Return the top value
+            return st.peek()[0];
+        }
+
+        // Method to get the minimum in stack
+        public int getMin() {
+            // Return the minimum
+            return st.peek()[1];
+        }
+    }
+
+
+
+
+}
