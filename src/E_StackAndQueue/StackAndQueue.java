@@ -1,9 +1,6 @@
 package E_StackAndQueue;
 
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 public class StackAndQueue {
 
@@ -77,55 +74,6 @@ public class StackAndQueue {
 
     }
 
-    //QUEUE IMPLEMENTATION USING ARRAY (circular queue)
-    class QueueUsingArray {
-        int arr[];
-        int size;
-        int start = -1, rear = -1;
-
-        //constructor
-        QueueUsingArray(int size) {
-            arr = new int[size];
-            this.size = size;
-        }
-
-        //isEmpty
-        boolean isEmpty() {
-            return start == -1;
-        }
-
-        //add
-        void add(int data) {
-            //if queue is full
-            if ((rear + 1) % size == start) return;
-            //if first element is being added
-            if (start == -1) start = 0;
-
-            rear = (rear + 1) % size;
-            arr[rear] = data;
-        }
-
-        //remove
-        int remove() {
-            if (isEmpty()) return -1;
-
-            int data = arr[start];
-            //if last element is being removed
-            if (start == rear) {
-                start = rear = -1;
-                return data;
-            }
-            start = (start + 1) % size;
-            return data;
-        }
-
-        //peek
-        int peek() {
-            if (isEmpty()) return -1;
-
-            return arr[start];
-        }
-    }
 
     //QUEUE IMPLEMENTATION USING LL
     class QueueUsingLL {
@@ -157,96 +105,139 @@ public class StackAndQueue {
     }
 
 
-    /// ////////////// QUESTIONS /////////////////////
+    /// /////////////////////// QUESTIONS //////////////////////////////
 
-    //NEXT GREATER ELEMENT
-    //(APPROACH: MONOTONIC DECREASING STACK :ELEMENTS IN THE STACK (BOTTOM → TOP) ARE ALWAYS IN DECREASING ORDER)
-    public int[] nextGreaterElement(int nums[]) {
-        //edge case
-        if (nums == null || nums.length == 0) return new int[0];
+    /// /////////////// LEARNING /////////////////
 
-        //main concept
-        Stack<Integer> s = new Stack<>();  //in this we will push indx of elements
-        int result[] = new int[nums.length];
-        for (int i = nums.length - 1; i >= 0; i--) {
-            //removing indx of all elements which are smaller than curr ele
-            while (!s.isEmpty() && nums[i] >= nums[s.peek()]) {
-                s.pop();
+    //IMPLEMENT STACK USING ARRAYS
+    class StackUsingArray {
+        int arr[] = new int[50];
+        int top = -1;
+
+        boolean isEmpty() {
+            return top == -1;
+        }
+
+        void push(int data) {
+            if (top == arr.length - 1) return;
+            arr[++top] = data;
+        }
+
+        int peek() {
+            if (top == -1) return Integer.MAX_VALUE;
+            return arr[top];
+        }
+
+        int pop() {
+            if (top == -1) return Integer.MAX_VALUE;
+            return arr[top--];
+        }
+    }
+
+    //IMPLEMENT QUEUE USING ARRAY
+    class QueueUsingArray {
+        int arr[];
+        int front, rear, size;
+
+        QueueUsingArray(int size) {
+            arr = new int[size];
+            front = rear = -1;
+            this.size = size;
+        }
+
+        boolean isEmpty() {
+            return front == -1;
+        }
+
+        void add(int data) {
+
+            //if queue is full
+            if ((rear + 1) % size == front) return;
+
+            rear = (rear + 1) % size;
+            arr[rear] = data;
+            //if queue is empty
+            if (front == -1) front = 0;
+        }
+
+        int remove() {
+            if (isEmpty()) return Integer.MAX_VALUE;
+            int result = arr[front];
+            //if last ele is being removed
+            if (front == rear) front = rear = -1;
+            else front = (front + 1) % size;
+            return result;
+        }
+
+        int peek() {
+            if (isEmpty()) return Integer.MAX_VALUE;
+            return arr[front];
+        }
+    }
+
+    //IMPLEMENT STACK USING QUEUE
+    class StackUsingQueue {
+        Queue<Integer> q = new ArrayDeque<>();
+
+        boolean isEmpty() {
+            return q.isEmpty();
+        }
+
+        void push(int data) {
+            q.add(data);
+            for (int i = 0; i < q.size() - 1; i++) {
+                q.add(q.remove());
             }
-            result[i] = s.isEmpty() ? -1 : nums[s.peek()];
-            //adding current ele to stack
-            s.push(i);
         }
-        // result[i] will store the next greater element of ele at nums[i]
 
-        return result;
+        int peek() {
+            if (isEmpty()) return Integer.MAX_VALUE;
+            return q.peek();
+        }
+
+        int pop() {
+            if (isEmpty()) return Integer.MAX_VALUE;
+            return q.remove();
+        }
 
     }
 
-    //BALANCED PARENTHESIS
-    public boolean isBalanced(String str) {
-        if (str == null || str.length() == 0) return true;
-        Stack<Character> s = new Stack<>();
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (ch == '{' || ch == '(' || ch == '[') {
-                s.push(ch);
-            } else if (s.isEmpty()) return false;
-            else if (ch == '}' && s.peek() != '{') return false;
-            else if (ch == ']' && s.peek() != '[') return false;
-            else if (ch == ')' && s.peek() != '(') return false;
-            else s.pop();
-        }
-        if (!s.isEmpty()) return false;
-        return true;
-    }
+    //IMPLEMENT QUEUE USING TWO STACKS
+    class QueueUsingStack {
+        Stack<Integer> sMain = new Stack<>();
+        Stack<Integer> sSecondary = new Stack<>();
 
-    //IMPLEMENTING MIN STACK
-    class MinStack {
-        // Initialize a stack
-        private Stack<int[]> st;
-
-        // Empty Constructor
-        public MinStack() {
-            st = new Stack<>();
+        boolean isEmpty() {
+            return sMain.isEmpty();
         }
 
-        // Method to push a value in stack
-        public void push(int value) {
-            // If stack is empty
-            if (st.isEmpty()) {
-                // Push current value as minimum
-                st.push(new int[]{value, value});
-                return;
+        void add(int data) {
+            while (!sMain.isEmpty()) {
+                sSecondary.push(sMain.pop());
             }
-
-            // Update the current minimum
-            int mini = Math.min(getMin(), value);
-
-            // Add the pair to the stack
-            st.push(new int[]{value, mini});
+            sMain.push(data);
+            while (!sSecondary.isEmpty()) {
+                sMain.push(sSecondary.pop());
+            }
         }
 
-        // Method to pop a value from stack
-        public void pop() {
-            // Using in-built pop method
-            st.pop();
+        int remove() {
+            if (sMain.isEmpty()) return Integer.MAX_VALUE;
+            return sMain.pop();
         }
 
-        // Method to get the top of stack
-        public int top() {
-            // Return the top value
-            return st.peek()[0];
+        int peek() {
+            if (sMain.isEmpty()) return Integer.MAX_VALUE;
+            return sMain.peek();
         }
 
-        // Method to get the minimum in stack
-        public int getMin() {
-            // Return the minimum
-            return st.peek()[1];
-        }
+
     }
 
-
+    //IMPLEMENT STACK USING LINKED LIST
 
 
 }
+
+
+
