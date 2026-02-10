@@ -4,110 +4,7 @@ import java.util.*;
 
 public class StackAndQueue {
 
-    // STACK IMPLEMENTATION USING ARRAYLIST
-    class StackUsingArrayList {
-        ArrayList<Integer> al = new ArrayList<>();
-        int top = -1;
-
-        //isEmpty
-        boolean isEmpty() {
-            if (top == -1) return true;
-            return false;
-        }
-
-        //size
-        int size() {
-            return top + 1;
-        }
-
-        //push
-        void push(int data) {
-            al.add(data);
-            top++;
-        }
-
-        //pop
-        int pop() {
-            if (isEmpty()) return -1;
-            int result = al.get(top);
-            al.remove(top);
-            top--;
-            return result;
-        }
-
-        //peek
-        int peek() {
-            if (isEmpty()) return -1;
-            return al.get(top);
-        }
-
-
-    }
-
-    //STACK IMPLEMENTATION USING LINKED LIST
-    class StackUsingLinkedList {
-        LinkedList<Integer> ll = new LinkedList<>();
-
-        //isEmpty
-        boolean isEmpty() {
-            return ll.isEmpty();
-        }
-
-        //push
-        void push(int data) {
-            ll.addFirst(data);
-        }
-
-        //pop
-        int pop() {
-            if (ll.isEmpty()) throw new EmptyStackException();
-            return ll.removeFirst();
-        }
-
-        //peek
-        int peek() {
-            if (ll.isEmpty()) throw new EmptyStackException();
-
-            return ll.getFirst();
-        }
-
-
-    }
-
-
-    //QUEUE IMPLEMENTATION USING LL
-    class QueueUsingLL {
-        LinkedList<Integer> ll = new LinkedList<>();
-
-        boolean isEmpty() {
-            return ll.isEmpty();
-        }
-
-        void push(int data) {
-            ll.addLast(data);
-        }
-
-        int remove() {
-            if (ll.isEmpty()) {
-                System.out.println("QUEUE IS EMPTY");
-                return -1;
-            }
-            return ll.removeFirst();
-        }
-
-        int peek() {
-            if (ll.isEmpty()) {
-                System.out.println("QUEUE IS EMPTY");
-                return -1;
-            }
-            return ll.getFirst();
-        }
-    }
-
-
-    /// /////////////////////// QUESTIONS //////////////////////////////
-
-    /// /////////////// LEARNING /////////////////
+    ////////////////// LEARNING /////////////////
 
     //IMPLEMENT STACK USING ARRAYS
     class StackUsingArray {
@@ -235,6 +132,111 @@ public class StackAndQueue {
     }
 
     //IMPLEMENT STACK USING LINKED LIST
+    class StackUsingLL{
+        LinkedList<Integer> ll = new LinkedList<>();
+
+        boolean isEmpty(){
+            return ll.isEmpty();
+        }
+        void push(int data){
+            ll.addFirst(data);
+        }
+        int pop(){
+            if(isEmpty()) throw new NoSuchElementException();
+            return ll.removeFirst();
+        }
+        int peek(){
+            if(isEmpty()) throw new NoSuchElementException();
+            return ll.getFirst();
+        }
+
+
+    }
+
+    //IMPLEMENT QUEUE USING LINKED LIST
+    class QueueUsingLL{
+    LinkedList<Integer> ll = new LinkedList<>();
+    boolean isEmpty(){
+        return ll.isEmpty();
+    }
+    void add(int data){
+        ll.addLast(data);
+    }
+    int remove(){
+        if (isEmpty()) throw new NoSuchElementException();
+        return ll.removeFirst();
+    }
+    int peek(){
+        if(isEmpty()) throw new NoSuchElementException();
+        return ll.getFirst();
+    }
+
+    }
+
+    //CHECK FOR BALANCED PARENTHESES
+    boolean checkForBalancedParenthesis(String str){
+        if(str==null || str.length()==0) return true;
+        Stack<Character> s = new Stack<>();
+        for(int itr = 0;itr<str.length();itr++){
+            char ch= str.charAt(itr);
+            if(ch=='(' || ch=='{' || ch=='['){
+                s.push(ch);
+            }else if(ch==')'){
+                if(s.isEmpty() || s.peek()!='(') return false;
+                s.pop();
+            }else if(ch=='}'){
+                if(s.isEmpty() || s.peek()!='{') return false;
+                s.pop();
+            }else if(ch==']'){
+                if(s.isEmpty() || s.peek()!='[') return false;
+                s.pop();
+            }
+        }
+        //at last stack should be empty if its a valid parenthesis
+        return s.isEmpty();
+
+        // why used stack?
+        // Because parentheses must be closed in reverse order of opening (LIFO), which is exactly what a stack provides.
+    }
+
+    //IMPLEMENT MIN STACK
+    class MinStack{
+        Stack<Integer> sNum = new Stack<>();
+        Stack<Integer> sMin = new Stack<>();
+
+        boolean isEmpty(){
+            return sNum.isEmpty();
+        }
+
+        void push(int data){
+            if(sNum.isEmpty()){
+                sNum.push(data);
+                sMin.push(data);
+                return;
+            }
+            sNum.push(data);
+
+            if( Math.min(sMin.peek(),data) == data) sMin.push(data);
+            return;
+        }
+        int pop(){
+            if(sNum.isEmpty()) throw new NoSuchElementException();
+            int result = sNum.pop();
+            if(result == sMin.peek()) sMin.pop();
+            return result;
+        }
+
+        int peek(){
+            if(sNum.isEmpty()) throw new NoSuchElementException();
+            return sNum.peek();
+        }
+        int getMin(){
+            if(sMin.isEmpty()) throw new NoSuchElementException();
+            return sMin.peek();
+        }
+
+    }
+
 
 
 }
