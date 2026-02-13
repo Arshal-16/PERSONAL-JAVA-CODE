@@ -248,6 +248,9 @@ public class StackAndQueue {
 
     /// /////////////// PREFIX, INFIX, POSTFIX /////////////////
 
+    //NOTE: ALL THE CODE WE WROTE IS VALID WHEN INPUT CONTAINS CHAR AND NOT DIGITS, TO MAKE IT VALID FOR DIGITS
+    //USE str.split(" ") TO EXTRACT THE DIGITS AND THEN ITERATE ON THE ARRAY AND SOLVE
+
     //INFIX TO POSTFIX
     String infixToPostfix(String infix) {
         if (infix == null || infix.length() == 0) return infix;
@@ -280,9 +283,7 @@ public class StackAndQueue {
 
             // If operator
             else {
-                while (!operator.isEmpty() && operator.peek() != '(' &&
-                        (priority(ch) < priority(operator.peek()) ||
-                                (priority(ch) == priority(operator.peek()) && ch != '^'))) { //^ is right associative
+                while (!operator.isEmpty() && operator.peek() != '(' && (priority(ch) < priority(operator.peek()) || (priority(ch) == priority(operator.peek()) && ch != '^'))) { //^ is right associative
 
                     ans.append(operator.pop());
                 }
@@ -310,7 +311,7 @@ public class StackAndQueue {
         //reverseStr the infix
         infix = reverseStr(infix);
         //swap the ( and ) brackets
-        infix=swapBrackets(infix);
+        infix = swapBrackets(infix);
         //apply infix to postfix logic but handle ^ right associativity
         Stack<Character> operator = new Stack<>();
         StringBuilder ans = new StringBuilder();
@@ -340,9 +341,7 @@ public class StackAndQueue {
 
             // If operator
             else {
-                while (!operator.isEmpty() && operator.peek() != '(' &&
-                        (priority(ch) < priority(operator.peek()) ||
-                                (priority(ch) == priority(operator.peek()) && ch == '^'))) { //^ is right associative
+                while (!operator.isEmpty() && operator.peek() != '(' && (priority(ch) < priority(operator.peek()) || (priority(ch) == priority(operator.peek()) && ch == '^'))) { //^ is right associative
 
                     ans.append(operator.pop());
                 }
@@ -380,6 +379,82 @@ public class StackAndQueue {
             }
         }
         return sb.toString();
+    }
+
+    //POSTFIX TO INFIX
+    String postfixToInfix(String str) {
+        if (str == null || str.length() == 0) return str;
+
+        Stack<String> s = new Stack<>();
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            //if char is operand
+            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+                s.push(String.valueOf(ch));
+            } else { //ch will be operator
+                String top2 = s.pop();
+                String top1 = s.pop();
+                String ans = "(" + top1 + ch + top2 + ")";
+                s.push(ans);
+            }
+        }
+        return s.pop();
+    }
+
+    //PREFIX TO INFIX
+    String prefixToInfix(String str) {
+        if (str == null || str.length() == 0) return str;
+
+        Stack<String> s = new Stack<>();
+        for (int i = str.length() - 1; i >= 0; i--) {
+            char ch = str.charAt(i);
+            //if ch is operand
+            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+                s.push(String.valueOf(ch));
+            } else { // it will be an operator
+                String top1 = s.pop();
+                String top2 = s.pop();
+                String ans = "(" + top1 + ch + top2 + ")";
+                s.push(ans);
+            }
+        }
+        return s.pop();
+    }
+
+    //POSTFIX TO PREFIX
+    String postfixToPrefix(String str) {
+        if (str == null || str.length() == 0) return str;
+
+        Stack<String> s = new Stack<>();
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (Character.isLetterOrDigit(ch)) {
+                s.push(String.valueOf(ch));
+            } else { //it will be an operator
+                String top2 = s.pop();
+                String top1 = s.pop();
+                s.push(ch+top1  + top2);
+            }
+        }
+        return s.pop();
+    }
+
+    //PREFIX TO POSTFIX
+    String prefixToPostfix(String str) {
+        if (str == null || str.length() == 0) return str;
+
+        Stack<String> s = new Stack<>();
+        for (int i = str.length()-1; i >=0; i--) {
+            char ch = str.charAt(i);
+            if (Character.isLetterOrDigit(ch)) {
+                s.push(String.valueOf(ch));
+            } else { //it will be an operator
+                String top1 = s.pop();
+                String top2 = s.pop();
+                s.push(top1  + top2+ch);
+            }
+        }
+        return s.pop();
     }
 
 }
