@@ -457,7 +457,82 @@ public class StackAndQueue {
         return s.pop();
     }
 
-    
+    ////////////////// MONOTONIC STACK/QUEUE PROBLEMS //////////////////////////
+    /*
+ A stack is monotonic if its elements are always arranged in a consistent order:
+Monotonic increasing stack: elements from bottom → top are increasing
+Monotonic decreasing stack: elements from bottom → top are decreasing
+Whenever you try to push a new value that would break the order, you pop elements until the order is restored.
+
+A queue is monotonic if its elements are always ordered:
+Monotonic increasing queue: front → back is increasing
+Monotonic decreasing queue: front → back is decreasing
+*/
+
+    //NORMAL NEXT GREATER ELEMENT
+    public int[] nextGreaterElement(int A[]){
+        int soln[] = new int[A.length];
+        Stack<Integer> s = new Stack<>();
+        for(int i=A.length-1;i>=0;i--){
+            int curr = A[i];
+            while(!s.isEmpty() && s.peek()<=curr) s.pop();
+            if(s.isEmpty()){
+                soln[i] = -1;
+            }else {
+                soln[i] = s.peek();
+            }
+            s.push(curr);
+        }
+        return soln;
+    }
+
+    //CLOCKWISE NEXT GREATER ELEMENT (NGE-2)
+
+    //brute
+//    public int[] nextGreaterElement2(int arr[]){
+//        if(arr.length==0) return new int[]{};
+//        int nge[] = new int[arr.length];
+//        for(int i=0;i<nge.length;i++) nge[i]= -1;
+//        // double the arr mentally like [1,2,3,4,5] will become [1,2,3,4,5,1,2,3,4,5]
+//       for(int  i = 0;i<arr.length;i++){
+//           for(int j=i+1;j<=i+arr.length-1;j++){
+//               int idx = j%arr.length;
+//               if(arr[idx]>arr[i]){
+//                   nge[i] = arr[idx];
+//                   break;
+//               }
+//           }
+//       }
+//       return nge;
+//    }
+
+    //OPTIMAL
+    public int[] nextGreaterElement2(int arr[]){
+        if(arr==null || arr.length==0) return new int[]{};
+        Stack<Integer> s = new Stack<>();
+        int nge[]= new int[arr.length];
+        int n = arr.length;
+        // double the arr hypothetically like [1,2,3,4,5] will become [1,2,3,4,5,1,2,3,4,5], index of last ele is 2n-1
+        for(int i = 2*n-1;i>=0;i--){
+            int curr = arr[i%n];
+            while(!s.isEmpty()&& s.peek()<=curr) s.pop();
+            if(i<n){
+                if(s.isEmpty()){
+                    nge[i]=-1;
+                }else{
+                    nge[i]=s.peek();
+                }
+
+            }
+            s.push(curr);
+        }
+        return nge;
+    }
+
+
+
+
+
 
 }
 
