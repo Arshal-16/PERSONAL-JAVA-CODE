@@ -529,9 +529,62 @@ Monotonic decreasing queue: front → back is decreasing
         return nge;
     }
 
+    //NEXT SMALLER ELEMENT
+    public int[] nextSmallerElement(int arr[]){
+        if(arr==null || arr.length==0) return arr;
+        int nse[]  = new int[arr.length];
+        Stack<Integer> s = new Stack<>();
+        for(int i = arr.length-1;i>=0;i--){
+            int curr = arr[i];
+            while(!s.isEmpty() && s.peek()>=curr) s.pop();
 
+            if(s.isEmpty()) nse[i]=-1;
+            else {
+                nse[i]=s.peek();
+            }
+            s.push(curr);
+        }
+        return nse;
+    }
 
+    //NUMBER OF NGEs TO THE RIGHT
+    public int[] numberOfNGEs(int arr[]){
+        if(arr==null || arr.length==0) return arr;
 
+        int numOfnge[] = new int[arr.length];
+
+        return numOfnge;
+    }
+
+    //TRAPPING RAINWATER USING STACK
+
+        //using array (prefix-suffix maximum)
+        public int waterTrapped(int arr[]){
+        if(arr==null || arr.length==0) return 0;
+        int largestBefore[]=new int[arr.length];
+        int largestAfter[]= new int[arr.length];
+        largestBefore[0]=largestAfter[arr.length-1]=0;
+        //find largest behind
+        for(int i=1;i<arr.length;i++){
+            largestBefore[i]=Math.max(largestBefore[i-1],arr[i-1]);
+        }
+        //find largest after
+        for(int i=arr.length-2;i>=0;i--){
+            largestAfter[i]=Math.max(largestAfter[i+1],arr[i+1]);
+        }
+
+        //find total water trapped
+        int TotalTrapped=0;
+        for(int i=0;i<arr.length;i++){
+            int min = Math.min(largestAfter[i],largestBefore[i]);
+            int trapped = min-arr[i];
+            TotalTrapped+= trapped>0?trapped:0;
+        }
+        return TotalTrapped;
+    }
+        //here S.C. canbe taken to n from 2n, but most optimal is O(1)
+
+        //using stack
 
 
 }
