@@ -433,7 +433,7 @@ public class StackAndQueue {
             } else { //it will be an operator
                 String top2 = s.pop();
                 String top1 = s.pop();
-                s.push(ch+top1  + top2);
+                s.push(ch + top1 + top2);
             }
         }
         return s.pop();
@@ -444,20 +444,20 @@ public class StackAndQueue {
         if (str == null || str.length() == 0) return str;
 
         Stack<String> s = new Stack<>();
-        for (int i = str.length()-1; i >=0; i--) {
+        for (int i = str.length() - 1; i >= 0; i--) {
             char ch = str.charAt(i);
             if (Character.isLetterOrDigit(ch)) {
                 s.push(String.valueOf(ch));
             } else { //it will be an operator
                 String top1 = s.pop();
                 String top2 = s.pop();
-                s.push(top1  + top2+ch);
+                s.push(top1 + top2 + ch);
             }
         }
         return s.pop();
     }
 
-    ////////////////// MONOTONIC STACK/QUEUE PROBLEMS //////////////////////////
+    /// /////////////// MONOTONIC STACK/QUEUE PROBLEMS //////////////////////////
     /*
  A stack is monotonic if its elements are always arranged in a consistent order:
 Monotonic increasing stack: elements from bottom → top are increasing
@@ -470,15 +470,15 @@ Monotonic decreasing queue: front → back is decreasing
 */
 
     //NORMAL NEXT GREATER ELEMENT
-    public int[] nextGreaterElement(int A[]){
+    public int[] nextGreaterElement(int A[]) {
         int soln[] = new int[A.length];
         Stack<Integer> s = new Stack<>();
-        for(int i=A.length-1;i>=0;i--){
+        for (int i = A.length - 1; i >= 0; i--) {
             int curr = A[i];
-            while(!s.isEmpty() && s.peek()<=curr) s.pop();
-            if(s.isEmpty()){
+            while (!s.isEmpty() && s.peek() <= curr) s.pop();
+            if (s.isEmpty()) {
                 soln[i] = -1;
-            }else {
+            } else {
                 soln[i] = s.peek();
             }
             s.push(curr);
@@ -507,20 +507,20 @@ Monotonic decreasing queue: front → back is decreasing
 //    }
 
     //OPTIMAL
-    public int[] nextGreaterElement2(int arr[]){
-        if(arr==null || arr.length==0) return new int[]{};
+    public int[] nextGreaterElement2(int arr[]) {
+        if (arr == null || arr.length == 0) return new int[]{};
         Stack<Integer> s = new Stack<>();
-        int nge[]= new int[arr.length];
+        int nge[] = new int[arr.length];
         int n = arr.length;
         // double the arr hypothetically like [1,2,3,4,5] will become [1,2,3,4,5,1,2,3,4,5], index of last ele is 2n-1
-        for(int i = 2*n-1;i>=0;i--){
-            int curr = arr[i%n];
-            while(!s.isEmpty()&& s.peek()<=curr) s.pop();
-            if(i<n){
-                if(s.isEmpty()){
-                    nge[i]=-1;
-                }else{
-                    nge[i]=s.peek();
+        for (int i = 2 * n - 1; i >= 0; i--) {
+            int curr = arr[i % n];
+            while (!s.isEmpty() && s.peek() <= curr) s.pop();
+            if (i < n) {
+                if (s.isEmpty()) {
+                    nge[i] = -1;
+                } else {
+                    nge[i] = s.peek();
                 }
 
             }
@@ -530,17 +530,17 @@ Monotonic decreasing queue: front → back is decreasing
     }
 
     //NEXT SMALLER ELEMENT
-    public int[] nextSmallerElement(int arr[]){
-        if(arr==null || arr.length==0) return arr;
-        int nse[]  = new int[arr.length];
+    public int[] nextSmallerElement(int arr[]) {
+        if (arr == null || arr.length == 0) return arr;
+        int nse[] = new int[arr.length];
         Stack<Integer> s = new Stack<>();
-        for(int i = arr.length-1;i>=0;i--){
+        for (int i = arr.length - 1; i >= 0; i--) {
             int curr = arr[i];
-            while(!s.isEmpty() && s.peek()>=curr) s.pop();
+            while (!s.isEmpty() && s.peek() >= curr) s.pop();
 
-            if(s.isEmpty()) nse[i]=-1;
+            if (s.isEmpty()) nse[i] = -1;
             else {
-                nse[i]=s.peek();
+                nse[i] = s.peek();
             }
             s.push(curr);
         }
@@ -548,8 +548,8 @@ Monotonic decreasing queue: front → back is decreasing
     }
 
     //NUMBER OF NGEs TO THE RIGHT
-    public int[] numberOfNGEs(int arr[]){
-        if(arr==null || arr.length==0) return arr;
+    public int[] numberOfNGEs(int arr[]) {
+        if (arr == null || arr.length == 0) return arr;
 
         int numOfnge[] = new int[arr.length];
 
@@ -558,63 +558,126 @@ Monotonic decreasing queue: front → back is decreasing
 
     //TRAPPING RAINWATER
 
-        //using array (prefix-suffix maximum)
-        public int waterTrapped(int arr[]){
-        if(arr==null || arr.length==0) return 0;
-        int largestBefore[]=new int[arr.length];
-        int largestAfter[]= new int[arr.length];
-        largestBefore[0]=largestAfter[arr.length-1]=0;
+    //using array (prefix-suffix maximum)
+    public int waterTrapped(int arr[]) {
+        if (arr == null || arr.length == 0) return 0;
+        int largestBefore[] = new int[arr.length];
+        int largestAfter[] = new int[arr.length];
+        largestBefore[0] = largestAfter[arr.length - 1] = 0;
         //find largest behind
-        for(int i=1;i<arr.length;i++){
-            largestBefore[i]=Math.max(largestBefore[i-1],arr[i-1]);
+        for (int i = 1; i < arr.length; i++) {
+            largestBefore[i] = Math.max(largestBefore[i - 1], arr[i - 1]);
         }
         //find largest after
-        for(int i=arr.length-2;i>=0;i--){
-            largestAfter[i]=Math.max(largestAfter[i+1],arr[i+1]);
+        for (int i = arr.length - 2; i >= 0; i--) {
+            largestAfter[i] = Math.max(largestAfter[i + 1], arr[i + 1]);
         }
 
         //find total water trapped
-        int TotalTrapped=0;
-        for(int i=0;i<arr.length;i++){
-            int min = Math.min(largestAfter[i],largestBefore[i]);
-            int trapped = min-arr[i];
-            TotalTrapped+= trapped>0?trapped:0;
+        int TotalTrapped = 0;
+        for (int i = 0; i < arr.length; i++) {
+            int min = Math.min(largestAfter[i], largestBefore[i]);
+            int trapped = min - arr[i];
+            TotalTrapped += trapped > 0 ? trapped : 0;
         }
         return TotalTrapped;
     }
-        //here S.C. canbe taken to n from 2n, but most optimal is O(1)
+    //here S.C. canbe taken to n from 2n, but most optimal is O(1)
 
-        //optimal solution
-        public int totalWaterTrapped(int arr[]){
-        if(arr==null || arr.length==0) return 0;
+    //optimal solution
+    public int totalWaterTrapped(int arr[]) {
+        if (arr == null || arr.length == 0) return 0;
 
-        int leftMax=0,rightMax=0,total=0;
-        int left=0,right=arr.length-1;
+        int leftMax = 0, rightMax = 0, total = 0;
+        int left = 0, right = arr.length - 1;
 
-        while(left<right){
-            if(arr[left]<=arr[right]){
-                if(leftMax>arr[left]){
-                    total+= leftMax-arr[left];
-                }else{
-                    leftMax=arr[left];
+        while (left < right) {
+            if (arr[left] <= arr[right]) {
+                if (leftMax > arr[left]) {
+                    total += leftMax - arr[left];
+                } else {
+                    leftMax = arr[left];
                 }
                 left++;
-            }else{ //arr[right] is smaller
-                if(rightMax>arr[right]){
-                    total+= rightMax-arr[right];
-                }else {
-                    rightMax=arr[right];
+            } else { //arr[right] is smaller
+                if (rightMax > arr[right]) {
+                    total += rightMax - arr[right];
+                } else {
+                    rightMax = arr[right];
                 }
                 right--;
             }
         }
         return total;
 
-        }
+    }
 
     //SUM OF SUBARRAY MINIMUMS
 
+    //better brute
+    public int subarrayMinimumSum(int arr[]) {
+        if (arr == null || arr.length == 0) return 0;
+        int n = arr.length;
+        long sum = 0;
+        long mod = (long)(1e9 +7);
+        for (int i = 0; i < n; i++) {
+            int min = arr[i];
+            for (int j = i; j < n; j++) {
+                min = Math.min(arr[j], min);
+                sum=(sum + min)%mod;
+            }
+        }
+        return (int)sum;
+    }
 
+    //optimal
+    public int SubarrayMinimumSum(int arr[]){
+        if(arr==null || arr.length==0) return 0;
+        int nse[] = new int[arr.length];
+        int pse[] = new int[arr.length];
+
+        Stack<Integer> s = new Stack<>();
+
+        //finding index of next smaller element for each element
+        for(int i=arr.length-1;i>=0;i--){
+            int curr = arr[i];
+            while(!s.isEmpty() && arr[s.peek()]>=curr){
+                s.pop();
+            }
+            if(s.isEmpty()){
+                nse[i]=arr.length;
+            }else{
+                nse[i]=s.peek();
+            }
+            s.push(i);
+        }
+        s.clear();
+        //finding index of previous smaller/equal element
+        for(int i=0;i<arr.length;i++){
+            int curr = arr[i];
+            while(!s.isEmpty() && arr[s.peek()]>curr){
+                s.pop();
+            }
+            if(s.isEmpty()){
+                pse[i]=-1;
+            }else{
+                pse[i]=s.peek();
+            }
+            s.push(i);
+        }
+        //finding the sum
+        long sum=0;
+        long mod = (long)(1e9 + 7);
+        for(int i=0;i<arr.length;i++){
+            sum= (sum + (i-pse[i])*(nse[i]-i)*arr[i])%mod;
+        }
+        return (int)sum;
+
+        //edge case : dont count duplicate contributions, if considering the contribution of equal element in nse
+        //then don't consider it in pse otherwise duplicates will also be counted
+        // ex: [1,1] so pairs will be  (1)(1,1)(1) now don't consider (1,1) again this will be duplicate
+        //we considered 1,1 before so we will not consider it for the later 1
+    }
 }
 
 
