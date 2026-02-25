@@ -556,7 +556,7 @@ Monotonic decreasing queue: front → back is decreasing
         return numOfnge;
     }
 
-    //TRAPPING RAINWATER USING STACK
+    //TRAPPING RAINWATER
 
         //using array (prefix-suffix maximum)
         public int waterTrapped(int arr[]){
@@ -584,7 +584,35 @@ Monotonic decreasing queue: front → back is decreasing
     }
         //here S.C. canbe taken to n from 2n, but most optimal is O(1)
 
-        //using stack
+        //optimal solution
+        public int totalWaterTrapped(int arr[]){
+        if(arr==null || arr.length==0) return 0;
+
+        int leftMax=0,rightMax=0,total=0;
+        int left=0,right=arr.length-1;
+
+        while(left<right){
+            if(arr[left]<=arr[right]){
+                if(leftMax>arr[left]){
+                    total+= leftMax-arr[left];
+                }else{
+                    leftMax=arr[left];
+                }
+                left++;
+            }else{ //arr[right] is smaller
+                if(rightMax>arr[right]){
+                    total+= rightMax-arr[right];
+                }else {
+                    rightMax=arr[right];
+                }
+                right--;
+            }
+        }
+        return total;
+
+        }
+
+    //SUM OF SUBARRAY MINIMUMS
 
 
 }
