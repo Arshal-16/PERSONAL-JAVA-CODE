@@ -619,65 +619,173 @@ Monotonic decreasing queue: front → back is decreasing
         if (arr == null || arr.length == 0) return 0;
         int n = arr.length;
         long sum = 0;
-        long mod = (long)(1e9 +7);
+        long mod = (long) (1e9 + 7);
         for (int i = 0; i < n; i++) {
             int min = arr[i];
             for (int j = i; j < n; j++) {
                 min = Math.min(arr[j], min);
-                sum=(sum + min)%mod;
+                sum = (sum + min) % mod;
             }
         }
-        return (int)sum;
+        return (int) sum;
     }
 
     //optimal
-    public int SubarrayMinimumSum(int arr[]){
-        if(arr==null || arr.length==0) return 0;
+    public int SubarrayMinimumSum(int arr[]) {
+        if (arr == null || arr.length == 0) return 0;
+
+        //BOTH ARRAYS WILL STORE INDEX NOT VALUES
         int nse[] = new int[arr.length];
         int pse[] = new int[arr.length];
 
         Stack<Integer> s = new Stack<>();
 
         //finding index of next smaller element for each element
-        for(int i=arr.length-1;i>=0;i--){
+        for (int i = arr.length - 1; i >= 0; i--) {
             int curr = arr[i];
-            while(!s.isEmpty() && arr[s.peek()]>=curr){
+            while (!s.isEmpty() && arr[s.peek()] >= curr) {
                 s.pop();
             }
-            if(s.isEmpty()){
-                nse[i]=arr.length;
-            }else{
-                nse[i]=s.peek();
+            if (s.isEmpty()) {
+                nse[i] = arr.length;
+            } else {
+                nse[i] = s.peek();
             }
             s.push(i);
         }
         s.clear();
         //finding index of previous smaller/equal element
-        for(int i=0;i<arr.length;i++){
+        for (int i = 0; i < arr.length; i++) {
             int curr = arr[i];
-            while(!s.isEmpty() && arr[s.peek()]>curr){
+            while (!s.isEmpty() && arr[s.peek()] > curr) {
                 s.pop();
             }
-            if(s.isEmpty()){
-                pse[i]=-1;
-            }else{
-                pse[i]=s.peek();
+            if (s.isEmpty()) {
+                pse[i] = -1;
+            } else {
+                pse[i] = s.peek();
             }
             s.push(i);
         }
         //finding the sum
-        long sum=0;
-        long mod = (long)(1e9 + 7);
-        for(int i=0;i<arr.length;i++){
-            sum= (sum + (i-pse[i])*(nse[i]-i)*arr[i])%mod;
+        long sum = 0;
+        long mod = (long) (1e9 + 7);
+        for (int i = 0; i < arr.length; i++) {
+            sum = (sum + (i - pse[i]) * (nse[i] - i) * arr[i]) % mod;
         }
-        return (int)sum;
+        return (int) sum;
 
         //edge case : dont count duplicate contributions, if considering the contribution of equal element in nse
         //then don't consider it in pse otherwise duplicates will also be counted
         // ex: [1,1] so pairs will be  (1)(1,1)(1) now don't consider (1,1) again this will be duplicate
         //we considered 1,1 before so we will not consider it for the later 1
     }
+
+    //ASTEROID COLLISION
+    public int[] asteroidCollision(int arr[]) {
+        if (arr == null || arr.length == 0) return new int[]{};
+        Stack<Integer> soln = new Stack<>();
+        for (int num : arr) {
+            boolean destroyed = false; //reset per asteroid
+            if (soln.isEmpty()) {
+                soln.push(num);
+                continue;
+            }
+            while (!soln.isEmpty() && (soln.peek() > 0 && num < 0)) {
+                if (Math.abs(num) < Math.abs(soln.peek())) {
+                    destroyed = true;
+                    break;
+                } else if (Math.abs(num) == Math.abs(soln.peek())) {
+                    soln.pop();
+                    destroyed = true;
+                    break;
+                } else {
+                    soln.pop();
+                }
+            }
+            if (!destroyed) soln.push(num);
+
+        }
+        int ans[] = new int[soln.size()];
+        for (int i = ans.length - 1; i >= 0; i--) {
+            ans[i] = soln.pop();
+        }
+        return ans;
+
+    }
+
+    //SUM OF SUBARRAY RANGES
+
+    //BRUTE
+    public int sumOfSubarrayRanges(int nums[]){
+        int sum=0;
+        for(int i=0;i<nums.length;i++){
+            int min = nums[i];
+            int max = nums[i];
+            for(int j=i;j<nums.length;j++){
+                min= Math.min(min,nums[j]);
+                max = Math.max(max,nums[j]);
+                sum+= (max-min);
+            }
+        }
+        return sum;
+    }
+
+    //OPTIMAL
+    public int sumOfSubArrayRanges(int nums[]){
+        return SubarrayMaximumSum(nums)-SubarrayMinimumSum(nums);
+    }
+
+        // SUM OF SUBARRAY MAXIMUMS
+    public int SubarrayMaximumSum(int arr[]){
+        if(arr==null || arr.length==0) return 0;
+
+        // BOTH ARRAYS WILL STORE INDEXES NOT VALUES
+        int nle[] = new int[arr.length];
+        int ple[] = new int[arr.length];
+
+        Stack<Integer> s = new Stack<>();
+
+        //finding index of next larger element for each element
+        for (int i = arr.length - 1; i >= 0; i--) {
+            int curr = arr[i];
+            while (!s.isEmpty() && arr[s.peek()] <= curr) {
+                s.pop();
+            }
+            if (s.isEmpty()) {
+                nle[i] = arr.length;
+            } else {
+                nle[i] = s.peek();
+            }
+            s.push(i);
+        }
+        s.clear();
+        //finding index of previous larger/equal element
+        for (int i = 0; i < arr.length; i++) {
+            int curr = arr[i];
+            while (!s.isEmpty() && arr[s.peek()] < curr) {
+                s.pop();
+            }
+            if (s.isEmpty()) {
+                ple[i] = -1;
+            } else {
+                ple[i] = s.peek();
+            }
+            s.push(i);
+        }
+        //finding the sum
+        long sum = 0;
+        long mod = (long) (1e9 + 7);
+        for (int i = 0; i < arr.length; i++) {
+            sum = (sum + (i - ple[i]) * (nle[i] - i) * arr[i]) % mod;
+        }
+        return (int) sum;
+
+
+    }
+
+
+
 }
 
 
