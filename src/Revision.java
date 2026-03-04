@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 public class Revision {
@@ -71,4 +72,24 @@ public class Revision {
         return xor1^xor2; //xor is commutative and associative
     }
 
+    //length of longest subarray that sums to k (prefix sum + hashmap) approach
+    int lengthOfLongestSubarray(int nums[], int k){
+        if (nums==null || nums.length==0) return 0;
+        HashMap<Integer,Integer> hm = new HashMap<>();
+        int length=0;
+        int sum=0;
+        hm.put(0,-1); // to handle cases when subarray starts from 0
+        for(int i=0;i<nums.length;i++){
+             sum+=nums[i];
+             if(hm.containsKey(sum-k)){
+                 int newLength= i- hm.get(sum-k);
+                 length=Math.max(length,newLength);
+             }
+             if(!hm.containsKey(sum)){
+             hm.put(sum,i);
+             }
+
+        }
+        return length;
+    }
 }
