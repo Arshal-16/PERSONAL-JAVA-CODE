@@ -204,6 +204,21 @@ public class arrays {
         return Union;
     }
 
+    //find the missing number XOR approach
+    int findTheMissingNumber(int nums[]){
+        if(nums==null || nums.length==0) return -1;
+        int xor1= 0; //xor of numbers from 1 to n
+        int xor2 = 0; //xor of all numbers in array
+
+        for(int i=0;i<nums.length;i++){
+            xor2^=nums[i];
+            xor1^=i+1; //this will go from 1 to (n-1)
+        }
+        xor1^=nums.length+1; // (n-1) +1 = n
+        // A^0 = A , A^A = 0
+        return xor1^xor2; //xor is commutative and associative
+    }
+
     //COUNT
     public static int countOne(int arr[]) {
         int maxCount = 0;
