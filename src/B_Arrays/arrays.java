@@ -235,8 +235,8 @@ public class arrays {
     }
 
     //LENGTH OF LONGEST SUBARRAY WITH SUM K
-    public static int longestSubArray(int arr[], int k) {
         //prefix array
+    public static int longestSubArray(int arr[], int k) {
         int prefix[] = new int[arr.length];
         prefix[0] = arr[0];
         for (int i = 1; i < arr.length; i++) {
@@ -252,6 +252,27 @@ public class arrays {
             }
         }
         return maxLength;
+    }
+
+        //prefix sum + hashmap approach
+    int lengthOfLongestSubarray(int nums[], int k){
+        if (nums==null || nums.length==0) return 0;
+        HashMap<Integer,Integer> hm = new HashMap<>();
+        int length=0;
+        int sum=0;
+        hm.put(0,-1); // to handle cases when subarray starts from 0
+        for(int i=0;i<nums.length;i++){
+            sum+=nums[i];
+            if(hm.containsKey(sum-k)){
+                int newLength= i- hm.get(sum-k);
+                length=Math.max(length,newLength);
+            }
+            if(!hm.containsKey(sum)){
+                hm.put(sum,i);
+            }
+
+        }
+        return length;
     }
 
     /// ////////////////////////////// MEDIUM ////////////////////////////////////
