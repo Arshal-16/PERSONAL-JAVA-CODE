@@ -275,6 +275,29 @@ public class arrays {
         return length;
     }
 
+    // optimal
+    public static int lengthOfLongestSubarrayOptimal(int nums[], int target) {
+        //this will only work when array contains positives
+        if (nums == null || nums.length == 0) return 0;
+        int length = 0, sum = nums[0];
+        int leftPtr = 0, rightPtr = 0;
+        //logic: on moving the right ptr the sum will only inc
+        // on moving left ptr the sum will only dec
+        while (rightPtr < nums.length) {
+            if (sum < target) {
+                rightPtr++; // inc the right ptr and adding it to sum
+                if (rightPtr < nums.length) sum += nums[rightPtr];
+            } else if (sum > target) {
+                sum -= nums[leftPtr++]; //sub the ele at left ptr and inc left ptr
+            } else { // sum==target
+               length=Math.max(length,rightPtr-leftPtr+1);
+                rightPtr++;
+                if (rightPtr < nums.length) sum += nums[rightPtr];
+            }
+        }
+        return length;
+    }
+
     /// ////////////////////////////// MEDIUM ////////////////////////////////////
 
     //TWO SUM
@@ -652,29 +675,6 @@ public class arrays {
            hm.put(sum, hm.getOrDefault(sum,0)+1);
        }
        return count;
-    }
-
-    // optimal
-    public static int countSubarraysOptimal(int nums[], int target) {
-        //this will only work when array contains positives
-        if (nums == null || nums.length == 0) return 0;
-        int count = 0, sum = nums[0];
-        int leftPtr = 0, rightPtr = 0;
-        //logic: on moving the right ptr the sum will only inc
-        // on moving left ptr the sum will only dec
-        while (rightPtr < nums.length) {
-            if (sum < target) {
-                rightPtr++; // inc the right ptr and adding it to sum
-                if (rightPtr < nums.length) sum += nums[rightPtr];
-            } else if (sum > target) {
-                sum -= nums[leftPtr++]; //sub the ele at left ptr and inc left ptr
-            } else { // sum==target
-                count++;
-                rightPtr++;
-                if (rightPtr < nums.length) sum += nums[rightPtr];
-            }
-        }
-        return count;
     }
 
 
