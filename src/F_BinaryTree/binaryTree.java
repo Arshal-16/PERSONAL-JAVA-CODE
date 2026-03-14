@@ -190,8 +190,7 @@ public class binaryTree {
         }
     }
 
-    //ITERATIVE INORDER TRAVERSAL OF BINARY TREE
-    //using state
+    //ITERATIVE PREORDER TRAVERSAL OF BINARY TREE
     class NodeAndState {
         Node node;
         int state;
@@ -202,8 +201,38 @@ public class binaryTree {
         }
     }
 
+    //using state
+    public void iterativePreorderTraversal(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
+        Stack<NodeAndState> s = new Stack<>();
+        s.push(new NodeAndState(root, 1));
+        while (!s.isEmpty()) {
+            NodeAndState current = s.pop();
+            if (current.state == 1) { // we are visiting node for the first time
+                al.add(current.node.data);
+                current.state = 2;
+                s.push(current);
+                if (current.node.left != null)
+                    s.push(new NodeAndState(current.node.left, 1)); // add the left child
+            } else if (current.state == 2) { // root and left subtree are traversed
+                if (current.node.right != null)
+                    s.push(new NodeAndState(current.node.right, 1));
+            }
+        }
+    }
 
-
+    //without using state(less complex and preferred)
+    public void iterativePreorder(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
+        Stack<Node> s = new Stack<>();
+        s.push(root);
+        while (!s.isEmpty()) {
+            Node current = s.pop();
+            al.add(current.data);
+            if (current.right != null) s.push(current.right);
+            if (current.left != null) s.push(current.left);
+        }
+    }
 
     //ITERATIVE INORDER TRAVERSAL OF BINARY TREE
     //using state
@@ -244,6 +273,34 @@ public class binaryTree {
             // move to right subtree
             current = current.right;
         }
+    }
+
+    //POSTORDER TRAVERSAL OF BINARY TREE
+    //using state
+    public void iterativePostorderTraversal(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
+        Stack<NodeAndState> s = new Stack<>();
+        s.push(new NodeAndState(root, 1));
+        while (!s.isEmpty()) {
+            NodeAndState current = s.pop();
+            if (current.state == 1) {
+                current.state = 2;
+                s.push(current);
+                if (current.node.left != null) s.push(new NodeAndState(current.node.left, 1));
+            } else if (current.state == 2) {
+                current.state = 3;
+                s.push(current);
+                if (current.node.right != null) s.push(new NodeAndState(current.node.right, 1));
+            } else if (current.state == 3) {
+                al.add(current.node.data);
+            }
+        }
+    }
+
+    //without using state(less complex)
+    public void iterativePostorder(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
+
     }
 
 }
