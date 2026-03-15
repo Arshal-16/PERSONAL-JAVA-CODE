@@ -227,8 +227,46 @@ public class binaryTree {
     }
 
     //without using state(less complex)
-    public void iterativePostorder(Node root, ArrayList<Integer> al) {
+    public void iterativePostorderUsing2Stacks(Node root, ArrayList<Integer> al) {
         if (root == null) return;
+        Stack<Node> s1 = new Stack<>();
+        Stack<Integer> s2 = new Stack<>();
+        s1.push(root);
+        while(!s1.isEmpty()){
+            Node current = s1.pop();
+            s2.push(current.data);
+            if(current.left!=null) s1.push(current.left);
+            if(current.right!=null) s1.push(current.right);
+            // like this when we are transferring elements from s1 to s2 it will be root at bottom then entire right
+            // subtree traversed in postorder then left subtree traversed in postorder at top
+        }
+        while(!s2.isEmpty()) al.add(s2.pop());
+
+    }
+
+    public void iterativePostorderUsing1Stack(Node root, ArrayList<Integer> al){
+        if(root==null ) return;
+
+        Node current = root;
+        Node lastVisited = null;
+        Stack<Node> s = new Stack<>();
+        while(current!=null || !s.isEmpty()){
+            //go as far left as possible
+            while(current!=null){
+                s.push(current);
+                current=current.left;
+            }
+            // look at the top node
+            Node topNode = s.peek();
+            //if right child exists and is not yet visited
+            if(topNode.right!=null && topNode.right!=lastVisited){
+                //move to right subtree
+                current= topNode.right;
+            }else{ //otherwise process the node and mark it as last visited
+              al.add(topNode.data);
+              lastVisited=s.pop(); //lastVisited = topNode
+            }
+        }
 
     }
 
