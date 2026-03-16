@@ -19,7 +19,7 @@ public class binaryTree {
         }
     }
 
-    /// //////// TRAVERSALS //////////////////
+    /// ///////// TRAVERSALS //////////////////
 
     //PREORDER INORDER POSTORDER TRAVERSALS IN ONE TRAVERSAL
     public ArrayList<ArrayList<Integer>> PreInPostInOneTraversal(Node root) {
@@ -232,42 +232,108 @@ public class binaryTree {
         Stack<Node> s1 = new Stack<>();
         Stack<Integer> s2 = new Stack<>();
         s1.push(root);
-        while(!s1.isEmpty()){
+        while (!s1.isEmpty()) {
             Node current = s1.pop();
             s2.push(current.data);
-            if(current.left!=null) s1.push(current.left);
-            if(current.right!=null) s1.push(current.right);
+            if (current.left != null) s1.push(current.left);
+            if (current.right != null) s1.push(current.right);
             // like this when we are transferring elements from s1 to s2 it will be root at bottom then entire right
             // subtree traversed in postorder then left subtree traversed in postorder at top
         }
-        while(!s2.isEmpty()) al.add(s2.pop());
+        while (!s2.isEmpty()) al.add(s2.pop());
 
     }
 
-    public void iterativePostorderUsing1Stack(Node root, ArrayList<Integer> al){
-        if(root==null ) return;
+    public void iterativePostorderUsing1Stack(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
 
         Node current = root;
         Node lastVisited = null;
         Stack<Node> s = new Stack<>();
-        while(current!=null || !s.isEmpty()){
+        while (current != null || !s.isEmpty()) {
             //go as far left as possible
-            while(current!=null){
+            while (current != null) {
                 s.push(current);
-                current=current.left;
+                current = current.left;
             }
             // look at the top node
             Node topNode = s.peek();
             //if right child exists and is not yet visited
-            if(topNode.right!=null && topNode.right!=lastVisited){
+            if (topNode.right != null && topNode.right != lastVisited) {
                 //move to right subtree
-                current= topNode.right;
-            }else{ //otherwise process the node and mark it as last visited
-              al.add(topNode.data);
-              lastVisited=s.pop(); //lastVisited = topNode
+                current = topNode.right;
+            } else { //otherwise process the node and mark it as last visited
+                al.add(topNode.data);
+                lastVisited = s.pop(); //lastVisited = topNode
             }
         }
 
     }
+
+    /// ///////// MEDIUM PROBLEMS //////////////////
+
+    //MAXIMUM DEPTH OF A BINARY TREE
+    public int maxDepth(Node root) {
+        if (root == null) return 0;
+
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+
+    //CHECK IF THE BINARY TREE IS BALANCED BINARY TREE
+
+    //brute tc = n^2, sc= height of tree
+    public boolean isBalancedBinaryTree(Node root) {
+        if (root == null) return true;
+
+        return (Math.abs(maxDepth(root.left)- maxDepth(root.right)) <= 1) && isBalancedBinaryTree(root.left) && isBalancedBinaryTree(root.right);
+    }
+
+    //optimal
+    public int[] isBalancedOptimal(Node root){ //[balanced,height]
+        if(root==null) return new int[]{1,0};
+        int left[] = isBalancedOptimal(root.left);
+        int right[] = isBalancedOptimal(root.right);
+        int balancedFlag =( Math.abs(left[1]-right[1])<=1)&&(left[0]==1)&&(right[0]==1)?1:0;
+        int height = Math.max(left[1],right[1])+1;
+        return new int[]{balancedFlag,height};
+    }
+
+    //another optimal (just a wrapper over our logic)
+    //returns height if tree is balanced otherwise -1
+    public int dfsHeight(Node root) {
+        // returns balanced?height:-1
+        // Base case: if the current node is NULL, return 0 (height of an empty tree)
+        if (root == null) return 0;
+
+        // Recursively calculate the height of the left subtree
+        int leftHeight = dfsHeight(root.left);
+
+        // If the left subtree is unbalanced, propagate the unbalance status
+        if (leftHeight == -1)
+            return -1;
+
+        // Recursively calculate the height of the right subtree
+        int rightHeight = dfsHeight(root.right);
+
+        // If the right subtree is unbalanced, propagate the unbalance status
+        if (rightHeight == -1)
+            return -1;
+
+        // Check if the difference in height between left and right subtrees is greater than 1
+        // If it's greater, the tree is unbalanced, return -1 to propagate the unbalance status
+        if (Math.abs(leftHeight - rightHeight) > 1)
+            return -1;
+
+        // Return the maximum height of left and right subtrees plus 1 (for the current node)
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+    public boolean isBalanced(Node root) {
+        return dfsHeight(root) != -1;
+    }
+
+    //CALCULATE THE DIAMETER OF A BINARY TREE
+
+
+
 
 }
