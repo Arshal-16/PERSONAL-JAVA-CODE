@@ -332,8 +332,63 @@ public class binaryTree {
     }
 
     //CALCULATE THE DIAMETER OF A BINARY TREE
+    int diameter = 0;
+    int heightForDia(Node root) {
+        if (root == null) return 0;
+        int leftHeight = heightForDia(root.left);
+        int rightHeight = heightForDia(root.right);
+        diameter = Math.max(diameter, leftHeight + rightHeight);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+    int diameterOfTree(Node root){
+        heightForDia(root);
+        return diameter;
+    }
 
+    //MAXIMUM SUM PATH IN BINARY TREE
 
+    // Returns the maximum path sum starting from this node and extending downward
+    int maxPathDown(Node root, int maxVal[]) {
+        if (root == null) return 0;
+
+        // Get max contribution from left subtree (ignore if negative)
+        int left = Math.max(0, maxPathDown(root.left, maxVal));
+
+        // Get max contribution from right subtree (ignore if negative)
+        int right = Math.max(0, maxPathDown(root.right, maxVal));
+
+        // Update global maximum:
+        // Case where current node is the highest point (path passes through it)
+        maxVal[0] = Math.max(maxVal[0], root.data + left + right);
+
+        // Return max path sum including current node and ONE subtree
+        // (only one branch can be extended upwards)
+        return root.data + Math.max(left, right);
+    }
+
+    int maxPathSum(Node root){
+        if(root == null) return 0;
+
+        // Stores the overall maximum path sum across all nodes
+        int maxVal[] = new int[]{Integer.MIN_VALUE};
+
+        maxPathDown(root, maxVal);
+
+        return maxVal[0];
+    }
+
+    //CHECK IF TWO TREES ARE IDENTICAL
+    public boolean isIdentical(Node rootA, Node rootB) {
+        //check root
+        if (rootA == null || rootB == null) return rootA == rootB;
+        if(rootA.data!=rootB.data) return false;
+
+        //check for subtrees
+        boolean leftSubtrees = isIdentical(rootA.left, rootB.left);
+        boolean rightSubtrees = isIdentical(rootA.right, rootB.right);
+
+        return leftSubtrees && rightSubtrees ;
+    }
 
 
 }
