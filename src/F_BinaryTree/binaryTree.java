@@ -424,4 +424,81 @@ public class binaryTree {
         return result;
     }
 
+    //BOUNDARY TRAVERSAL OF A BINARY TREE
+    public ArrayList<Integer> boundaryTraversal(Node root){
+        ArrayList<Integer> result = new ArrayList<>();
+        if(root==null) return result;
+        if(root.left == null && root.right == null){
+            result.add(root.data);
+            return result;
+        }
+        ArrayList<Integer> leftPart = new ArrayList<>();
+        ArrayList<Integer> rightPart = new ArrayList<>();
+        ArrayList<Integer> leafs = new ArrayList<>();
+        // getting the left part of traversal
+        Node current = root.left;
+        while(current!=null){
+            // break if we hit a leaf
+            if(current.left==null && current.right==null) break;
+            //add to leftPart
+            leftPart.add(current.data);
+            if(current.left!=null){
+                current=current.left;
+            }else if(current.right!=null){
+                current=current.right;
+            }
+        }
+
+        // getting the right part of traversal
+        current=root.right;
+        while(current!=null){
+            // break if we hit a leaf
+            if(current.left==null && current.right==null) break;
+            //add to rightPart
+            rightPart.add(current.data);
+            if(current.right!=null){
+                current=current.right;
+            }else if(current.left!=null){
+                current=current.left;
+            }
+        }
+        // now reverse the right part
+        int start=0,end=rightPart.size()-1;
+       while(start<end){
+           int temp = rightPart.get(end);
+           rightPart.set(end,rightPart.get(start));
+           rightPart.set(start,temp);
+           start++;
+           end--;
+       }
+
+       //getting the leafs
+        getLeafs(root, leafs);
+
+        // merge everything to make the result
+        result.add(root.data);
+        mergeArrayList(result,leftPart);
+        mergeArrayList(result,leafs);
+        mergeArrayList(result,rightPart);
+
+        return result;
+
+    }
+    void getLeafs(Node root, ArrayList<Integer> al){
+        if(root==null ) return;
+        if(root.left==null && root.right==null) {
+            al.add(root.data);
+            return;
+        }
+        getLeafs(root.left,al);
+        getLeafs(root.right,al);
+    }
+
+    void mergeArrayList(ArrayList<Integer> a, ArrayList<Integer> b) {
+        for (int i = 0; i < b.size(); i++) {
+            a.add(b.get(i));
+        }
+    }
+
+
 }
