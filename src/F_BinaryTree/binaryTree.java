@@ -1,9 +1,6 @@
 package F_BinaryTree;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public class binaryTree {
 
@@ -285,17 +282,17 @@ public class binaryTree {
     public boolean isBalancedBinaryTree(Node root) {
         if (root == null) return true;
 
-        return (Math.abs(maxDepth(root.left)- maxDepth(root.right)) <= 1) && isBalancedBinaryTree(root.left) && isBalancedBinaryTree(root.right);
+        return (Math.abs(maxDepth(root.left) - maxDepth(root.right)) <= 1) && isBalancedBinaryTree(root.left) && isBalancedBinaryTree(root.right);
     }
 
     //optimal
-    public int[] isBalancedOptimal(Node root){ //[balanced,height]
-        if(root==null) return new int[]{1,0};
+    public int[] isBalancedOptimal(Node root) { //[balanced,height]
+        if (root == null) return new int[]{1, 0};
         int left[] = isBalancedOptimal(root.left);
         int right[] = isBalancedOptimal(root.right);
-        int balancedFlag =( Math.abs(left[1]-right[1])<=1)&&(left[0]==1)&&(right[0]==1)?1:0;
-        int height = Math.max(left[1],right[1])+1;
-        return new int[]{balancedFlag,height};
+        int balancedFlag = (Math.abs(left[1] - right[1]) <= 1) && (left[0] == 1) && (right[0] == 1) ? 1 : 0;
+        int height = Math.max(left[1], right[1]) + 1;
+        return new int[]{balancedFlag, height};
     }
 
     //another optimal (just a wrapper over our logic)
@@ -327,12 +324,14 @@ public class binaryTree {
         // Return the maximum height of left and right subtrees plus 1 (for the current node)
         return Math.max(leftHeight, rightHeight) + 1;
     }
+
     public boolean isBalanced(Node root) {
         return dfsHeight(root) != -1;
     }
 
     //CALCULATE THE DIAMETER OF A BINARY TREE
     int diameter = 0;
+
     int heightForDia(Node root) {
         if (root == null) return 0;
         int leftHeight = heightForDia(root.left);
@@ -340,7 +339,8 @@ public class binaryTree {
         diameter = Math.max(diameter, leftHeight + rightHeight);
         return Math.max(leftHeight, rightHeight) + 1;
     }
-    int diameterOfTree(Node root){
+
+    int diameterOfTree(Node root) {
         heightForDia(root);
         return diameter;
     }
@@ -366,8 +366,8 @@ public class binaryTree {
         return root.data + Math.max(left, right);
     }
 
-    int maxPathSum(Node root){
-        if(root == null) return 0;
+    int maxPathSum(Node root) {
+        if (root == null) return 0;
 
         // Stores the overall maximum path sum across all nodes
         int maxVal[] = new int[]{Integer.MIN_VALUE};
@@ -381,14 +381,47 @@ public class binaryTree {
     public boolean isIdentical(Node rootA, Node rootB) {
         //check root
         if (rootA == null || rootB == null) return rootA == rootB;
-        if(rootA.data!=rootB.data) return false;
+        if (rootA.data != rootB.data) return false;
 
         //check for subtrees
         boolean leftSubtrees = isIdentical(rootA.left, rootB.left);
         boolean rightSubtrees = isIdentical(rootA.right, rootB.right);
 
-        return leftSubtrees && rightSubtrees ;
+        return leftSubtrees && rightSubtrees;
     }
 
+    //ZIG ZAG TRAVERSAL OF BINARY TREE
+    public ArrayList<ArrayList<Integer>> zigZagTraversal(Node root){
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        if(root==null) return result;
+        Queue<Node> q = new ArrayDeque<>();
+        //add root
+        q.add(root);
+        //flag
+        boolean leftToRight = true;
+        while(!q.isEmpty()){
+            int size=q.size(); // num of nodes at current level
+
+            // temp array to store current lvl elements in correct order
+            int currLvl[] = new int[size];
+            for(int i=0;i<size;i++){
+                Node current = q.remove();
+                int idx = leftToRight?i:(size-1-i);
+                currLvl[idx] = current.data;
+                if(current.left!=null) q.add(current.left);
+                if(current.right!=null) q.add(current.right);
+            }
+            //switch the flag
+            leftToRight=!leftToRight;
+            //create temporary al
+            ArrayList<Integer> al = new ArrayList<>();
+            //copy elements from array to al
+            for(int num:currLvl){
+                al.add(num);
+            }
+            result.add(al);
+         }
+        return result;
+    }
 
 }
