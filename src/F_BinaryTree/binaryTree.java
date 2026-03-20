@@ -4,6 +4,9 @@ import java.util.*;
 
 public class binaryTree {
 
+    //Non-static inner class → like a child always carrying a parent with them
+    //Static nested class → independent person, no dependency
+
     static class Node {
         int data;
         Node left;
@@ -499,6 +502,107 @@ public class binaryTree {
             a.add(b.get(i));
         }
     }
+
+    //VERTICAL ORDER TRAVERSAL OF BINARY TREE
+
+    //Non-static inner class → like a child always carrying a parent with them
+    //Static nested class → independent person, no dependency
+
+    //helper class
+   static class VerticalOrderHelper {
+        Node node;
+        int horizontalDist;
+
+        VerticalOrderHelper(Node node, int horizontalDist) {
+            this.node = node;
+            this.horizontalDist = horizontalDist;
+        }
+    }
+
+    public ArrayList<ArrayList<Integer>> verticalOrderTraversal(Node root) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        if (root == null) return result;
+
+        HashMap<Integer, ArrayList<Integer>> hm = new HashMap<>();
+        int minDist = 0, maxDist = 0;
+
+        Queue<VerticalOrderHelper> q = new ArrayDeque<>();
+        q.add(new VerticalOrderHelper(root, 0));
+
+        while (!q.isEmpty()) {
+            VerticalOrderHelper current = q.remove();
+            minDist = Math.min(minDist, current.horizontalDist);
+            maxDist = Math.max(maxDist, current.horizontalDist);
+            if (hm.containsKey(current.horizontalDist)) {
+                hm.get(current.horizontalDist).add(current.node.data);
+            } else {
+                ArrayList<Integer> newAl = new ArrayList<>();
+                newAl.add(current.node.data);
+                hm.put(current.horizontalDist, newAl);
+            }
+            if (current.node.left != null)
+                q.add(new VerticalOrderHelper(current.node.left, current.horizontalDist - 1));
+
+            if (current.node.right != null)
+                q.add(new VerticalOrderHelper(current.node.right, current.horizontalDist + 1));
+        }
+
+        while (minDist <= maxDist) {
+            if (hm.containsKey(minDist))
+                result.add(hm.get(minDist));
+            minDist++;
+        }
+        return result;
+    }
+
+    //TOP VIEW OF A BINARY TREE
+
+    //Non-static inner class → like a child always carrying a parent with them
+    //Static nested class → independent person, no dependency
+
+    //helper class
+     static class TopViewHelper{
+        Node node;
+        int horizontalDist;
+        TopViewHelper(Node node, int horizontalDist){
+            this.node = node;
+            this.horizontalDist=horizontalDist;
+        }
+    }
+    public ArrayList<Integer> topView(Node root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        if (root == null) return result;
+
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        int minDist = 0, maxDist = 0;
+
+        Queue<TopViewHelper> q = new ArrayDeque<>();
+        q.add(new TopViewHelper(root, 0));
+
+        while (!q.isEmpty()) {
+            TopViewHelper current = q.remove();
+
+            if (!hm.containsKey(current.horizontalDist)) {
+                hm.put(current.horizontalDist, current.node.data);
+                minDist = Math.min(minDist, current.horizontalDist);
+                maxDist = Math.max(maxDist, current.horizontalDist);
+            }
+
+            if (current.node.left != null)
+                q.add(new TopViewHelper(current.node.left, current.horizontalDist - 1));
+
+            if (current.node.right != null)
+                q.add(new TopViewHelper(current.node.right, current.horizontalDist + 1));
+        }
+
+        for (int i = minDist; i <= maxDist; i++) {
+            result.add(hm.get(i));
+        }
+
+        return result;
+    }
+
+
 
 
 }
