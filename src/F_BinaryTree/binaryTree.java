@@ -394,44 +394,44 @@ public class binaryTree {
     }
 
     //ZIG ZAG TRAVERSAL OF BINARY TREE
-    public ArrayList<ArrayList<Integer>> zigZagTraversal(Node root){
+    public ArrayList<ArrayList<Integer>> zigZagTraversal(Node root) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        if(root==null) return result;
+        if (root == null) return result;
         Queue<Node> q = new ArrayDeque<>();
         //add root
         q.add(root);
         //flag
         boolean leftToRight = true;
-        while(!q.isEmpty()){
-            int size=q.size(); // num of nodes at current level
+        while (!q.isEmpty()) {
+            int size = q.size(); // num of nodes at current level
 
             // temp array to store current lvl elements in correct order
             int currLvl[] = new int[size];
-            for(int i=0;i<size;i++){
+            for (int i = 0; i < size; i++) {
                 Node current = q.remove();
-                int idx = leftToRight?i:(size-1-i);
+                int idx = leftToRight ? i : (size - 1 - i);
                 currLvl[idx] = current.data;
-                if(current.left!=null) q.add(current.left);
-                if(current.right!=null) q.add(current.right);
+                if (current.left != null) q.add(current.left);
+                if (current.right != null) q.add(current.right);
             }
             //switch the flag
-            leftToRight=!leftToRight;
+            leftToRight = !leftToRight;
             //create temporary al
             ArrayList<Integer> al = new ArrayList<>();
             //copy elements from array to al
-            for(int num:currLvl){
+            for (int num : currLvl) {
                 al.add(num);
             }
             result.add(al);
-         }
+        }
         return result;
     }
 
     //BOUNDARY TRAVERSAL OF A BINARY TREE
-    public ArrayList<Integer> boundaryTraversal(Node root){
+    public ArrayList<Integer> boundaryTraversal(Node root) {
         ArrayList<Integer> result = new ArrayList<>();
-        if(root==null) return result;
-        if(root.left == null && root.right == null){
+        if (root == null) return result;
+        if (root.left == null && root.right == null) {
             result.add(root.data);
             return result;
         }
@@ -440,61 +440,62 @@ public class binaryTree {
         ArrayList<Integer> leafs = new ArrayList<>();
         // getting the left part of traversal
         Node current = root.left;
-        while(current!=null){
+        while (current != null) {
             // break if we hit a leaf
-            if(current.left==null && current.right==null) break;
+            if (current.left == null && current.right == null) break;
             //add to leftPart
             leftPart.add(current.data);
-            if(current.left!=null){
-                current=current.left;
-            }else if(current.right!=null){
-                current=current.right;
+            if (current.left != null) {
+                current = current.left;
+            } else if (current.right != null) {
+                current = current.right;
             }
         }
 
         // getting the right part of traversal
-        current=root.right;
-        while(current!=null){
+        current = root.right;
+        while (current != null) {
             // break if we hit a leaf
-            if(current.left==null && current.right==null) break;
+            if (current.left == null && current.right == null) break;
             //add to rightPart
             rightPart.add(current.data);
-            if(current.right!=null){
-                current=current.right;
-            }else if(current.left!=null){
-                current=current.left;
+            if (current.right != null) {
+                current = current.right;
+            } else if (current.left != null) {
+                current = current.left;
             }
         }
         // now reverse the right part
-        int start=0,end=rightPart.size()-1;
-       while(start<end){
-           int temp = rightPart.get(end);
-           rightPart.set(end,rightPart.get(start));
-           rightPart.set(start,temp);
-           start++;
-           end--;
-       }
+        int start = 0, end = rightPart.size() - 1;
+        while (start < end) {
+            int temp = rightPart.get(end);
+            rightPart.set(end, rightPart.get(start));
+            rightPart.set(start, temp);
+            start++;
+            end--;
+        }
 
-       //getting the leafs
+        //getting the leafs
         getLeafs(root, leafs);
 
         // merge everything to make the result
         result.add(root.data);
-        mergeArrayList(result,leftPart);
-        mergeArrayList(result,leafs);
-        mergeArrayList(result,rightPart);
+        mergeArrayList(result, leftPart);
+        mergeArrayList(result, leafs);
+        mergeArrayList(result, rightPart);
 
         return result;
 
     }
-    void getLeafs(Node root, ArrayList<Integer> al){
-        if(root==null ) return;
-        if(root.left==null && root.right==null) {
+
+    void getLeafs(Node root, ArrayList<Integer> al) {
+        if (root == null) return;
+        if (root.left == null && root.right == null) {
             al.add(root.data);
             return;
         }
-        getLeafs(root.left,al);
-        getLeafs(root.right,al);
+        getLeafs(root.left, al);
+        getLeafs(root.right, al);
     }
 
     void mergeArrayList(ArrayList<Integer> a, ArrayList<Integer> b) {
@@ -509,7 +510,7 @@ public class binaryTree {
     //Static nested class → independent person, no dependency
 
     //helper class
-   static class VerticalOrderHelper {
+    static class VerticalOrderHelper {
         Node node;
         int horizontalDist;
 
@@ -561,14 +562,16 @@ public class binaryTree {
     //Static nested class → independent person, no dependency
 
     //helper class
-     static class TopViewHelper{
+    static class TopViewHelper {
         Node node;
         int horizontalDist;
-        TopViewHelper(Node node, int horizontalDist){
+
+        TopViewHelper(Node node, int horizontalDist) {
             this.node = node;
-            this.horizontalDist=horizontalDist;
+            this.horizontalDist = horizontalDist;
         }
     }
+
     public ArrayList<Integer> topView(Node root) {
         ArrayList<Integer> result = new ArrayList<>();
         if (root == null) return result;
@@ -596,13 +599,99 @@ public class binaryTree {
         }
 
         for (int i = minDist; i <= maxDist; i++) {
-            result.add(hm.get(i));
+            if (hm.containsKey(i)) {
+                result.add(hm.get(i));
+            }
         }
 
         return result;
     }
 
 
+    //BOTTOM VIEW OF A BINARY TREE
 
+    //helper class
+    static class BottomViewHelper {
+        Node node;
+        int horizontalDist;
+
+        BottomViewHelper(Node node, int horizontalDist) {
+            this.node = node;
+            this.horizontalDist = horizontalDist;
+        }
+    }
+
+    public ArrayList<Integer> bottomView(Node root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        if (root == null) return result;
+
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        int minDist = 0, maxDist = 0;
+
+        Queue<BottomViewHelper> q = new ArrayDeque<>();
+        q.add(new BottomViewHelper(root, 0));
+
+        while (!q.isEmpty()) {
+            BottomViewHelper current = q.remove();
+
+            hm.put(current.horizontalDist, current.node.data);
+            minDist = Math.min(minDist, current.horizontalDist);
+            maxDist = Math.max(maxDist, current.horizontalDist);
+
+
+            if (current.node.left != null)
+                q.add(new BottomViewHelper(current.node.left, current.horizontalDist - 1));
+
+            if (current.node.right != null)
+                q.add(new BottomViewHelper(current.node.right, current.horizontalDist + 1));
+        }
+
+        for (int i = minDist; i <= maxDist; i++) {
+            if (hm.containsKey(i)) {
+                result.add(hm.get(i));
+            }
+        }
+
+        return result;
+    }
+
+    //LEFT VIEW OF BINARY TREE
+    public ArrayList<Integer> leftView(Node root){
+        ArrayList<Integer> result = new ArrayList<>();
+        if(root==null) return result;
+
+        Queue<Node> queue = new ArrayDeque<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            int lvlSize= queue.size();
+            for(int i=0;i<lvlSize;i++){
+                Node current= queue.remove();
+                if(i==0) result.add(current.data);
+                if(current.left!=null) queue.add(current.left);
+                if(current.right!=null) queue.add(current.right);
+            }
+        }
+        return result;
+    }
+
+    //RIGHT VIEW OF BINARY TREE
+    public ArrayList<Integer> rightView(Node root){
+        ArrayList<Integer> result = new ArrayList<>();
+        if(root==null) return result;
+
+        Queue<Node> queue = new ArrayDeque<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            int lvlSize= queue.size();
+            for(int i=0;i<lvlSize;i++){
+                Node current= queue.remove();
+                if(i==0) result.add(current.data);
+                // NOTICE FIRST RIGHT IS ADDED THEN LEFT
+                if(current.right!=null) queue.add(current.right);
+                if(current.left!=null) queue.add(current.left);
+            }
+        }
+        return result;
+    }
 
 }
