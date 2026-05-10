@@ -571,10 +571,12 @@ public class binarySearch {
          * Also:
          * left tells how many array elements exist
          * before the kth missing number.
-         *
+         * Observation: lets assume left is 4 then before left values will be 0,1,2, and 3 ; now after bs when left is at 4 we expected value 5 to be at index 4
+         * but it is not 5 and therefore we got some missing count which is greater than or equal to k
+         * so in ideal case 5 should be at idx 4 but some larger integer is there, so the 1st missing integer is 4+1=5, second missing int is 4+2=6
+         * 3rd missing int is 4+3=7 and.......... so the Kth missing integer will be 4+k which is left+k
          * Therefore:
-         *
-         * answer = k + left
+         * answer = left+k
          */
         return left + k;
     }
