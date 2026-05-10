@@ -351,6 +351,7 @@ public class binarySearch {
         }
         return -1;
     }
+
     //DONT USE Math.pow use this fn
     public static long power(int base, int exp, int limit) {
         long result = 1;
@@ -362,86 +363,147 @@ public class binarySearch {
     }
 
     //KOKO EATING BANANAS
-    public static int bananasPerHour(int arr[], int h){
-        int start=1,end=arr[0],ans=1;
-        for(int num:arr){
-            if(num>end) end=num;
+    public static int bananasPerHour(int arr[], int h) {
+        int start = 1, end = arr[0], ans = 1;
+        for (int num : arr) {
+            if (num > end) end = num;
         }
 
-        while(start<=end){
-            int mid= start+ (end-start)/2;
-            int timeToEat=0;
-            for(int num:arr){
-                timeToEat+= (int)Math.ceil((double)num/mid);
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int timeToEat = 0;
+            for (int num : arr) {
+                timeToEat += (int) Math.ceil((double) num / mid);
             }
-            if(timeToEat<=h){
-                ans=mid;
-                end=mid-1;
-            }else{
-                start=mid+1;
+            if (timeToEat <= h) {
+                ans = mid;
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
         return ans;
     }
 
     //MINIMUM DAYS TO MAKE M BOUQUETS
-    public static int makeBouquets(int arr[], int k, int m){
-        if((long)m*k>arr.length) return -1;
+    public static int makeBouquets(int arr[], int k, int m) {
+        if ((long) m * k > arr.length) return -1;
 
-        int start=1,ans=-1;
-        int end=arr[0];
-        for(int num:arr){
-            if(num>end){
-                end=num;
+        int start = 1, ans = -1;
+        int end = arr[0];
+        for (int num : arr) {
+            if (num > end) {
+                end = num;
             }
         }
 
-        while(start<=end){
-            int days=start+(end-start)/2;
-            int bouquetsMade=0;
-            int count=0;
-            for(int num:arr){
-                if(days>=num){
+        while (start <= end) {
+            int days = start + (end - start) / 2;
+            int bouquetsMade = 0;
+            int count = 0;
+            for (int num : arr) {
+                if (days >= num) {
                     count++;
-                    if(count>=k){
+                    if (count >= k) {
                         bouquetsMade++;
-                        count=0;
+                        count = 0;
                     }
-                }else{
-                    count=0;
+                } else {
+                    count = 0;
                 }
             }
-            if(bouquetsMade>=m){
-                ans=days;
-                end=days-1;
-            }else{
-                start=days+1;
+            if (bouquetsMade >= m) {
+                ans = days;
+                end = days - 1;
+            } else {
+                start = days + 1;
             }
         }
         return ans;
     }
 
     //FIND THE SMALLEST DIVISOR GIVEN A THRESHOLD
-    public static int smallestDivisor(int arr[],int limit){
-        int start=1,end=arr[0],ans=-1;
-        for(int num:arr){
-            if(num>end) end=num;
+    public static int smallestDivisor(int arr[], int limit) {
+        int start = 1, end = arr[0], ans = -1;
+        for (int num : arr) {
+            if (num > end) end = num;
         }
-        while(start<=end){
-            int mid=start+(end-start)/2;
-            int divResult=0;
-            for(int num:arr){
-                divResult+= (int)Math.ceil((double) num/mid);
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int divResult = 0;
+            for (int num : arr) {
+                divResult += (int) Math.ceil((double) num / mid);
             }
-            if(divResult<=limit){
-                ans=mid;
-                end=mid-1;
-            }else{
-                start=mid+1;
+            if (divResult <= limit) {
+                ans = mid;
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
         return ans;
     }
+
+    //CAPACITY TO SHIP WITHIN D DAYS
+    public int shipWithinDays(int[] weights, int days) {
+        if (weights.length == 0)
+            return 0;
+        int minWt = weights[0];
+        int maxWt = 0;
+        for (int wt : weights) {
+            maxWt += wt;
+            minWt = Math.max(minWt, wt);
+        }
+
+        while (minWt < maxWt) {
+            int wt = minWt + (maxWt - minWt) / 2;
+            //daysRedq start at 1 because we will start filling the first day and when the capacity is reached we will increment the day
+            int daysReqd = 1;
+            int todaysWt = 0;
+            //logic to calculate daysReqd
+            for (int weight : weights) {
+                if ((todaysWt + weight) <= wt) {
+                    todaysWt += weight;
+                } else {
+                    daysReqd++;
+                    todaysWt = weight;
+                }
+            }
+            if (daysReqd <= days) {
+                maxWt = wt;
+            } else {
+                minWt = wt + 1;
+            }
+        }
+        return minWt;
+    }
+
+
+    //Kth MISSING POSITIVE INTEGER
+
+    // linear traversal approach
+    public int findKthPositive(int[] arr, int k) {
+        //array index pointer
+        int i = 0;
+        //expected number
+        int num = 1;
+        //missing count
+        int count = 0;
+
+        while (true) {
+            if (i < arr.length && arr[i] == num) {
+                i++;
+            } else {
+                count++;
+                if (count == k) break;
+            }
+            num++;
+        }
+        return num;
+    }
+
+    //binary search approach
+
 
 
     /////////////// BS ON 2D ARRAYS //////////////////
