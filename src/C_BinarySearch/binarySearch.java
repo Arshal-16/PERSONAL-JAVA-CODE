@@ -504,6 +504,80 @@ public class binarySearch {
 
     //binary search approach
 
+    public int findKthPositiveBS(int[] arr, int k) {
+
+        // Binary search range over indices of the array
+        int left = 0;
+        int right = arr.length - 1;
+
+        /*
+         * Key Observation:
+         *
+         * Number of missing positive integers before arr[i]:
+         *
+         * missing = arr[i] - (i + 1)
+         *
+         * Why?
+         *
+         * In a perfect sequence with no missing numbers:
+         * index: 0 1 2 3
+         * value: 1 2 3 4
+         *
+         * value should ideally be (i + 1)
+         *
+         * If actual value is larger,
+         * that difference represents how many numbers are missing.
+         */
+
+        while (left <= right) {
+
+            int mid = left + (right - left) / 2;
+
+            // Missing numbers before arr[mid]
+            int missing = arr[mid] - (mid + 1);
+
+            /*
+             * We are searching for:
+             *
+             * the FIRST index where
+             * missing numbers before arr[index] >= k
+             */
+
+            if (missing < k) {
+
+                /*
+                 * Not enough missing numbers yet.
+                 * kth missing number lies further right.
+                 */
+                left = mid + 1;
+
+            } else {
+
+                /*
+                 * We found an index where missing >= k.
+                 * But we want the FIRST such index,
+                 * so continue searching on the left side.
+                 */
+                right = mid - 1;
+            }
+        }
+
+        /*
+         * After binary search:
+         *
+         * left = first index where
+         * missing numbers before arr[left] >= k
+         *
+         * Also:
+         * left tells how many array elements exist
+         * before the kth missing number.
+         *
+         * Therefore:
+         *
+         * answer = k + left
+         */
+        return left + k;
+    }
 
 
     /////////////// BS ON 2D ARRAYS //////////////////
