@@ -446,8 +446,7 @@ public class binarySearch {
 
     //CAPACITY TO SHIP WITHIN D DAYS
     public int shipWithinDays(int[] weights, int days) {
-        if (weights.length == 0)
-            return 0;
+        if (weights.length == 0) return 0;
         int minWt = weights[0];
         int maxWt = 0;
         for (int wt : weights) {
@@ -531,6 +530,163 @@ public class binarySearch {
         missing num= low + k
         */
         return low + k;
+    }
+
+    //Aggressive Cows (solved by self)
+    public int aggressiveCows(int[] position, int m) {
+
+        Arrays.sort(position);
+
+        int low = 1;
+        int high = position[position.length - 1] - position[0];
+        int ans = 0;
+
+        while (low <= high) {
+
+            int mid = low + (high - low) / 2;
+
+            // greedy check: try placing cows with at least 'mid' distance
+            int cowsPlaced = 1;
+            int lastPlaced = position[0];
+
+            for (int i = 1; i < position.length; i++) {
+
+                if (position[i] - lastPlaced >= mid) {
+                    cowsPlaced++;
+                    lastPlaced = position[i];
+                }
+
+                if (cowsPlaced == m) break;
+            }
+
+            // if we can place all cows, try bigger distance
+            if (cowsPlaced >= m) {
+                ans = mid;
+                low = mid + 1;
+            }
+            // otherwise reduce distance
+            else {
+                high = mid - 1;
+            }
+        }
+
+        return ans;
+    }
+
+    //Split array largest sum
+
+    public int splitArray(int[] nums, int k) {
+
+        // We are trying to split the array into k contiguous subarrays
+        // such that the maximum subarray sum is minimized.
+        // max(sum1,sum2,sum3,....) should be min ==> we have to minimize the individual sums (this is the core logic)
+        // Binary search is used on the "answer" (maximum allowed subarray sum).
+
+        int maxSum = 0;        // upper bound: sum of all elements (one subarray)
+        int minSum = nums[0];  // lower bound: largest single element (cannot split below this)
+
+        for (int num : nums) {
+            maxSum += num;                 // total sum of array
+            minSum = Math.max(minSum, num); // max element ensures feasibility
+        }
+
+        int ans = 0;
+
+        // Binary search on possible maximum subarray sum
+        while (minSum <= maxSum) {
+
+            int sum = minSum + (maxSum - minSum) / 2; // candidate max allowed sum
+
+            int subArrays = 1;  // we start with one subarray
+            int currSum = 0;    // current subarray sum
+
+            // Greedily form subarrays under the constraint "sum"
+            for (int num : nums) {
+
+                // If adding current element does not exceed allowed sum
+                if (currSum + num <= sum) {
+                    currSum += num;
+                } else {
+                    // Otherwise, start a new subarray
+                    currSum = num;
+                    subArrays++;
+                }
+            }
+
+            // If we can split into <= k subarrays,
+            // it means "sum" is feasible, try to minimize further
+            if (subArrays <= k) {
+                ans = sum;         // store best valid answer so far
+                maxSum = sum - 1;  // try smaller maximum sum
+            } else {
+                // Too many subarrays -> sum is too small
+                minSum = sum + 1;
+            }
+        }
+
+        return ans;
+    }
+
+
+    // Painter's Partition Problem
+    public int paint(int A, int B, int[] C) {
+
+        // We are trying to assign boards to A painters
+        // such that:
+        // 1. each painter gets contiguous boards
+        // 2. we minimize the maximum time taken by any painter
+        //
+        // Core idea:
+        // We are minimizing the "maximum workload" among all painters.
+        // max(workload1,wl2,wl3,....) should be minimum
+
+        // Binary search range:
+        // low  = largest single board (minimum possible workload)
+        // high = sum of all boards (one painter does everything)
+
+        long low = 0;
+        long high = 0;
+
+        for (int board : C) {
+            low = Math.max(low, board); // cannot assign less than biggest board
+            high += board;              // worst case: one painter
+        }
+
+        // Binary search on the answer (maximum allowed workload per painter)
+        while (low <= high) {
+
+            long mid = low + (high - low) / 2; // candidate max workload
+
+            int paintersUsed = 1;      // start with first painter
+            long currentPainterLoad = 0; // workload of current painter
+
+            // Greedy check:
+            // try to assign boards sequentially while respecting 'mid'
+            for (int board : C) {
+
+                // If current painter can take this board without exceeding limit
+                if (currentPainterLoad + board <= mid) {
+                    currentPainterLoad += board;
+                } else {
+                    // Otherwise, assign a new painter
+                    paintersUsed++;
+                    currentPainterLoad = board;
+                }
+            }
+
+            // If we can paint using <= A painters,
+            // then 'mid' is feasible, try minimizing further
+            if (paintersUsed <= A) {
+                high = mid - 1;
+            } else {
+                // Too few capacity per painter -> need to increase limit
+                low = mid + 1;
+            }
+        }
+
+        // 'low' is the minimum possible maximum workload per painter
+        // Each unit takes B time, so multiply at end
+        return (int) ((low * B) % 10000003);
     }
 
 
