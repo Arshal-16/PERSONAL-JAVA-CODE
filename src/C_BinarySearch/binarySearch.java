@@ -506,79 +506,31 @@ public class binarySearch {
 
     public int findKthPositiveBS(int[] arr, int k) {
 
-        // Binary search range over indices of the array
-        int left = 0;
-        int right = arr.length - 1;
-
-        /*
-         * Key Observation:
-         *
-         * Number of missing positive integers before arr[i]:
-         *
-         * missing = arr[i] - (i + 1)
-         *
-         * Why?
-         *
-         * In a perfect sequence with no missing numbers:
-         * index: 0 1 2 3
-         * value: 1 2 3 4
-         *
-         * value should ideally be (i + 1)
-         *
-         * If actual value is larger,
-         * that difference represents how many numbers are missing.
-         */
-
-        while (left <= right) {
-
-            int mid = left + (right - left) / 2;
-
-            // Missing numbers before arr[mid]
+        int low = 0;
+        int high = arr.length - 1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
             int missing = arr[mid] - (mid + 1);
-
-            /*
-             * We are searching for:
-             *
-             * the FIRST index where
-             * missing numbers before arr[index] >= k
-             */
-
             if (missing < k) {
-
-                /*
-                 * Not enough missing numbers yet.
-                 * kth missing number lies further right.
-                 */
-                left = mid + 1;
-
+                low = mid + 1;
             } else {
-
-                /*
-                 * We found an index where missing >= k.
-                 * But we want the FIRST such index,
-                 * so continue searching on the left side.
-                 */
-                right = mid - 1;
+                //missing>=k
+                high = mid - 1;
             }
         }
-
         /*
-         * After binary search:
-         *
-         * left = first index where
-         * missing numbers before arr[left] >= k
-         *
-         * Also:
-         * left tells how many array elements exist
-         * before the kth missing number.
-         * Observation: lets assume left is 4 then before left values will be 0,1,2, and 3 ; now after bs when left is at 4 we expected value 5 to be at index 4
-         * but it is not 5 and therefore we got some missing count which is greater than or equal to k
-         * so in ideal case 5 should be at idx 4 but some larger integer is there, so the 1st missing integer is 4+1=5, second missing int is 4+2=6
-         * 3rd missing int is 4+3=7 and.......... so the Kth missing integer will be 4+k which is left+k
-         * Therefore:
-         * answer = left+k
-         */
-        return left + k;
+        after while loop high will be at index where no. of integers missing before arr[high] will be less than k, but the Kth missing
+        integer will be bw arr[high] and arr[low] so arr[high]+more will give us the ans
+        eg: 2,3,4,7,11 and k=5
+        here no of elements missing before 7 are 3 and no. of elements missing before 11 are 6 so high will be at 7 and low at 11
+        ans = 7+more =7+(5-3)==>9 Ans
+        now ans will be arr[high]+more where more = k-(numbers missing till arr[high]) but in cases when missing number is before the
+        first index(0) then high will be pointing at -1 and arr[-1] is not defined.
+        Missing Num = arr[high]+(k-(arr[high]-(high+1)))==> arr[high]+k-arr[high]+high+1
+        ==>k+(high+1) ==> k + (low)
+        missing num= low + k
+        */
+        return low + k;
     }
 
 

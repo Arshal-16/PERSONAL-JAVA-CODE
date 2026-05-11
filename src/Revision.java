@@ -93,5 +93,19 @@ public class Revision {
         return length;
     }
 
+    int secondLargestElement(int arr[]){
+        if(arr==null||arr.length==0) throw new NoSuchElementException();
+        
+        int largest=arr[0],secLargest=Integer.MIN_VALUE;
+
+        for(int num:arr){
+            if(num>largest){
+                secLargest=largest;
+                largest=num;
+            }else if(num<largest&&num>secLargest) secLargest=num;
+        }
+        return secLargest==Integer.MIN_VALUE?-1:secLargest;
+    }
+
 
 }
