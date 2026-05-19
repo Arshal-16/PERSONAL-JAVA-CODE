@@ -781,8 +781,59 @@ Monotonic decreasing queue: front → back is decreasing
         }
         return (int) sum;
 
-
     }
+
+    // REMOVE K DIGITS
+    /*
+   INTUITION: While traversing the string, if the current digit is smaller than the previous digits,
+    we remove those larger digits (if k allows) because placing a smaller digit earlier reduces the overall number
+    more significantly. After processing all digits, if k is still remaining,
+    we remove from the end since the largest impact left is at the back.
+    */
+
+    public String removeKdigits(String num, int k) {
+        Stack<Integer> soln = new Stack<>();
+        int idx = 0;
+        int len = num.length();
+
+        while (idx < len) {
+            // here we can also do num.CharAt(idx)-'0';
+            int digit = Integer.parseInt(String.valueOf(num.charAt(idx)));
+            // we want string to maintain non-decreasing order from left to right
+            while (!soln.isEmpty() && (k > 0) && soln.peek() > digit) {
+                soln.pop();
+                k--;
+            }
+
+            soln.push(digit);
+            idx++;
+        }
+
+        while (k > 0 && !soln.isEmpty()) {
+            soln.pop();
+            k--;
+        }
+        String smallest = "";
+        while (!soln.isEmpty()) {
+            smallest = soln.pop() + smallest;
+        }
+        // removing leading zeros
+        int i = 0;
+        while (i < smallest.length() && smallest.charAt(i) == '0') {
+            i++;
+        }
+
+        // substring(n) where n == length() returns an empty string ""
+        smallest = smallest.substring(i);
+
+        // if everything was zeros or empty
+        if (smallest.length() == 0) {
+            return "0";
+        }
+
+        return smallest;
+    }
+
 }
 
 
