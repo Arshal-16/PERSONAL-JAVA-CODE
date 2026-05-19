@@ -813,25 +813,25 @@ Monotonic decreasing queue: front → back is decreasing
             soln.pop();
             k--;
         }
-        String smallest = "";
+        StringBuilder smallest = new StringBuilder();
+
         while (!soln.isEmpty()) {
-            smallest = soln.pop() + smallest;
-        }
-        // removing leading zeros
-        int i = 0;
-        while (i < smallest.length() && smallest.charAt(i) == '0') {
-            i++;
+            smallest.append(soln.pop());
         }
 
-        // substring(n) where n == length() returns an empty string ""
-        smallest = smallest.substring(i);
+        // reverse because stack gives digits in reverse order
+        smallest.reverse();
 
-        // if everything was zeros or empty
+        // remove leading zeros properly
+        while (smallest.length() > 0 && smallest.charAt(0) == '0') {
+            smallest.deleteCharAt(0);
+        }
+
         if (smallest.length() == 0) {
             return "0";
         }
 
-        return smallest;
+        return smallest.toString();
     }
 
 }
