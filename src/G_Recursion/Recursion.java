@@ -193,5 +193,155 @@ public class Recursion {
 
     */
 
+    // Count good numbers
+
+    /* Optimal Solution
+    class Solution {
+
+    private static final long MOD = 1_000_000_007L;
+
+    public int countGoodNumbers(long n) {
+
+        long evenIdx = (n + 1) / 2;
+        long oddIdx = n / 2;
+        long ans = (powerHelper(5, evenIdx) * powerHelper(4, oddIdx)) % MOD;
+
+        return (int) ans;
+    }
+
+    long powerHelper(long base, long pow) {
+
+        if (pow == 0)
+            return 1;
+
+        long half = powerHelper(base, pow / 2);
+
+        long result = (half * half) % MOD;
+
+        if (pow % 2 == 1) {
+            result = (result * base) % MOD;
+        }
+
+        return result;
+    }
+}
+
+    */
+
+    /* Purely using recursion (time complexity will be exponential)
+
+// starting from position 'index' up to length 'n'.
+
+public static int countGoodNumbers(int index, int n) {
+
+    // Base case:
+    // If we've filled all positions [0...n-1],
+    // we've formed one valid good string.
+    if (index == n) {
+        return 1;
+    }
+
+    int result = 0;
+
+    // Even index positions can contain:
+    // {0, 2, 4, 6, 8} -> 5 choices
+    if (index % 2 == 0) {
+
+        int[] evenDigits = {0, 2, 4, 6, 8};
+
+        // Try every valid digit at this position
+        for (int digit : evenDigits) {
+            result = (result + countGoodNumbers(index + 1, n)) % MOD;
+        }
+    }
+
+    // Odd index positions can contain:
+    // {2, 3, 5, 7} -> 4 choices
+    else {
+
+        int[] primeDigits = {2, 3, 5, 7};
+
+        // Try every valid digit at this position
+        for (int digit : primeDigits) {
+            result = (result + countGoodNumbers(index + 1, n)) % MOD;
+        }
+    }
+    return result;
+}
+*/
+
+    // Sort a stack using recursion
+
+    /*
+    class Solution {
+
+    public void sortStack(Stack<Integer> st) {
+
+        // Base case
+        if (st.isEmpty()) {
+            return;
+        }
+
+        int top = st.pop();
+
+        sortStack(st);
+
+        insert(top, st);
+    }
+
+    void insert(int ele, Stack<Integer> st) {
+
+        // Base case
+        if (st.isEmpty() || st.peek() <= ele) {
+            st.push(ele);
+            return;
+        }
+
+        int top = st.pop();
+
+        insert(ele, st);
+
+        st.push(top);
+    }
+}
+     */
+
+    // Reverse stack using recursion
+
+    /*
+
+    class Solution {
+
+    public void reverseStack(Stack<Integer> st) {
+
+        //base case
+        if(st.isEmpty()) return;
+
+        int top  = st.pop();
+
+        reverseStack(st);
+
+        pushBottom(top,st);
+
+    }
+
+    void pushBottom(int ele, Stack<Integer> st){
+
+        //base case
+        if(st.isEmpty()){
+            st.push(ele);
+            return;
+        }
+
+        int top  = st.pop();
+
+        pushBottom(ele,st);
+
+        st.push(top);
+    }
+}
+
+     */
+
 
 }
