@@ -415,7 +415,42 @@ public static int countGoodNumbers(int index, int n) {
     }
     */
 
+    // Power Set
 
+    /* Solved 78. Subsets from leetcode, same concept of pick/don't pick
+
+    class Solution {
+
+        // TC = (2^n)*n AND SC = n
+
+        public List<List<Integer>> subsets(int[] nums) {
+            List<List<Integer>> ans = new ArrayList<>();
+
+            helper(0, new ArrayList<>(), nums, ans);
+
+            return ans;
+        }
+
+        void helper(int idx, ArrayList<Integer> current, int nums[], List<List<Integer>> ans) {
+
+            // base case
+            if (idx == nums.length) {
+                // note: don't add current directly
+                ans.add(new ArrayList<>(current));
+                return;
+            }
+
+            // pick the current element
+            current.add(nums[idx]);
+            helper(idx + 1, current, nums, ans);
+
+            // don't pick the current element
+            current.remove(current.size() - 1);
+            helper(idx + 1, current, nums, ans);
+
+        }
+    }
+    */
 
 
 }
