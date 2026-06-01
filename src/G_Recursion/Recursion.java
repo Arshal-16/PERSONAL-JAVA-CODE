@@ -343,5 +343,79 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
+    /// /////////// SUBSEQUENCE PATTERN ///////////////////////
+
+    // Generate binary strings without consecutive 1's
+
+    /* Solved 3211. Generate Binary Strings Without Adjacent Zeros from leetcode
+
+    class Solution {
+    public List<String> validStrings(int n) {
+        // All substrings of length 2 should contain atleast one '1'
+        // ie consecutive 0 should not be there
+
+        ArrayList<String> ans = new ArrayList<>();
+
+        return generateSequences(0, n, "", ans);
+    }
+
+    List<String> generateSequences(int idx, int n, String s, List<String> ans) {
+
+        // base case
+        if (idx == n) {
+            ans.add(s);
+            return ans;
+        }
+        if (idx == 0 || s.charAt(idx-1) == '1') {
+            generateSequences(idx + 1, n, s + "0", ans);
+            generateSequences(idx + 1, n, s + "1", ans);
+        } else {
+            generateSequences(idx + 1, n, s + "1", ans);
+        }
+
+        return ans;
+    }
+}
+     */
+
+    // Generate Parentheses
+
+    /*
+
+    class Solution {
+        public List<String> generateParenthesis(int n) {
+
+            ArrayList<String> ans = new ArrayList<>();
+            helper(n, 0, 0, new StringBuilder(), ans);
+            return ans;
+
+        }
+
+        void helper(int n, int openUsed, int closeUsed,
+                    StringBuilder current, List<String> ans) {
+
+            // base case
+            if (current.length() == 2 * n) {
+                ans.add(current.toString());
+                return;
+            }
+
+            if (openUsed < n) {
+                current.append('(');
+                helper(n, openUsed + 1, closeUsed, current, ans);
+                current.deleteCharAt(current.length() - 1);
+            }
+
+            if (closeUsed < openUsed) {
+                current.append(')');
+                helper(n, openUsed, closeUsed + 1, current, ans);
+                current.deleteCharAt(current.length() - 1);
+            }
+        }
+    }
+    */
+
+
+
 
 }
