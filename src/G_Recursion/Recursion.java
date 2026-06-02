@@ -452,5 +452,113 @@ public static int countGoodNumbers(int index, int n) {
     }
     */
 
+    // Count all subsequences with sum K
+
+    /* this solution if it is allowed to consider empty subsequence
+
+    class Solution {
+    public int countSubsequenceWithTargetSum(int[] nums, int target) {
+        return helper(0, nums, target);
+    }
+
+     int helper(int index, int[] nums, int remainingSum) {
+        if (index == nums.length) {
+            return remainingSum == 0 ? 1 : 0;
+        }
+
+        int include = helper(index + 1, nums, remainingSum - nums[index]);
+        int exclude = helper(index + 1, nums, remainingSum);
+
+        return include + exclude;
+    }
+}
+
+     */
+
+    /* This soln if empty subsequence is not allowed
+
+    class Solution {
+    public int countSubsequenceWithTargetSum(int[] nums, int k) {
+        return dfs(0, nums, k, false);
+    }
+
+    private int dfs(int index, int[] nums, int remainingSum, boolean picked) {
+        if (index == nums.length) {
+            return (remainingSum == 0 && picked) ? 1 : 0;
+        }
+
+        int include = dfs(index + 1, nums, remainingSum - nums[index], true);
+        int exclude = dfs(index + 1, nums, remainingSum, picked);
+
+        return include + exclude;
+    }
+}
+
+     */
+
+    // Check if there exists a subsequence with sum K
+
+    /*
+
+    class Solution {
+    public boolean checkSubsequenceSum(int[] nums, int k) {
+        return helper(0, nums, k);
+    }
+
+    private boolean helper(int index, int[] nums, int remainingSum) {
+        if (index == nums.length) {
+            return remainingSum == 0;
+        }
+
+        if (helper(index + 1, nums, remainingSum - nums[index])) {
+            return true;
+        }
+
+        if (helper(index + 1, nums, remainingSum)) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+     */
+
+    // Combination Sum
+
+    /*
+
+    class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+
+        List<List<Integer>> ans = new ArrayList<>();
+        helper(0, candidates, target, new ArrayList<>(), ans);
+        return ans;
+    }
+
+    void helper(int idx, int[] candidates, int remainingSum,
+                ArrayList<Integer> curr, List<List<Integer>> ans) {
+
+        // base case: if we have processed all elements
+        if (idx == candidates.length) {
+            if (remainingSum == 0) {
+                ans.add(new ArrayList<>(curr)); // store valid combination
+            }
+            return;
+        }
+
+        // pick current element (if it does not exceed remaining sum)
+        if (candidates[idx] <= remainingSum) {
+            curr.add(candidates[idx]); // choose element
+            helper(idx, candidates, remainingSum - candidates[idx], curr, ans);
+            curr.remove(curr.size() - 1); // backtrack
+        }
+
+        // skip current element
+        helper(idx + 1, candidates, remainingSum, curr, ans);
+    }
+}
+
+     */
 
 }
