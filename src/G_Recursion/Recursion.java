@@ -561,4 +561,144 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
+    // Combination Sum II
+
+    /*
+
+    class Solution {
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+
+        Arrays.sort(candidates);
+
+        List<List<Integer>> ans = new ArrayList<>();
+
+        helper(0, candidates, target, new ArrayList<>(), ans);
+
+        return ans;
+
+    }
+
+    void helper(int start, int[] candidates, int remaining,
+            List<Integer> path, List<List<Integer>> ans) {
+
+    // start tells "From which index am I allowed to pick the next number?"
+
+    // We found a valid combination whose sum equals the target
+    if (remaining == 0) {
+        ans.add(new ArrayList<>(path));
+        return;
+    }
+
+    // Try every candidate starting from 'start'.
+    // Using 'start' ensures each element is used at most once.
+    for (int i = start; i < candidates.length; i++) {
+
+        // Skip duplicates at the same recursion level.
+        if (i > start && candidates[i] == candidates[i - 1]) {
+            continue;
+        }
+
+        // Since the array is sorted, all elements after candidates[i]
+        // will also be greater than 'remaining', so no valid combination
+        // can be formed beyond this point.
+        if (candidates[i] > remaining) {
+            break;
+        }
+
+        // Choose the current candidate.
+        path.add(candidates[i]);
+
+        helper(i + 1, candidates, remaining - candidates[i], path, ans);
+
+        // Backtrack: remove the last chosen element and try the next candidate.
+        path.remove(path.size() - 1);
+    }
+}
+}
+
+     */
+
+    // Subset I ( Subset Sum : Sum of all Subsets )
+
+    /*
+
+    class Solution {
+    public List<Integer> subsetSums(int[] nums) {
+
+        List<Integer> result = new ArrayList<>();
+        helper(0, 0, nums, result);
+
+        Collections.sort(result);
+
+        return result;
+    }
+
+    void helper(int idx, int sum, int nums[], List<Integer> result){
+
+        //base case
+        if(idx==nums.length){
+            result.add(sum);
+            return;
+        }
+
+        // pick the curr ele
+        helper(idx+1,sum+nums[idx],nums,result);
+
+        // don't pick the curr ele
+        helper(idx+1,sum,nums,result);
+
+    }
+}
+
+     */
+
+    // Subsets II
+
+    /*
+
+    Every recursion state represents a valid subset,
+    so add the current subset to the answer immediately.
+    We use a loop to try every possible next element.
+    Choosing nums[i] is the "pick" step.
+    The "not-pick" case is implicit: after exploring a choice,
+    we backtrack and continue the loop, effectively skipping
+    that element and moving on to other possibilities.
+    Duplicate values are skipped at the same recursion level
+    to avoid generating duplicate subsets.
+
+    class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+
+        // Sort
+        Arrays.sort(nums);
+
+        List<List<Integer>> ans = new ArrayList<>();
+
+        helper(0, nums, new ArrayList<>(), ans);
+
+        return ans;
+    }
+
+    void helper(int start, int nums[], List<Integer> path, List<List<Integer>> ans) {
+
+        ans.add(new ArrayList<>(path));
+
+        for (int i = start; i < nums.length; i++) {
+            if (i > start && nums[i] == nums[i - 1])
+                continue;
+
+            // select the current element
+            path.add(nums[i]);
+            helper(i + 1, nums, path, ans);
+            //backtrack
+            path.remove(path.size() - 1);
+        }
+
+    }
+}
+
+     */
+
+
+
 }
