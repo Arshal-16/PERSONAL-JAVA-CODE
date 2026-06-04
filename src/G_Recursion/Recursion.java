@@ -699,6 +699,184 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
+    // Combination Sum III
+
+    /*
+
+    class Solution {
+    public List<List<Integer>> combinationSum3(int k, int n) {
+
+        int nums[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        List<List<Integer>> ans = new ArrayList<>();
+
+        helper(0, nums, k , n, new ArrayList<>(), ans);
+
+        return ans;
+
+    }
+
+    void helper(int idx, int nums[], int k, int remaining, ArrayList<Integer> curr, List<List<Integer>> ans) {
+
+        // base case
+        if (idx == nums.length || k == 0 || remaining == 0) {
+            if (remaining == 0 && k == 0) {
+                ans.add(new ArrayList<>(curr));
+            }
+            return;
+        }
+
+        // pick
+        if (nums[idx] <= remaining) {
+            curr.add(nums[idx]);
+            helper(idx + 1, nums, k - 1, remaining - nums[idx], curr, ans);
+            curr.remove(curr.size() - 1);
+        }
+
+        // don't pick
+        helper(idx + 1, nums, k, remaining, curr, ans);
+
+    }
+}
+
+     */
+
+    /* Slightly optimised for memory ( runtime beats 100%, memory beats 81% )
+
+    class Solution {
+    public List<List<Integer>> combinationSum3(int k, int n) {
+
+        List<List<Integer>> ans = new ArrayList<>();
+
+        helper(1, k, n, new ArrayList<>(), ans);
+
+        return ans;
+
+    }
+
+    void helper(int num, int k, int remaining, ArrayList<Integer> curr, List<List<Integer>> ans) {
+
+        // base case
+        if (num > 9 || k == 0 || remaining == 0) {
+            if (remaining == 0 && k == 0) {
+                ans.add(new ArrayList<>(curr));
+            }
+            return;
+        }
+
+        // pick
+        if (num <= remaining) {
+            curr.add(num);
+            helper(num + 1, k - 1, remaining - num, curr, ans);
+            curr.remove(curr.size() - 1);
+        }
+
+        // don't pick
+        helper(num + 1, k, remaining, curr, ans);
+
+    }
+}
+
+     */
+
+    /* Most preferred solution, above 2 solutions were done by self
+
+    class Solution {
+
+    public List<List<Integer>> combinationSum3(int k, int n) {
+
+        List<List<Integer>> result = new ArrayList<>();
+
+        backtrack(n, 1, new ArrayList<>(), k, result);
+
+        return result;
+    }
+
+    void backtrack(int remainingSum, int startNum, List<Integer> currentCombination, int targetSize, List<List<Integer>> result) {
+
+        // base case
+        if (remainingSum == 0 && currentCombination.size() == targetSize) {
+            result.add(new ArrayList<>(currentCombination));
+            return;
+        }
+        // base case
+        if (remainingSum <= 0 || currentCombination.size() > targetSize) {
+            return;
+        }
+
+        for (int num = startNum; num <= 9; num++) {
+
+            if (num > remainingSum) {
+                break;
+            }
+
+            currentCombination.add(num);
+
+            backtrack(remainingSum - num, num + 1, currentCombination, targetSize, result);
+
+            currentCombination.remove(currentCombination.size() - 1);
+        }
+    }
+}
+
+     */
+
+    // Letter Combinations of a Phone Number
+
+    /*
+
+    class Solution {
+
+    public List<String> letterCombinations(String digits) {
+        List<String> combinations = new ArrayList<>();
+
+        buildCombinations(0, digits, new StringBuilder(), combinations);
+
+        return combinations;
+    }
+
+    void buildCombinations(int digitIndex, String digits, StringBuilder currentCombination, List<String> combinations) {
+
+        if (digits.length() == 0) {
+            return;
+        }
+
+        if (digitIndex == digits.length()) {
+            combinations.add(currentCombination.toString());
+            return;
+        }
+
+        char startChar, endChar;
+
+        int currentDigit = digits.charAt(digitIndex) - '0';
+
+        if (currentDigit < 8) {
+            startChar = (char) ('a' + (currentDigit - 2) * 3);
+
+            if (currentDigit != 7) {
+                endChar = (char) (startChar + 2);
+            } else {
+                endChar = (char) (startChar + 3);
+            }
+        } else if (currentDigit == 8) {
+            startChar = 't';
+            endChar = (char) (startChar + 2);
+        } else {
+            startChar = 'w';
+            endChar = (char) (startChar + 3);
+        }
+
+        for (char letter = startChar; letter <= endChar; letter++) {
+            currentCombination.append(letter);
+
+            buildCombinations(digitIndex + 1,digits,currentCombination,combinations);
+
+            currentCombination.deleteCharAt(digitIndex);
+        }
+    }
+}
+
+     */
 
 
 }
