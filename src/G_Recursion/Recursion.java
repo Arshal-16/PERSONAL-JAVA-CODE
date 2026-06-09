@@ -1025,6 +1025,15 @@ public static int countGoodNumbers(int index, int n) {
                 }
             }
         }
+
+        For the diagonals that run from the top-right to the bottom-left (`/` diagonals),
+        all cells on the same diagonal have the same value of `col - row` (equivalently,
+        you can use `row - col`; both work). For example, in a 4×4 board, the cells `(0,3)`, `(1,2)`, `(2,1)`, and `(3,0)` all have `col - row = 3`,
+        so they belong to the same diagonal. The problem is that `col - row` can be negative. On an `n × n` board, its range is from `-(n - 1)` to `+(n - 1)`.
+        Since array indices cannot be negative, we shift the entire range by adding `n - 1`,
+        giving the formula `n - 1 + col - row`. This converts the range from `[-(n-1), +(n-1)]` to `[0, 2n-2]`,
+        which fits perfectly into an array of size `2*n - 1`.
+
      */
 
 
