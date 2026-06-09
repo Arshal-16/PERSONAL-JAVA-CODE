@@ -878,5 +878,156 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
+    ////////////// TRYING OUT ALL COMBOS/HARD  ///////////////////////
+
+    // Palindrome Partitioning ( LC 131 )
+
+    /*
+
+    Given a string s, partition s such that every substring of the partition is a palindrome. Return all possible palindrome partitioning of s.
+
+    A palindrome string is a string that reads the same backward as forward.
+
+    Example 1:
+
+    Input:  s = "aab"
+    Output: [["a","a","b"],["aa","b"]]
+
+    Example 2:
+
+    Input:  s = "a"
+    Output: [["a"]]
+
+    Constraints:
+
+    • 1 <= s.length <= 16
+    • s contains only lowercase English letters.
+
+    */ // question
+
+    /*
+        class Solution {
+        public List<List<String>> partition(String s) {
+
+            List<List<String>> res = new ArrayList<>();
+            backtrack(0, s, new ArrayList<>(), res);
+
+            return res;
+        }
+
+        void backtrack(int idx, String s, List<String> path, List<List<String>> res) {
+
+        // Base case:
+        // We have processed the entire string, so the current
+        // partition stored in 'path' is a valid answer.
+        if (idx == s.length()) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+
+        // Try every possible substring starting from idx
+        for (int i = idx; i < s.length(); i++) {
+
+            // Skip if the current substring is not a palindrome
+            if (!isPalindrome(s, idx, i))
+                continue;
+
+            // Choose:
+            // Add the palindrome substring to the current partition
+            path.add(s.substring(idx, i + 1));
+
+            // Explore:
+            // Recursively partition the remaining part of the string
+            backtrack(i + 1, s, path, res);
+
+            // Unchoose (Backtrack):
+            // Remove the last added substring so that we can
+            // try another partition choice
+            path.remove(path.size() - 1);
+        }
+    }
+
+        boolean isPalindrome(String s, int start, int end) {
+
+            while (start < end) {
+                if (s.charAt(start) != s.charAt(end))
+                return false;
+                start++;
+                end--;
+            }
+            return true;
+        }
+    }
+
+     */
+
+    // N-Queens
+
+    /* See how hashing is used to check if queen canbe placed
+            class Solution {
+            public List<List<String>> solveNQueens(int n) {
+
+                char board[][] = new char[n][n];
+
+                // fill the board
+                for (int row = 0; row < n; row++) {
+                    for (int col = 0; col < n; col++) {
+                        board[row][col] = '.';
+                    }
+                }
+
+                List<List<String>> res = new ArrayList<>();
+
+                int[] leftRow = new int[n];
+                int[] lowerDiagonal = new int[2 * n - 1];
+                int[] upperDiagonal = new int[2 * n - 1];
+
+                backtrack(0, board, res, n, leftRow, lowerDiagonal, upperDiagonal);
+
+                return res;
+            }
+
+            void backtrack(int col, char board[][], List<List<String>> res, int n,
+                           int[] leftRow, int[] lowerDiagonal, int[] upperDiagonal) {
+
+                // base case
+                if (col == n) {
+                    List<String> temp = new ArrayList<>();
+                    for (int row = 0; row < n; row++) {
+                        temp.add(new String(board[row]));
+                    }
+                    res.add(temp);
+                    return;
+                }
+
+                for (int row = 0; row < n; row++) {
+
+                    // O(1) safety check using hashing
+                    if (leftRow[row] == 0 &&
+                        lowerDiagonal[row + col] == 0 &&
+                        upperDiagonal[(n - 1 )+ (col - row)] == 0) {
+
+                        // place queen
+                        board[row][col] = 'Q';
+                        leftRow[row] = 1;
+                        lowerDiagonal[row + col] = 1;
+                        upperDiagonal[(n - 1 )+ (col - row)] = 1;
+
+                        backtrack(col + 1, board, res, n,
+                                  leftRow, lowerDiagonal, upperDiagonal);
+
+                        // backtrack
+                        board[row][col] = '.';
+                        leftRow[row] = 0;
+                        lowerDiagonal[row + col] = 0;
+                        upperDiagonal[(n - 1 )+ (col - row)] = 0;
+                    }
+                }
+            }
+        }
+     */
+
+
+
 
 }
