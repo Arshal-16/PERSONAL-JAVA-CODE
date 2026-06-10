@@ -961,6 +961,134 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
+    // Word Search
+
+    /* ( done by self ) here i used visited array, but it canbe done without it, optimizing SC from mn to 1
+
+            class Solution {
+            public boolean exist(char[][] board, String word) {
+
+                int rows = board.length;
+                int cols = board[0].length;
+
+                for (int row = 0; row < rows; row++) {
+                    for (int col = 0; col < cols; col++) {
+                        if (backtrack(0, row, col, word, board, new boolean[rows][cols])) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            boolean backtrack(int currIdx, int row, int col, String word,
+                              char[][] board, boolean[][] visited) {
+
+                // base case
+                if (currIdx == word.length()) {
+                    return true;
+                }
+
+                if (row >= board.length || col >= board[0].length || row < 0 || col < 0) {
+                    return false;
+                }
+
+                if (board[row][col] == word.charAt(currIdx) && !visited[row][col]) {
+                    // mark position as visited
+                    visited[row][col] = true;
+
+                    // check for next letter upward
+                    if (backtrack(currIdx + 1, row - 1, col, word, board, visited))
+                        return true;
+
+                    // check for next letter downward
+                    if (backtrack(currIdx + 1, row + 1, col, word, board, visited))
+                        return true;
+
+                    // check for next letter left
+                    if (backtrack(currIdx + 1, row, col - 1, word, board, visited))
+                        return true;
+
+                    // check for next letter right
+                    if (backtrack(currIdx + 1, row, col + 1, word, board, visited))
+                        return true;
+
+                    // backtrack
+                    visited[row][col]=false;
+                }
+
+                return false;
+            }
+        }
+
+
+    */
+
+    /*
+
+    The time complexity is **O(m × n × 4^L)** because we may start a DFS from every cell in the board (`m × n` starting positions).
+    For each starting position, the recursion can explore up to **4 directions** (up, down, left, right) at every character of the word.
+    If the word length is `L`, the recursion tree can have at most `4^L` paths in the worst case.
+    Therefore, combining the `m × n` starting cells with the worst-case DFS exploration gives a total time complexity of **O(m × n × 4^L)**.
+    This is a conservative upper bound; a tighter analysis is **O(m × n × 4 × 3^(L−1))** because after the first move,
+    we cannot immediately revisit the previous cell.
+
+        class Solution {
+
+        public boolean exist(char[][] board, String word) {
+
+            int rows = board.length;
+            int cols = board[0].length;
+
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
+                    if (backtrack(0, row, col, word, board)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private boolean backtrack(int currIdx, int row, int col, String word,
+                char[][] board) {
+
+            // matched entire word
+            if (currIdx == word.length()) {
+                return true;
+            }
+
+            // out of bounds
+            if (row < 0 || row >= board.length ||
+                    col < 0 || col >= board[0].length) {
+                return false;
+            }
+
+            // character mismatch or already visited
+            if (board[row][col] != word.charAt(currIdx)) {
+                return false;
+            }
+
+            // mark as visited
+            char temp = board[row][col];
+            board[row][col] = '#';
+
+            boolean found = backtrack(currIdx + 1, row - 1, col, word, board) ||
+                    backtrack(currIdx + 1, row + 1, col, word, board) ||
+                    backtrack(currIdx + 1, row, col - 1, word, board) ||
+                    backtrack(currIdx + 1, row, col + 1, word, board);
+
+            // restore cell (backtrack)
+            board[row][col] = temp;
+
+            return found;
+        }
+    }
+
+
+    */ // without using visited array
+
     // N-Queens
 
     /* See how hashing is used to check if queen canbe placed
@@ -1035,6 +1163,61 @@ public static int countGoodNumbers(int index, int n) {
         which fits perfectly into an array of size `2*n - 1`.
 
      */
+
+    // Rat in a Maze
+
+    /*
+
+        class Solution {
+        public List<String> findPath(int[][] grid) {
+
+            List<String> res = new ArrayList<>();
+
+            if (grid[0][0] == 0) {
+                return res;
+            }
+
+            backtrack(0, 0, "", grid, res);
+
+            return res;
+        }
+
+        void backtrack(int row, int col, String currPath, int grid[][], List<String> res) {
+
+            int n = grid.length;
+
+            // out of bounds
+            if (row < 0 || col < 0 || row >= n || col >= n) {
+                return;
+            }
+
+            // blocked or already visited
+            if (grid[row][col] == 0) {
+                return;
+            }
+
+            // destination reached
+            if (row == n - 1 && col == n - 1) {
+                res.add(currPath);
+                return;
+            }
+
+            // mark visited
+            grid[row][col] = 0;
+
+            backtrack(row - 1, col, currPath + "U", grid, res);
+            backtrack(row + 1, col, currPath + "D", grid, res);
+            backtrack(row, col - 1, currPath + "L", grid, res);
+            backtrack(row, col + 1, currPath + "R", grid, res);
+
+            // backtrack
+            grid[row][col] = 1;
+        }
+    }
+
+     */
+
+
 
 
 
