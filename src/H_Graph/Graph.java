@@ -3,6 +3,8 @@ import java.util.*;
 
 public class Graph {
 
+    /////////////////////// LEARNING ////////////////////////////
+
     // BREADTH FIRST SEARCH (BFS)
 
     /*
@@ -60,6 +62,8 @@ public class Graph {
 
    In an undirected graph, each edge appears
    in the adjacency list of both endpoints.
+
+   The inner for loop will run for all degrees i.e. ∑ degree(v) = 2E (for undirected graph)
 
    Therefore, total edge traversals = 2E
 
@@ -132,6 +136,10 @@ public class Graph {
     }
 
     */
+
+    // DEPTH FIRST SEARCH (DFS)
+
+
 
 
 }
