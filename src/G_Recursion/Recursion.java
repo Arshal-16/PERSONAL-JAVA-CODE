@@ -1217,9 +1217,4 @@ public static int countGoodNumbers(int index, int n) {
 
      */
 
-
-
-
-
-
 }
