@@ -139,6 +139,124 @@ public class Graph {
 
     // DEPTH FIRST SEARCH (DFS)
 
+    /*
+   Traversal Type: Depth-wise (DFS - Preorder)
+
+   Starting Node = 1
+
+   Graph Structure (Assumed Traversal Order):
+
+                           1
+                         /   \
+                        /     \
+                       2       6
+                      / \     / \
+                     3   4   7   8
+                          \
+                           5
+                            \
+                             7   (cross connection as in graph)
+
+   Adjacency (for DFS consistency):
+
+   1 -> {2, 6}
+   2 -> {3, 4}
+   3 -> {}
+   4 -> {5}
+   5 -> {7}
+   6 -> {7, 8}
+   7 -> {}
+   8 -> {}
+
+   DFS Traversal (Preorder, Visited Marked):
+
+   Start at 1
+   Go deep before visiting siblings
+
+   Traversal Steps:
+
+   1 -> 2 -> 3 (backtrack)
+   2 -> 4 -> 5 -> 7 (backtrack to 1)
+   1 -> 6 -> 8
+
+   Complete DFS Order:
+   1 -> 2 -> 3 -> 4 -> 5 -> 7 -> 6 -> 8
+*/ // Explanation
+
+    /*
+   DFS (Recursive Approach) - Time & Space Complexity
+
+   Each vertex is visited exactly once
+   → Visited array ensures no repeated processing
+
+   Each edge is explored at most twice (undirected graph)
+   → Once from each endpoint
+   → Total edge checks = 2E
+
+   ---------------------------------------
+   TIME COMPLEXITY
+
+   Work done:
+   - Visiting all vertices = V
+   - Traversing adjacency lists = 2E ( The inner for loop will run for all degrees i.e. ∑ degree(v) = 2E (for undirected graph) )
+
+   Total work = V + 2E
+
+   Ignoring constants:
+
+   Time Complexity = O(V + E)
+
+
+   ---------------------------------------
+   SPACE COMPLEXITY
+
+   1. Visited Array:
+      O(V)
+
+   2. Recursion Stack (DFS call stack):
+      - Worst case: all nodes in a single chain
+      - Maximum depth = V
+
+      Stack Space = O(V)
+
+   3. Adjacency List (given input graph):
+      O(V + E)
+
+   ---------------------------------------
+   TOTAL SPACE COMPLEXITY
+
+   Auxiliary Space (excluding graph storage):
+      = O(V) (visited + recursion stack)
+
+   Including graph representation:
+      = O(V + E)
+
+
+   ---------------------------------------
+   FINAL:
+
+   Time Complexity  = O(V + E)
+   Space Complexity = O(V) auxiliary
+                     = O(V + E) including graph
+*/ // Time and Space Complexity
+
+    /*
+
+        void dfsOfGraph(int startNode, boolean visited[], List<List<Integer>> adjacencyList, List<Integer> dfs){
+
+            visited[startNode]=true;
+            dfs.add(startNode);
+
+            for(int neighbour:adjacencyList.get(startNode)){
+                if(!visited[neighbour]){
+                    dfsOfGraph(neighbour, visited, adjacencyList, dfs);
+                }
+            }
+        }
+
+     */
+
+    /////////////////////// PROBLEMS ON BFS/DFS ////////////////////////////
 
 
 
