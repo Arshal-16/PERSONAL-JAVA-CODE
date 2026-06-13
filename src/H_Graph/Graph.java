@@ -256,8 +256,127 @@ public class Graph {
 
      */
 
+    // DETECT CYCLE IN UNDIRECTED GRAPH (USING BFS)
+
+    /*
+
+    static class Pair {
+        int childNode;
+        int parentNode;
+
+        Pair(int childNode, int parentNode) {
+            this.childNode = childNode;
+            this.parentNode = parentNode;
+        }
+    }
+
+    boolean detectCycle(ArrayList<ArrayList<Integer>> adjacencyList) {
+
+        boolean[] visited = new boolean[adjacencyList.size()];
+
+        // We iterate through all nodes to handle disconnected graphs.
+        // If the graph is guaranteed to be connected, a single call like
+        // isCyclic(0, visited, adjacencyList) would be sufficient.
+
+        for (int node = 0; node < adjacencyList.size(); node++) {
+            if (!visited[node]) {
+                if (isCyclic(node, visited, adjacencyList)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    boolean isCyclic(int startNode, boolean[] visited, ArrayList<ArrayList<Integer>> adjacencyList) {
+
+        visited[startNode] = true;
+
+        Queue<Pair> queue = new ArrayDeque<>();
+        queue.add(new Pair(startNode, -1));
+
+        while (!queue.isEmpty()) {
+
+            Pair currentPair = queue.remove();
+
+            int currentNode = currentPair.childNode;
+            int parentNode = currentPair.parentNode;
+
+            for (int neighbourNode : adjacencyList.get(currentNode)) {
+
+                if (!visited[neighbourNode]) {
+                    visited[neighbourNode] = true;
+                    queue.add(new Pair(neighbourNode, currentNode));
+                } else if (neighbourNode != parentNode) {
+                    // Neighbour is already visited and is not the parent,
+                    // which means we found a cycle in an undirected graph.
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+     */
+
+    // DETECT CYCLE IN UNDIRECTED GRAPH (USING DFS)
+
+    /*
+
+        boolean detectCycle(ArrayList<ArrayList<Integer>> adjacencyList) {
+
+            boolean[] visited = new boolean[adjacencyList.size()];
+
+            // We iterate through all nodes to handle disconnected graphs.
+            // If the graph is guaranteed to be connected, a single call like
+            // isCyclic(0, -1, visited, adjacencyList) would be sufficient.
+            for (int node = 0; node < adjacencyList.size(); node++) {
+                if (!visited[node]) {
+                    if (isCyclic(node, -1, visited, adjacencyList)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        boolean isCyclic(int currentNode, int parentNode,
+                         boolean[] visited,
+                         ArrayList<ArrayList<Integer>> adjacencyList) {
+
+            visited[currentNode] = true;
+
+            for (int neighbourNode : adjacencyList.get(currentNode)) {
+
+                if (!visited[neighbourNode]) {
+
+                    if (isCyclic(neighbourNode, currentNode,
+                            visited, adjacencyList)) {
+                        return true;
+                    }
+
+                } else if (neighbourNode != parentNode) {
+
+                    // Neighbour is already visited and is not the parent,
+                    // which means we found a cycle in an undirected graph.
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+     */
+
+
+
     /////////////////////// PROBLEMS ON BFS/DFS ////////////////////////////
 
-
+    
 
 }
