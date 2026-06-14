@@ -350,6 +350,55 @@ public class arrays {
         return maxSum;
     }
 
+    // PRINT SUBARRAY WITH MAXIMUM SUBARRAY SUM
+
+    /*
+            class Solution {
+            public int[] maxSubArray(int[] nums) {
+
+                // Stores the maximum sum found so far
+                int maxSum = nums[0];
+
+                // Stores the current subarray sum while iterating
+                int currSum = nums[0];
+
+                // Final best subarray start and end indices
+                int start = 0;
+                int end = 0;
+
+                // Temporary start index for current subarray
+                int tempStart = 0;
+
+                for (int i = 1; i < nums.length; i++) {
+
+                    // If current sum becomes negative, start a new subarray
+                    if (currSum < 0) {
+                        currSum = nums[i];
+                        tempStart = i;
+                    } else {
+                        // Extend current subarray
+                        currSum += nums[i];
+                    }
+
+                    // Update best sum and record indices if we found a better subarray
+                    if (currSum > maxSum) {
+                        maxSum = currSum;
+                        start = tempStart;
+                        end = i;
+                    }
+                }
+
+                // Build the result array using stored indices
+                int[] result = new int[end - start + 1];
+                for (int i = start; i <= end; i++) {
+                    result[i - start] = nums[i];
+                }
+
+                return result;
+            }
+        }
+     */
+
     //STOCK BUY AND SELL
     public static int buyAndSell(int arr[]) {
         if (arr == null || arr.length < 2) return 0;
