@@ -465,6 +465,44 @@ public class arrays {
         return arr;
     }
 
+    /* MORE CLEAN AND READABLE CODE
+            class Solution {
+            public void nextPermutation(int[] nums) {
+                int n = nums.length;
+                int i = n - 2;
+                while (i >= 0 && nums[i] >= nums[i + 1]) {
+                    i--;
+                }
+                //i will be at pivot
+                if (i >= 0) {
+                    int j = n - 1;
+
+                    // find first element from end which is greater than nums[i]
+                    while (j > i && nums[i] >= nums[j]) {
+                        j--;
+                    }
+                    swap(nums, i, j);
+                }
+                reverse(nums, i + 1, n - 1);
+            }
+
+            void swap(int nums[], int posA, int posB) {
+                int temp = nums[posA];
+                nums[posA] = nums[posB];
+                nums[posB] = temp;
+            }
+
+            void reverse(int nums[], int start, int end) {
+                while (start < end) {
+                    swap(nums, start, end);
+                    start++;
+                    end--;
+                }
+            }
+        }
+     */
+
+
     //LEADERS IN AN ARRAY
     public static ArrayList<Integer> leadersInArray(int arr[]) {
         if (arr == null || arr.length == 0) return new ArrayList<>();
