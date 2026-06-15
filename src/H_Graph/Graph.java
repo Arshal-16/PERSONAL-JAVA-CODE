@@ -374,9 +374,419 @@ public class Graph {
      */
 
 
-
     /////////////////////// PROBLEMS ON BFS/DFS ////////////////////////////
 
-    
+    // Number of Provinces
+
+    /* Canbe solved with both bfs and dfs
+
+            class Solution {
+            public int findCircleNum(int[][] isConnected) {
+
+                int n = isConnected.length;
+
+                // convert matrix to adjacency list
+
+                List<List<Integer>> graph = new ArrayList<>();
+
+                for (int city = 0; city < n; city++) {
+                    graph.add(new ArrayList<>());
+                }
+
+                for (int city = 0; city < n; city++) {
+                    for (int neighborCity = 0; neighborCity < n; neighborCity++) {
+                        if (isConnected[city][neighborCity] == 1) {
+                            graph.get(city).add(neighborCity);
+                        }
+                    }
+                }
+
+                boolean[] visited = new boolean[n];
+                int provinceCount = 0;
+
+                for (int city = 0; city < n; city++) {
+                    if (!visited[city]) {
+                        provinceCount++;
+                        bfs(city, visited, graph);
+                    }
+                }
+
+                return provinceCount;
+            }
+
+            private void bfs(int startCity, boolean[] visited, List<List<Integer>> graph) {
+                Queue<Integer> queue = new ArrayDeque<>();
+
+                visited[startCity] = true;
+                queue.add(startCity);
+
+                while (!queue.isEmpty()) {
+                    int currentCity = queue.remove();
+
+                    for (int neighbor : graph.get(currentCity)) {
+                        if (!visited[neighbor]) {
+                            visited[neighbor] = true;
+                            queue.add(neighbor);
+                        }
+                    }
+                }
+            }
+}
+
+     */
+
+    /* Solution without using adjacency list
+
+            class Solution {
+            public int findCircleNum(int[][] isConnected) {
+                int n = isConnected.length;
+                boolean[] visited = new boolean[n];
+
+                int provinceCount = 0;
+
+                for (int city = 0; city < n; city++) {
+                    if (!visited[city]) {
+                        provinceCount++;
+                        bfs(city, isConnected, visited);
+                    }
+                }
+
+                return provinceCount;
+            }
+
+            private void bfs(int startCity, int[][] isConnected, boolean[] visited) {
+                Queue<Integer> queue = new ArrayDeque<>();
+
+                visited[startCity] = true;
+                queue.add(startCity);
+
+                while (!queue.isEmpty()) {
+                    int currentCity = queue.remove();
+
+                    for (int nextCity = 0; nextCity < isConnected.length; nextCity++) {
+                        if (isConnected[currentCity][nextCity] == 1 && !visited[nextCity]) {
+                            visited[nextCity] = true;
+                            queue.add(nextCity);
+                        }
+                    }
+                }
+            }
+        }
+
+     */
+
+    // Rotting Oranges
+
+    /* Recall why dfs will give a wrong ans if used here
+
+            import java.util.*;
+
+        class Solution {
+
+            static class OrangeState {
+                int row;
+                int col;
+                int time;
+
+                OrangeState(int row, int col, int time) {
+                    this.row = row;
+                    this.col = col;
+                    this.time = time;
+                }
+            }
+
+            public int orangesRotting(int[][] grid) {
+                return bfs(grid);
+            }
+
+            private int bfs(int[][] grid) {
+
+                int rowCount = grid.length;
+                int colCount = grid[0].length;
+
+                boolean[][] visited = new boolean[rowCount][colCount];
+
+                Queue<OrangeState> bfsQueue = new ArrayDeque<>();
+
+                int freshOrangeCount = 0;
+
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < colCount; col++) {
+
+                        if (grid[row][col] == 2) {
+                            visited[row][col] = true;
+                            bfsQueue.add(new OrangeState(row, col, 0));
+                        } else if (grid[row][col] == 1) {
+                            freshOrangeCount++;
+                        }
+                    }
+                }
+
+                int maxTime = 0;
+                int rottedFreshOrangeCount = 0;
+
+                int[] rowDirections = {-1, 0, 0, 1};
+                int[] colDirections = {0, -1, 1, 0};
+
+                while (!bfsQueue.isEmpty()) {
+
+                    OrangeState currentOrange = bfsQueue.remove();
+
+                    maxTime = Math.max(maxTime, currentOrange.time);
+
+                    for (int direction = 0; direction < 4; direction++) {
+
+                        int nextRow = currentOrange.row + rowDirections[direction];
+                        int nextCol = currentOrange.col + colDirections[direction];
+
+                        if (nextRow >= 0 && nextRow < rowCount &&
+                            nextCol >= 0 && nextCol < colCount &&
+                            !visited[nextRow][nextCol] &&
+                            grid[nextRow][nextCol] == 1) {
+
+                            visited[nextRow][nextCol] = true;
+
+                            bfsQueue.add(
+                                new OrangeState(
+                                    nextRow,
+                                    nextCol,
+                                    currentOrange.time + 1
+                                )
+                            );
+
+                            rottedFreshOrangeCount++;
+                        }
+                    }
+                }
+
+                return rottedFreshOrangeCount == freshOrangeCount? maxTime : -1;
+            }
+        }
+
+     */
+
+    // Flood Fill
+
+    /*
+
+          class Solution {
+
+            public int[][] floodFill(int[][] image, int sr, int sc, int color) {
+
+                int initialColor = image[sr][sc];
+
+                // No work needed if the pixel already has the target color.
+                if (initialColor == color) {
+                    return image;
+                }
+
+                dfs(sr, sc, image, initialColor, color);
+
+                return image;
+            }
+
+            private void dfs(int currentRow, int currentCol, int[][] image, int initialColor,
+                int targetColor) {
+
+                image[currentRow][currentCol] = targetColor;
+
+                int[] rowDirections = {-1, 0, 0, 1};
+                int[] colDirections = {0, -1, 1, 0};
+
+                for (int direction = 0; direction < 4; direction++) {
+
+                    int nextRow = currentRow + rowDirections[direction];
+                    int nextCol = currentCol + colDirections[direction];
+
+                    if (nextRow >= 0 && nextRow < image.length &&
+                        nextCol >= 0 && nextCol < image[0].length &&
+                        image[nextRow][nextCol] == initialColor) {
+                        dfs(nextRow, nextCol, image, initialColor, targetColor);
+                    }
+                }
+            }
+        }
+
+     */
+
+    // Detect Cycle in an Undirected Graph (using BFS / DFS) ==> Solved in learning section
+
+    // Distance of nearest cell having zero ( LC 542 )
+
+    /*
+
+    If you start BFS from every cell that contains `1`,
+    then for each such cell you may end up exploring a large portion of the matrix until you find a `0`.
+    In the worst case, each BFS can take **O(m · n)** time, and since there can be up to **m · n** ones,
+    the total time complexity becomes **O((m · n)²)**. This quadratic behavior is too slow for typical constraints in grid problems,
+    especially when m and n can be up to a few hundred. That’s why this approach is inefficient compared to multi-source BFS starting from 0 instead of 1,
+    which computes all distances in a single traversal.
+
+
+        class Solution {
+
+
+                static class CellState {
+                int row;
+                int col;
+                int distanceFromZero;
+
+                CellState(int row, int col, int distanceFromZero) {
+                    this.row = row;
+                    this.col = col;
+                    this.distanceFromZero = distanceFromZero;
+                }
+            }
+
+
+            public int[][] updateMatrix(int[][] mat) {
+
+                int rowCount = mat.length;
+                int colCount = mat[0].length;
+
+                int[][] distanceMatrix = new int[rowCount][colCount];
+
+                bfs(distanceMatrix, mat);
+
+                return distanceMatrix;
+            }
+
+            private void bfs(int[][] distanceMatrix, int[][] matrix) {
+
+                Queue<CellState> queue = new ArrayDeque<>();
+
+                int rowCount = matrix.length;
+                int colCount = matrix[0].length;
+
+                boolean[][] visited = new boolean[rowCount][colCount];
+
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < colCount; col++) {
+
+                        if (matrix[row][col] == 0) {
+                            visited[row][col] = true;
+                            queue.add(new CellState(row, col, 0));
+                        }
+                    }
+                }
+
+                int[] rowOffsets = {0, -1, 1, 0};
+                int[] colOffsets = {-1, 0, 0, 1};
+
+                while (!queue.isEmpty()) {
+
+                    CellState currentCell = queue.remove();
+
+                    int currentRow = currentCell.row;
+                    int currentCol = currentCell.col;
+                    int distanceFromZero = currentCell.distanceFromZero;
+
+                    distanceMatrix[currentRow][currentCol] = distanceFromZero;
+
+                    for (int direction = 0; direction < 4; direction++) {
+
+                        int nextRow = currentRow + rowOffsets[direction];
+                        int nextCol = currentCol + colOffsets[direction];
+
+                        if (
+                            nextRow >= 0 && nextRow < rowCount &&
+                            nextCol >= 0 && nextCol < colCount &&
+                            !visited[nextRow][nextCol] &&
+                            matrix[nextRow][nextCol] == 1
+                        ) {
+                            visited[nextRow][nextCol] = true;
+
+                            queue.add(new CellState(nextRow, nextCol, distanceFromZero + 1));
+                        }
+                    }
+                }
+            }
+        }
+
+     */
+
+    /* Without using visited array (more optimal in terms of space)
+
+    If you start BFS from every cell that contains `1`,
+    then for each such cell you may end up exploring a large portion of the matrix until you find a `0`.
+    In the worst case, each BFS can take **O(m · n)** time, and since there can be up to **m · n** ones,
+    the total time complexity becomes **O((m · n)²)**. This quadratic behavior is too slow for typical constraints in grid problems,
+    especially when m and n can be up to a few hundred. That’s why this approach is inefficient compared to multi-source BFS starting from 0 instead of 1,
+    which computes all distances in a single traversal.
+
+           class Solution {
+
+            class CellState {
+                int row;
+                int col;
+                int distanceFromZero;
+
+                CellState(int row, int col, int distanceFromZero) {
+                    this.row = row;
+                    this.col = col;
+                    this.distanceFromZero = distanceFromZero;
+                }
+            }
+
+            public int[][] updateMatrix(int[][] mat) {
+
+                int m = mat.length;
+                int n = mat[0].length;
+
+                int[][] dist = new int[m][n];
+
+                bfs(mat, dist);
+
+                return dist;
+            }
+
+            private void bfs(int[][] mat, int[][] dist) {
+
+                int m = mat.length;
+                int n = mat[0].length;
+
+                Queue<CellState> queue = new ArrayDeque<>();
+
+                // Initialize: push all 0s, mark 1s as unvisited (-1)
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < n; j++) {
+
+                        if (mat[i][j] == 0) {
+                            dist[i][j] = 0;
+                            queue.add(new CellState(i, j, 0));
+                        } else {
+                            dist[i][j] = -1;
+                        }
+                    }
+                }
+
+                int[] dr = { 0, 0, -1, 1 };
+                int[] dc = { -1, 1, 0, 0 };
+
+                while (!queue.isEmpty()) {
+
+                    CellState cur = queue.poll();
+
+                    for (int k = 0; k < 4; k++) {
+
+                        int nr = cur.row + dr[k];
+                        int nc = cur.col + dc[k];
+
+                        if (nr >= 0 && nr < m && nc >= 0 && nc < n && dist[nr][nc] == -1) {
+
+                            dist[nr][nc] = cur.distanceFromZero + 1;
+                            queue.add(new CellState(nr, nc, cur.distanceFromZero + 1));
+                        }
+                    }
+                }
+            }
+        }
+
+    */
+
+
+
+
+
 
 }
