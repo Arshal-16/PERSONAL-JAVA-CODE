@@ -784,7 +784,305 @@ public class Graph {
 
     */
 
+    //
 
+    /* Both dfs and bfs approach will work here
+
+            class Solution {
+            public void solve(char[][] board) {
+
+                int rowCount = board.length;
+                int colCount = board[0].length;
+
+                boolean visited[][] = new boolean[rowCount][colCount];
+
+                // traversing top and bottom rows
+                for (int col = 0; col < colCount; col++) {
+
+                    if (!visited[0][col] && board[0][col] == 'O') {
+                        dfs(0, col, visited, board);
+                    }
+
+                    if (!visited[rowCount - 1][col] && board[rowCount - 1][col] == 'O') {
+                        dfs(rowCount - 1, col, visited, board);
+                    }
+                }
+
+                // traversing left and right cols
+                for (int row = 0; row < rowCount; row++) {
+
+                    if (!visited[row][0] && board[row][0] == 'O') {
+                        dfs(row, 0, visited, board);
+                    }
+
+                    if (!visited[row][colCount - 1] && board[row][colCount - 1] == 'O') {
+                        dfs(row, colCount - 1, visited, board);
+                    }
+                }
+
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < colCount; col++) {
+                        if (board[row][col] == 'O' && !visited[row][col]) {
+                            board[row][col] = 'X';
+                        }
+                    }
+                }
+            }
+
+            void dfs(int row, int col, boolean visited[][], char[][] board) {
+
+                visited[row][col] = true;
+
+                int rowOffset[] = { -1, 0, 0, 1 };
+                int colOffset[] = { 0, 1, -1, 0 };
+
+                for (int i = 0; i < 4; i++) {
+
+                    int nextRow = row + rowOffset[i];
+                    int nextCol = col + colOffset[i];
+
+                    if (nextRow >= 0 && nextRow < board.length &&
+                            nextCol >= 0 && nextCol < board[0].length &&
+                            !visited[nextRow][nextCol] && board[nextRow][nextCol] == 'O') {
+                        dfs(nextRow, nextCol, visited, board);
+                    }
+                }
+
+            }
+        }
+
+     */
+
+    // Number of Enclaves
+
+    /*
+
+            class Solution {
+            public int numEnclaves(int[][] grid) {
+
+                int rowCount = grid.length;
+                int colCount = grid[0].length;
+
+                boolean visited[][] = new boolean[rowCount][colCount];
+
+                // traversing top and bottom rows
+                for (int col = 0; col < colCount; col++) {
+                    //top row
+                    if (grid[0][col] == 1 && !visited[0][col]) {
+                        dfs(0, col, visited, grid);
+                    }
+
+                    //bottom row
+                    if (grid[rowCount - 1][col] == 1 && !visited[rowCount - 1][col]) {
+                        dfs(rowCount - 1, col, visited, grid);
+                    }
+                }
+
+                // traversing first and last columns
+                for (int row = 0; row < rowCount; row++) {
+
+                    // traversing first col
+                    if (grid[row][0] == 1 && !visited[row][0]) {
+                        dfs(row, 0, visited, grid);
+                    }
+
+                    // traversing last col
+                    if (grid[row][colCount - 1] == 1 && !visited[row][colCount - 1]) {
+                        dfs(row, colCount - 1, visited, grid);
+                    }
+
+                }
+
+                int landCount = 0;
+
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < colCount; col++) {
+                        if (grid[row][col] == 1 && !visited[row][col]) {
+                            landCount++;
+                        }
+                    }
+                }
+
+                return landCount;
+
+            }
+
+            void dfs(int row, int col, boolean visited[][], int grid[][]) {
+
+                visited[row][col] = true;
+
+                int rowOffset[] = { 1, 0, 0, -1 };
+                int colOffset[] = { 0, 1, -1, 0 };
+
+                for (int i = 0; i < 4; i++) {
+                    int nextRow = row + rowOffset[i];
+                    int nextCol = col + colOffset[i];
+
+                    if (nextRow >= 0 && nextRow < grid.length &&
+                            nextCol >= 0 && nextCol < grid[0].length &&
+                            !visited[nextRow][nextCol] && grid[nextRow][nextCol] == 1) {
+                        dfs(nextRow, nextCol, visited, grid);
+                    }
+                }
+            }
+        }
+
+     */
+
+    // Number of Distinct Islands ( LC 694 PAID )
+
+    /* Question
+
+    Given a boolean 2D matrix grid of size n * m.
+    You have to find the number of distinct islands where a group of connected 1s (horizontally or vertically) forms an island.
+    Two islands are considered to be distinct if and only if one island is equal to another (not rotated or reflected).
+
+    Example 1:
+
+    Input:
+    grid[][] = {
+        {1, 1, 0, 0, 0},
+        {1, 1, 0, 0, 0},
+        {0, 0, 0, 1, 1},
+        {0, 0, 0, 1, 1}
+    }
+
+    Output:
+    1
+
+    Explanation:
+    Island 1 at the top-left corner is the same as island 2 at the bottom-right corner.
+
+     */
+
+    /*
+
+
+        class Solution {
+
+
+            // DFS to traverse an island and store its shape  relative to the starting cell.
+
+            private void dfs(int currentRow, int currentCol, int[][] visited, int[][] grid, ArrayList<String> islandShape,
+                    int baseRow, int baseCol) {
+
+                visited[currentRow][currentCol] = 1;
+
+                // Store coordinates relative to the island's starting cell
+                islandShape.add((currentRow - baseRow) + " " + (currentCol - baseCol));
+
+                int[] rowDirection = {-1, 0, 1, 0};
+                int[] colDirection = {0, -1, 0, 1};
+
+                int totalRows = grid.length;
+                int totalCols = grid[0].length;
+
+                for (int direction = 0; direction < 4; direction++) {
+
+                    int nextRow = currentRow + rowDirection[direction];
+                    int nextCol = currentCol + colDirection[direction];
+
+                    if (nextRow >= 0 && nextRow < totalRows &&
+                            nextCol >= 0 && nextCol < totalCols &&
+                            visited[nextRow][nextCol] == 0 &&
+                            grid[nextRow][nextCol] == 1) {
+
+                        dfs(nextRow, nextCol, visited, grid, islandShape, baseRow, baseCol);
+                    }
+                }
+            }
+
+
+             // Counts the number of distinct island shapes.
+
+            int countDistinctIslands(int[][] grid) {
+
+                int totalRows = grid.length;
+                int totalCols = grid[0].length;
+
+                int[][] visited = new int[totalRows][totalCols];
+
+                // Stores unique island shapes
+                HashSet<ArrayList<String>> uniqueIslands = new HashSet<>();
+
+                for (int row = 0; row < totalRows; row++) {
+                    for (int col = 0; col < totalCols; col++) {
+
+                        // Start DFS from every unvisited land cell
+                        if (grid[row][col] == 1 && visited[row][col] == 0) {
+
+                            ArrayList<String> islandShape = new ArrayList<>();
+
+                            dfs(row, col, visited, grid, islandShape,
+                                    row,   // base row
+                                    col    // base col
+                            );
+
+                            uniqueIslands.add(islandShape);
+                        }
+                    }
+                }
+
+                return uniqueIslands.size();
+            }
+        }
+
+     */
+
+    // Word Ladder I
+
+    // Word Ladder II
+
+    // Number of Islands
+
+    /*
+
+            class Solution {
+            public int numIslands(char[][] grid) {
+
+                int rowCount = grid.length;
+                int colCount = grid[0].length;
+
+                boolean visited[][] = new boolean[rowCount][colCount];
+
+                int islandCount = 0;
+
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < colCount; col++) {
+                        if (grid[row][col] == '1' && !visited[row][col]) {
+                            islandCount++;
+                            dfs(row, col, visited, grid);
+                        }
+                    }
+                }
+
+                return islandCount;
+
+            }
+
+            void dfs(int row, int col, boolean visited[][], char[][] grid) {
+
+                visited[row][col] = true;
+
+                int rowOffset[] = { -1, 0, 0, 1 };
+                int colOffset[] = { 0, 1, -1, 0 };
+
+                for (int i = 0; i < 4; i++) {
+
+                    int nextRow = row + rowOffset[i];
+                    int nextCol = col + colOffset[i];
+
+                    if (nextRow >= 0 && nextRow < grid.length &&
+                            nextCol >= 0 && nextCol < grid[0].length &&
+                            !visited[nextRow][nextCol] && grid[nextRow][nextCol] == '1') {
+                        dfs(nextRow, nextCol, visited, grid);
+                    }
+                }
+
+            }
+        }
+
+     */
 
 
 
