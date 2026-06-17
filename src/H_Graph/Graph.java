@@ -1111,6 +1111,201 @@ public class Graph {
 
     // Word Ladder II
 
+    // For both the below solution TLE on LC
+
+    /*  Classical Solution
+
+            class Solution {
+
+            public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+
+                // Stores all dictionary words that have not yet been visited
+                // in previous BFS levels.
+                Set<String> unvisitedWords = new HashSet<>(wordList);
+
+                // Each queue entry represents a complete transformation path
+                // from beginWord to the current word.
+                Queue<List<String>> pathQueue = new ArrayDeque<>();
+
+                List<String> startingPath = new ArrayList<>();
+                startingPath.add(beginWord);
+
+                pathQueue.add(startingPath);
+
+                // Stores all words discovered in the current BFS level.
+                // These words will be removed from the dictionary only when
+                // we move to the next level, allowing multiple shortest paths
+                // in the same level to reach the same word.
+                List<String> wordsDiscoveredInLevel = new ArrayList<>();
+                wordsDiscoveredInLevel.add(beginWord);
+
+                // Tracks the current BFS depth (path length).
+                int currentLevel = 0;
+
+                // Stores all shortest transformation sequences.
+                List<List<String>> shortestPaths = new ArrayList<>();
+
+                while (!pathQueue.isEmpty()) {
+
+                    List<String> currentPath = pathQueue.remove();
+
+                    // If we have moved to a deeper BFS level,
+                    // mark all words discovered in the previous level as visited.
+                    if (currentPath.size() > currentLevel) {
+
+                        currentLevel++;
+
+                        for (String discoveredWord : wordsDiscoveredInLevel) {
+                            unvisitedWords.remove(discoveredWord);
+                        }
+
+                        // Start tracking words for the new level.
+                        wordsDiscoveredInLevel.clear();
+                    }
+
+                    // Once a shortest path has been found, BFS guarantees that any
+                    // longer path cannot be part of the answer.
+                    if (!shortestPaths.isEmpty()
+                            && currentPath.size() > shortestPaths.get(0).size()) {
+                        break;
+                    }
+
+                    // The last word in the path is the current word being expanded.
+                    StringBuilder currentWord = new StringBuilder(currentPath.get(currentPath.size() - 1));
+
+                    // If the destination word is reached, store the path
+                    // and do not expand it further.
+                    if (currentWord.toString().equals(endWord)) {
+                        shortestPaths.add(new ArrayList<>(currentPath));
+                        continue;
+                    }
+
+                    // Try changing each character position of the current word.
+                    for (int index = 0; index < currentWord.length(); index++) {
+
+                        char originalCharacter = currentWord.charAt(index);
+
+                        // Replace the current character with every lowercase letter.
+                        for (char replacement = 'a'; replacement <= 'z'; replacement++) {
+
+                            currentWord.setCharAt(index, replacement);
+
+                            String transformedWord = currentWord.toString();
+
+                            // If the transformed word exists in the dictionary
+                            // and has not been visited in a previous level,
+                            // extend the current path and enqueue it.
+                            if (unvisitedWords.contains(transformedWord)) {
+
+                                currentPath.add(transformedWord);
+
+                                pathQueue.add(new ArrayList<>(currentPath));
+
+                                wordsDiscoveredInLevel.add(transformedWord);
+
+                                // Backtrack so the current path can be reused.
+                                currentPath.remove(currentPath.size() - 1);
+                            }
+                        }
+
+                        // Restore the original character before moving
+                        // to the next position.
+                        currentWord.setCharAt(index, originalCharacter);
+                    }
+                }
+
+                return shortestPaths;
+            }
+        }
+
+     */
+
+    /* My solution, optimizing for space by removing usedOnLvl arraylist ( correct solution )
+
+            class Solution {
+
+            public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+
+                // Stores all dictionary words that have not yet been marked as visited.
+                // Words will be removed level by level to ensure that all shortest
+                // transformation paths are preserved.
+                Set<String> unvisitedWords = new HashSet<>(wordList);
+
+                // Each queue entry represents a complete transformation path
+                // from beginWord to the current word.
+                Queue<ArrayList<String>> queue = new ArrayDeque<>();
+
+                List<List<String>> result = new ArrayList<>();
+
+                ArrayList<String> initialPath = new ArrayList<>();
+                initialPath.add(beginWord);
+
+                queue.add(initialPath);
+
+                while (!queue.isEmpty()) {
+
+                    ArrayList<String> currentPath = queue.remove();
+
+                    // The last word in the path is the current word being expanded.
+                    StringBuilder currentWord = new StringBuilder(currentPath.get(currentPath.size() - 1));
+
+                    // Mark the current word as visited.
+                    // This removal is intended to happen after the previous BFS
+                    // level has been fully processed so that multiple shortest
+                    // paths can still reach the same word.
+                    unvisitedWords.remove(currentWord.toString());
+
+                    if (!result.isEmpty() && currentPath.size() > result.get(0).size()) {
+                        break;
+                    }
+
+                    // If the destination word is reached, store the path if it
+                    // belongs to the shortest transformation length found so far.
+                    if (currentWord.toString().equals(endWord)) {
+                        result.add(currentPath);
+                        continue;
+                    }
+
+                    // Generate all possible one-character transformations
+                    // of the current word.
+                    for (int index = 0; index < currentWord.length(); index++) {
+
+                        char originalCharacter = currentWord.charAt(index);
+
+                        // Replace the current character with every lowercase letter.
+                        for (char replacement = 'a'; replacement <= 'z'; replacement++) {
+
+                            currentWord.setCharAt(index, replacement);
+
+                            String transformedWord = currentWord.toString();
+
+                            // If the transformed word exists in the dictionary
+                            // and has not been visited yet, extend the current path
+                            // and enqueue the new path.
+                            if (unvisitedWords.contains(transformedWord)) {
+
+                                currentPath.add(transformedWord);
+
+                                queue.add(new ArrayList<>(currentPath));
+
+                                // Backtrack so that the current path can be reused
+                                // for the next transformation.
+                                currentPath.remove(currentPath.size() - 1);
+                            }
+                        }
+
+                        // Restore the original character before moving
+                        // to the next position.
+                        currentWord.setCharAt(index, originalCharacter);
+                    }
+                }
+
+                return result;
+            }
+        }
+
+     */
+
     // Number of Islands
 
     /*
