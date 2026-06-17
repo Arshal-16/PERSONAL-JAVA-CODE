@@ -1031,6 +1031,84 @@ public class Graph {
 
     // Word Ladder I
 
+    /* time complexity : no. of words in wordList * (length of word * 26)
+
+            class Solution {
+
+            static class WordState {
+                String word;
+                int transformationLength;
+
+                WordState(String word, int transformationLength) {
+                    this.word = word;
+                    this.transformationLength = transformationLength;
+                }
+            }
+
+            public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+
+                // Stores all unused dictionary words.
+                // Also acts as a visited set by removing words once they are queued.
+                Set<String> unvisitedWords = new HashSet<>(wordList);
+
+                // BFS queue storing the current word and the length
+                // of the transformation sequence up to that word.
+                Queue<WordState> queue = new ArrayDeque<>();
+
+                queue.add(new WordState(beginWord, 1));
+
+                // beginWord does not need to be revisited.
+                unvisitedWords.remove(beginWord);
+
+                while (!queue.isEmpty()) {
+
+                    WordState currentState = queue.remove();
+
+                    StringBuilder currentWord = new StringBuilder(currentState.word);
+                    int currentLength = currentState.transformationLength;
+
+                    // Since BFS explores level by level,
+                    // the first time we reach endWord is the shortest path.
+                    if (currentWord.toString().equals(endWord)) {
+                        return currentLength;
+                    }
+
+                    // Try changing each character position.
+                    for (int index = 0; index < currentWord.length(); index++) {
+
+                        char originalCharacter = currentWord.charAt(index);
+
+                        // Replace the current character with every lowercase letter.
+                        for (char replacement = 'a'; replacement <= 'z'; replacement++) {
+
+                            currentWord.setCharAt(index, replacement);
+
+                            String transformedWord = currentWord.toString();
+
+                            // If the transformed word exists in the dictionary
+                            // and has not been visited yet, enqueue it.
+                            if (unvisitedWords.contains(transformedWord)) {
+
+                                queue.add(new WordState(transformedWord,currentLength + 1));
+
+                                // Mark as visited.
+                                unvisitedWords.remove(transformedWord);
+                            }
+                        }
+
+                        // Restore the original character before moving
+                        // to the next position.
+                        currentWord.setCharAt(index, originalCharacter);
+                    }
+                }
+
+                // No valid transformation sequence exists.
+                return 0;
+            }
+        }
+
+     */
+
     // Word Ladder II
 
     // Number of Islands
