@@ -1222,6 +1222,11 @@ public class Graph {
 
     /* My solution, optimizing for space by removing usedOnLvl arraylist ( correct solution )
 
+            Time Complexity:  O(P × (26L + mK)) (if m correct words are generated)
+            Space Complexity: O(P × K)
+            P = total number of paths generated
+            K = average path length
+
             class Solution {
 
             public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
@@ -1249,6 +1254,7 @@ public class Graph {
                     // The last word in the path is the current word being expanded.
                     StringBuilder currentWord = new StringBuilder(currentPath.get(currentPath.size() - 1));
 
+                    // This currentWord will be added to arrayList on the previous level,
                     // Mark the current word as visited.
                     // This removal is intended to happen after the previous BFS
                     // level has been fully processed so that multiple shortest
