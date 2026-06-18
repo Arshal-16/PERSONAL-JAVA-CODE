@@ -1363,7 +1363,189 @@ public class Graph {
 
      */
 
+    // Bipartite Graph
 
+    // using BFS
+
+    /*
+
+                class Solution {
+
+                public boolean isBipartite(int[][] graph) {
+
+                    int totalNodes = graph.length;
+
+                    // -1 = unvisited
+                    //  0 = belongs to partition A
+                    //  1 = belongs to partition B
+                    int[] color = new int[totalNodes];
+
+                    Arrays.fill(color, -1);
+
+                    // Check every connected component
+                    for (int node = 0; node < totalNodes; node++) {
+                        if (color[node] == -1) {
+                            if (!isComponentBipartite(node, color, graph)) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+
+                private boolean isComponentBipartite(int startNode, int[] color, int[][] graph) {
+
+                    Queue<Integer> queue = new ArrayDeque<>();
+
+                    color[startNode] = 1;
+                    queue.add(startNode);
+
+                    while (!queue.isEmpty()) {
+
+                        int currentNode = queue.remove();
+
+                        for (int neighbor : graph[currentNode]) {
+
+                            // Assign the opposite color to an unvisited neighbor
+                            if (color[neighbor] == -1) {
+                                color[neighbor] = 1 - color[currentNode];
+                                queue.add(neighbor);
+                            }
+                            // Adjacent nodes cannot belong to the same partition
+                            else if (color[neighbor] == color[currentNode]) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+     */
+
+    // using DFS
+
+    /*
+
+            class Solution {
+
+            public boolean isBipartite(int[][] graph) {
+
+                int totalNodes = graph.length;
+
+                // -1 = unvisited
+                //  0 = belongs to partition A
+                //  1 = belongs to partition B
+                int[] color = new int[totalNodes];
+
+                Arrays.fill(color, -1);
+
+                // Check every connected component
+                for (int node = 0; node < totalNodes; node++) {
+                    if (color[node] == -1) {
+
+                        if (!isComponentBipartite(node, 0, color, graph)) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            private boolean isComponentBipartite(int currentNode, int currColor, int[] color,
+                    int[][] graph) {
+
+                color[currentNode] = currColor;
+
+                for (int neighbor : graph[currentNode]) {
+
+                    // Assign the opposite color to an unvisited neighbor
+                    if (color[neighbor] == -1) {
+
+                        if (!isComponentBipartite(neighbor, 1 - currColor, color, graph)) {
+                            return false;
+                        }
+                    }
+                    // Adjacent nodes cannot belong to the same partition
+                    else if (color[neighbor] == currColor) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+     */
+
+    // Cycle Detection in Directed Graph ( DFS )
+
+    /*
+
+            class Solution {
+
+            public boolean isCyclic(int vertices, List<List<Integer>> adj) {
+
+                boolean[] visited = new boolean[vertices];
+
+                // Tracks nodes that are part of the current DFS path
+                boolean[] onPath = new boolean[vertices];
+
+                // The graph may be disconnected, so start DFS from every unvisited node
+                for (int node = 0; node < vertices; node++) {
+                    if (!visited[node]) {
+                        if (hasCycle(node, visited, onPath, adj)) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            private boolean hasCycle(int currentNode,
+                                     boolean[] visited,
+                                     boolean[] onPath,
+                                     List<List<Integer>> adj) {
+
+                visited[currentNode] = true;
+                onPath[currentNode] = true;
+
+                for (int neighbor : adj.get(currentNode)) {
+
+                    // Explore unvisited neighbors
+                    if (!visited[neighbor]) {
+                        if (hasCycle(neighbor, visited, onPath, adj)) {
+                            return true;
+                        }
+                    }
+
+                    // Reaching a node already on the current DFS path
+                    // means we found a back edge, which forms a cycle.
+                    else if (onPath[neighbor]) {
+                        return true;
+                    }
+                }
+
+                // Backtrack: remove the current node from the DFS path
+                onPath[currentNode] = false;
+
+                return false;
+            }
+        }
+
+        We can avoid using a separate `onPath` array by storing three states for each node in a single integer array.
+        Let `state[node] = -1` represent an unvisited node, `state[node] = 1` represent a node that is currently on the DFS path (i.e., in the recursion stack),
+        and `state[node] = 0` represent a node that has been fully processed and is no longer on the current path.
+        During DFS, mark a node as `1` when entering it. If we encounter a neighbor whose state is already `1`,
+        we have found a back edge and therefore a cycle. After exploring all neighbors, mark the node as `0` before returning.
+        This approach combines the functionality of both `visited` and `onPath` into a single array, reducing space usage and simplifying state management.
+
+
+     */
 
 
 }
