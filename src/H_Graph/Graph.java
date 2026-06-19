@@ -1606,7 +1606,7 @@ public class Graph {
             2. To satisfy `2 -> 3`, we write: `1, 2, 3`
             3. Now we must satisfy `3 -> 1`. This requires `3` to appear *before* `1`.
 
-            This creates a circular dependency contradiction (1 < 2 < 3 < 1).
+            This creates a ✨✨✨ cyclic/circular dependency ✨✨✨ contradiction (1 < 2 < 3 < 1).
             Since a vertex cannot appear both before and after another vertex in a single linear sequence,
             topological sorting cannot exist for graphs with cycles.
 
@@ -1722,7 +1722,185 @@ public class Graph {
 
      */
 
+    // Detect a cycle in a directed graph ( using kahn's algo / modified bfs )
 
+    /*
 
+            class Solution {
+
+            public boolean isCyclic(int numVertices, List<List<Integer>> adjList) {
+
+                // Step 1: Calculate the in-degree for every vertex
+                int[] inDegree = new int[numVertices];
+                for (int node = 0; node < numVertices; node++) {
+                    for (int neighbor : adjList.get(node)) {
+                        inDegree[neighbor]++;
+                    }
+                }
+
+                // Step 2: Push all nodes with an in-degree of 0 into the queue
+                Queue<Integer> bfsQueue = new ArrayDeque<>();
+                for (int node = 0; node < numVertices; node++) {
+                    if (inDegree[node] == 0) {
+                        bfsQueue.add(node);
+                    }
+                }
+
+                // Keep a counter to track how many vertices successfully reach an in-degree of 0
+                int visitedNodeCount = 0;
+
+                // Step 3: Process the queue
+                while (!bfsQueue.isEmpty()) {
+                    int currentNode = bfsQueue.remove();
+                    visitedNodeCount++; // Increment the counter as this node is safely processed
+
+                    // Since 'currentNode' is now processed, we remove its dependency from its neighbors ✨✨✨
+                    for (int neighbor : adjList.get(currentNode)) {
+                        inDegree[neighbor]--;
+
+                        // If a neighbor's in-degree becomes 0, add it to the queue
+                        if (inDegree[neighbor] == 0) {
+                            bfsQueue.add(neighbor);
+                        }
+                    }
+                }
+
+                // Step 4: If we processed all vertices, there is NO cycle.
+                // If visitedNodeCount is less than numVertices, a cycle exists.
+                return visitedNodeCount != numVertices;
+            }
+        }
+
+     */
+
+    // Course Schedule I
+
+    /*
+
+    We converted the prerequisites matrix into an adjacency list to avoid a major performance bottleneck.
+    In its original form, prerequisites is just an unordered list of edges. To find which courses depend on a completed course,
+    the algorithm has to scan the entire list from scratch every single time, resulting in an incredibly slow O(V * E) time complexity in BFS while loop
+    that leads to a Time Limit Exceeded (TLE) error on LC . By pre-building an adjacency list,
+    we create an explicit lookup structure where each course points directly to its dependent neighbors.
+    This optimizes the neighbor lookups from an expensive full-array scan to a near-instant O(1) operation per edge,
+    dropping the overall time complexity to an optimal, interview-ready O(V + E).
+
+            class Solution {
+
+            public boolean canFinish(int numCourses, int[][] prerequisites) {
+
+                // Step 1: Initialize the adjacency list for the graph
+                List<List<Integer>> adjList = new ArrayList<>();
+
+                for (int i = 0; i < numCourses; i++) {
+                    adjList.add(new ArrayList<>());
+                }
+
+                // Step 2: Build the graph and populate the in-degree array
+                // A prerequisite pair [course, prereq] represents a directed edge: prereq -> course
+                int inDegree[] = new int[numCourses];
+                for (int edge[] : prerequisites) {
+                    int course = edge[0];
+                    int prereq = edge[1];
+
+                    adjList.get(prereq).add(course);
+                    inDegree[course]++;
+                }
+
+                // Step 3: Add all courses with 0 in-degree (no prerequisites) to the queue
+                Queue<Integer> bfsQueue = new ArrayDeque<>();
+
+                for (int course = 0; course < numCourses; course++) {
+                    if (inDegree[course] == 0) {
+                        bfsQueue.add(course);
+                    }
+                }
+
+                int finishedCourses = 0;
+
+                // Step 4: Process the courses using Kahn's algorithm
+                while (!bfsQueue.isEmpty()) {
+
+                    int currCourse = bfsQueue.remove();
+                    finishedCourses++;
+
+                    // Instantly look up only the neighbors of the current course (O(1) look up per edge)
+                    for (int neighborCourse : adjList.get(currCourse)) {
+                        inDegree[neighborCourse]--;
+
+                        if (inDegree[neighborCourse] == 0) {
+                            bfsQueue.add(neighborCourse);
+                        }
+                    }
+                }
+
+                // Step 5: If we could finish all courses, it's a valid DAG (no cycles)
+                return finishedCourses == numCourses;
+            }
+        }
+
+     */
+
+    // Course Schedule II
+
+    /*
+
+        class Solution {
+            public int[] findOrder(int numCourses, int[][] prerequisites) {
+
+                // Step 1: Initialize the adjacency list for the graph
+                List<List<Integer>> adjList = new ArrayList<>();
+                for (int i = 0; i < numCourses; i++) {
+                    adjList.add(new ArrayList<>());
+                }
+
+                // Step 2: Build the graph and populate the in-degree array
+                // A prerequisite pair [course, prereq] represents a directed edge: prereq -> course
+                int[] inDegree = new int[numCourses];
+                for (int[] edge : prerequisites) {
+                    int course = edge[0];
+                    int prereq = edge[1];
+
+                    adjList.get(prereq).add(course);
+                    inDegree[course]++;
+                }
+
+                // Step 3: Add all courses with 0 in-degree (no prerequisites) to the queue
+                Queue<Integer> bfsQueue = new ArrayDeque<>();
+                for (int course = 0; course < numCourses; course++) {
+                    if (inDegree[course] == 0) {
+                        bfsQueue.add(course);
+                    }
+                }
+
+                int[] courseOrder = new int[numCourses];
+                int idx = 0;
+
+                // Step 4: Process the courses using Kahn's algorithm
+                while (!bfsQueue.isEmpty()) {
+                    int currCourse = bfsQueue.remove();
+                    courseOrder[idx++] = currCourse;
+
+                    // Instantly look up only the neighbors of the current course
+                    for (int neighborCourse : adjList.get(currCourse)) {
+                        inDegree[neighborCourse]--;
+
+                        if (inDegree[neighborCourse] == 0) {
+                            bfsQueue.add(neighborCourse);
+                        }
+                    }
+                }
+
+                // Step 5: If we processed all courses, return the valid order.
+                // Otherwise, a cycle exists (it's impossible to complete), so return an empty array.
+                if (idx == numCourses) {
+                    return courseOrder;
+                }
+
+                return new int[0];
+            }
+        }
+
+     */
 
 }
