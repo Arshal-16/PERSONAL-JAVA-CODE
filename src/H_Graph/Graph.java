@@ -1548,4 +1548,181 @@ public class Graph {
      */
 
 
+    /////////////////////// TOPO SORT AND PROBLEMS ////////////////////////////
+
+    /*
+
+        ## Topological Sorting: What is topological sort?
+
+            A **Topological Sort** of a directed graph is a linear ordering of its vertices such that for every directed edge u --> v,
+            vertex u comes before vertex v in the ordering.
+
+            > Crucial Condition: Topological sorting is **only valid for Directed Acyclic Graphs (DAGs)**.
+            If the graph contains any cycles, a topological sort is mathematically impossible.
+
+            ---
+
+            ### Example 1: A Valid Directed Acyclic Graph (DAG)
+
+            Consider the following graph structure represented in your notes:
+
+            **Vertices:** `0, 1, 2, 3, 4, 5`
+
+            **Directed Edges:**
+
+            * `5 -> 0`
+            * `4 -> 0`
+            * `5 -> 2`
+            * `2 -> 3`
+            * `3 -> 1`
+            * `4 -> 1`
+
+            Because there are no cycles in this graph, we can find valid linear orderings where every dependency is satisfied.
+
+            #### Valid Topological Orderings:
+
+            * `5  4  2  3  1  0`
+            * `4  5  2  3  1  0`
+
+            *(Notice how in both orderings, `5` and `4` always appear before `0` and `1`, and `2` always appears before `3`.)*
+
+            ---
+
+            ### Why Must the Graph Be Acyclic? (The 1-2-3 Example)
+
+            To see why a topological sort fails if a graph has a cycle, let's look at the second example:
+
+            **Edges in the Cycle:**
+
+            * `1 -> 2` (Meaning `1` must appear before `2`)
+            * `2 -> 3` (Meaning `2` must appear before `3`)
+            * `3 -> 1` (Meaning `3` must appear before `1`)
+
+            #### The Contradiction:
+
+            If we try to arrange these in a straight line:
+
+            1. To satisfy `1 -> 2`, we write: `1, 2`
+            2. To satisfy `2 -> 3`, we write: `1, 2, 3`
+            3. Now we must satisfy `3 -> 1`. This requires `3` to appear *before* `1`.
+
+            This creates a circular dependency contradiction (1 < 2 < 3 < 1).
+            Since a vertex cannot appear both before and after another vertex in a single linear sequence,
+            topological sorting cannot exist for graphs with cycles.
+
+     */
+
+    /*
+
+    Topological Sort using DFS
+
+            class Solution {
+
+            public int[] topoSort(int numVertices, List<List<Integer>> adjList) {
+
+                boolean[] isVisited = new boolean[numVertices];
+
+                Stack<Integer> topoOrderStack = new Stack<>();
+
+                // Call DFS for all unvisited component nodes to handle disconnected graphs
+                for (int node = 0; node < numVertices; node++) {
+                    if (!isVisited[node]) {
+                        findTopoSortDFS(node, isVisited, topoOrderStack, adjList);
+                    }
+                }
+
+                // Pop elements from the stack to build the final topological order array
+                int[] topologicalOrder = new int[numVertices];
+                int index = 0;
+
+                while (!topoOrderStack.isEmpty()) {
+
+                    topologicalOrder[index++] = topoOrderStack.pop();
+
+                }
+
+                return topologicalOrder;
+            }
+
+            private void findTopoSortDFS(int currentNode, boolean[] isVisited, Stack<Integer> topoOrderStack, List<List<Integer>> adjList) {
+
+                // Mark the current node as visited
+                isVisited[currentNode] = true;
+
+                // Traverse all the deeper dependencies / neighbors first
+                for (int neighbor : adjList.get(currentNode)) {
+                    if (!isVisited[neighbor]) {
+                        findTopoSortDFS(neighbor, isVisited, topoOrderStack, adjList);
+                    }
+                }
+
+                // Post-order processing:
+                // All tasks/nodes that depend on 'currentNode' have been fully explored and
+                // pushed to the stack. Now, it is safe to push 'currentNode' onto the stack.
+                topoOrderStack.push(currentNode);
+            }
+        }
+
+     */
+
+    /*
+
+            Topological Sort using Kahn's Algorithm ( modified bfs )
+
+            class Solution {
+
+            public int[] topoSort(int numVertices, List<List<Integer>> adjList) {
+
+                // Step 1: Calculate the in-degree (number of incoming edges) for every vertex
+                int[] inDegree = new int[numVertices];
+                for (int node = 0; node < numVertices; node++) {
+                    for (int neighbor : adjList.get(node)) {
+                        inDegree[neighbor]++;
+                    }
+                }
+
+                // Step 2: Initialize a queue and enqueue all vertices with an in-degree of 0.
+                // An in-degree of 0 means the node has no dependencies and can be processed immediately.
+                // A DAG will always have atleast 1 node with indegree 0
+                Queue<Integer> bfsQueue = new ArrayDeque<>();
+                for (int node = 0; node < numVertices; node++) {
+                    if (inDegree[node] == 0) {
+                        bfsQueue.add(node);
+                    }
+                }
+
+                // Initialize variables to track our linear topological ordering
+                int[] topologicalOrder = new int[numVertices];
+                int index = 0;
+
+                // Step 3: Process the nodes in the queue
+                while (!bfsQueue.isEmpty()) {
+                    // Remove the node from the front of the queue and add it to our final ordering
+                    int currentNode = bfsQueue.remove();
+                    topologicalOrder[index++] = currentNode;
+
+                    // Step 4: Iterate through all the neighbors of the processed node
+                    for (int neighbor : adjList.get(currentNode)) {
+                        // Since 'currentNode' is now processed, we remove its dependency from its neighbors ✨✨✨
+                        inDegree[neighbor]--;
+
+                        // If a neighbor's in-degree drops to 0, all its prerequisites are met. ✨✨✨
+                        // We can now safely add it to the queue to be processed next. ✨✨✨
+                        if (inDegree[neighbor] == 0) {
+                            bfsQueue.add(neighbor);
+                        }
+                    }
+                }
+
+                // Note: In an interview setup, if 'index != numVertices', it implies the graph
+                // contains a cycle, and a valid topological sort is impossible. ✨✨✨
+                return topologicalOrder;
+            }
+        }
+
+     */
+
+
+
+
 }
