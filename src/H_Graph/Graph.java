@@ -1976,6 +1976,9 @@ public class Graph {
     /*
 
     Using toposort/ kahn's algo (modified bfs)
+    // this soln is better than DFS approach because for massive graphs
+    // StackOverFlow error will happen using DFS approach but it won't happen with
+    // this approach and both algos have same time and space complexity
 
             class Solution {
 
@@ -2054,6 +2057,101 @@ public class Graph {
 
                 return safeNodesList;
         }
+        }
+
+     */
+
+    // Alien Dictionary
+
+    /*
+
+          class Solution {
+
+            public String findOrder(String[] dictionary, int wordCount, int charLimit) {
+
+                // Initialize graph using Sets to avoid duplicate edges automatically
+                List<Set<Integer>> graph = new ArrayList<>();
+                for (int i = 0; i < charLimit; i++) {
+                    graph.add(new HashSet<>());
+                }
+
+                // Build the graph by comparing adjacent words
+                for (int i = 0; i < wordCount - 1; i++) {
+                    String currentWord = dictionary[i];
+                    String nextWord = dictionary[i + 1];
+
+                    // Edge Case Check: If currentWord is a longer prefix of nextWord (e.g., "abc" before "ab")
+                    if (currentWord.length() > nextWord.length() && currentWord.startsWith(nextWord)) {
+                        return ""; // Invalid dictionary order
+                    }
+
+                    int minLength = Math.min(currentWord.length(), nextWord.length());
+
+                    // Find the first mismatching character to establish a dependency rule
+                    for (int ptr = 0; ptr < minLength; ptr++) {
+                        char u = currentWord.charAt(ptr);
+                        char v = nextWord.charAt(ptr);
+
+                        if (u != v) {
+                            int sourceNode = u - 'a';
+                            int destinationNode = v - 'a';
+
+                            // Adds the rule: sourceNode comes before destinationNode
+                            graph.get(sourceNode).add(destinationNode);
+                            break; // Stop comparing further characters for this pair
+                        }
+                    }
+                }
+
+                // Return the computed topological sequence
+                return performTopologicalSort(charLimit, graph);
+            }
+
+            private String performTopologicalSort(int totalLanguages, List<Set<Integer>> graph) {
+
+                int[] inDegree = new int[totalLanguages];
+
+                // Calculate in-degree for each node
+                for (int i = 0; i < totalLanguages; i++) {
+                    for (int neighbor : graph.get(i)) {
+                        inDegree[neighbor]++;
+                    }
+                }
+
+                // Queue to store nodes with 0 in-degree (ready to be processed)
+                Queue<Integer> zeroInDegreeQueue = new LinkedList<>();
+                for (int i = 0; i < totalLanguages; i++) {
+                    if (inDegree[i] == 0) {
+                        zeroInDegreeQueue.add(i);
+                    }
+                }
+
+                StringBuilder alphabetOrder = new StringBuilder();
+
+                // Process the graph
+                while (!zeroInDegreeQueue.isEmpty()) {
+
+                    int currentNode = zeroInDegreeQueue.remove();
+                    alphabetOrder.append((char) (currentNode + 'a'));
+
+                    // since current node is processed remove its depencency from its neighbors
+                    for (int neighbor : graph.get(currentNode)) {
+                        inDegree[neighbor]--;
+
+                        if (inDegree[neighbor] == 0) {
+                            zeroInDegreeQueue.add(neighbor);
+                        }
+                    }
+                }
+
+                // Cycle Check: If the order length matches total unique characters, it's valid
+                if (alphabetOrder.length() == totalLanguages) {
+                    return alphabetOrder.toString();
+                }
+
+                // If there's a cycle, a valid topological sort is impossible
+                return "";
+            }
         }
 
      */
