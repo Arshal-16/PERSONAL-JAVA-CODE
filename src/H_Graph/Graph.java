@@ -1903,4 +1903,159 @@ public class Graph {
 
      */
 
+    // Find Eventual Safe States
+
+    /*
+
+    Using dfs: here instead of 3 boolean arrays a single int array can be used but this way is more readable and
+    interview preferred, in case of using single array code quality and readability goes down
+
+            class Solution {
+
+            // concept : if a node is part of a cycle or leads to a cycle it
+            // can never be a safe node
+
+            public List<Integer> eventualSafeNodes(int[][] graph) {
+
+                int vertices = graph.length;
+
+                boolean visited[] = new boolean[vertices];
+
+                boolean inPath[] = new boolean[vertices];
+
+                boolean isSafe[] = new boolean[vertices];
+
+                List<Integer> safeNodes = new ArrayList<>();
+
+                for (int node = 0; node < vertices; node++) {
+
+                    if (!visited[node]) {
+                        isComponentCyclic(node, visited, inPath, isSafe, graph);
+                    }
+
+                }
+
+                for(int i=0;i<vertices; i++){
+                    if(isSafe[i]){
+                        safeNodes.add(i);
+                    }
+                }
+
+                return safeNodes;
+            }
+
+            boolean isComponentCyclic(int currNode, boolean visited[], boolean inPath[], boolean isSafe[], int graph[][]){
+
+                visited[currNode]=true;
+                inPath[currNode]=true;
+
+                for(int neighbor: graph[currNode]){
+
+                    if(!visited[neighbor]){
+                        if(isComponentCyclic(neighbor, visited, inPath, isSafe, graph)){
+                            return true;
+                        }
+                    }else if(inPath[neighbor]){
+                    // neighbor is visited and is part of a cycle or leads to a cycle
+                        return true;
+                    }
+
+                }
+
+                inPath[currNode]=false;
+                // if we reached here it means no path from curr node
+                // leads to a cycle or is part of a cycle
+                isSafe[currNode]=true;
+
+                return false;
+            }
+        }
+
+     */
+
+    /*
+
+    Using toposort/ kahn's algo (modified bfs)
+
+            class Solution {
+
+            public List<Integer> eventualSafeNodes(int[][] graph) {
+
+                int totalNodes = graph.length;
+
+                // 1. Initialize the adjacency list for the reversed graph
+                List<List<Integer>> reversedGraph = new ArrayList<>();
+                for (int i = 0; i < totalNodes; i++) {
+                    reversedGraph.add(new ArrayList<>());
+                }
+
+                // In the reversed graph, 'inDegree' corresponds to the 'out-degree' of the original graph.
+                int[] inDegree = new int[totalNodes];
+
+                // 2. Build the reversed graph and calculate in-degrees
+                for (int node = 0; node < totalNodes; node++) {
+                    for (int neighbor : graph[node]) {
+                        // Original edge: node -> neighbor
+                        // Reversed edge: neighbor -> node
+                        reversedGraph.get(neighbor).add(node);
+
+                        // Track how many outgoing paths 'node' has in the original graph
+                        inDegree[node]++;
+                    }
+                }
+
+
+                 * CONCEPT EXPLANATION:
+                 * * 1. In the original graph, a node is terminal if its out-degree is 0.
+                 * After reversing the edges, these terminal nodes will have an in-degree of 0.
+                 * * 2. We start our BFS queue with these terminal nodes and iteratively strip away
+                 * the paths leading into them in the original graph.
+                 * * 3. Whenever a neighbor's in-degree drops to 0, it means that EVERY SINGLE
+                 * outgoing path from that node in the original graph successfully terminated
+                 * at a safe node. It guarantees the node neither forms a cycle nor leads to one.
+                 * * 4. Any nodes locked inside a cycle (or pointing down a dead-end path toward a cycle)
+                 * will never have their in-degrees drop to 0, meaning they will never enter the queue
+                 * and will be correctly filtered out as unsafe.
+                 *
+
+            Queue<Integer> bfsQueue = new ArrayDeque<>();
+            boolean isSafeNode[] = new boolean[totalNodes];
+
+            // Push all initial terminal nodes (in-degree 0 in reversed graph) into the queue
+                for (int i = 0; i < totalNodes; i++) {
+                if (inDegree[i] == 0) {
+                    bfsQueue.add(i);
+                }
+            }
+
+            // 3. Process the graph layer-by-layer
+                while (!bfsQueue.isEmpty()) {
+                int currNode = bfsQueue.remove();
+                isSafeNode[currNode] = true;
+
+                // Since currNode is verified safe, remove its dependency from parent nodes
+                for (int parentNode : reversedGraph.get(currNode)) {
+                    inDegree[parentNode]--;
+
+                    // If all outgoing paths from parentNode lead to safe nodes, it is now safe
+                    if (inDegree[parentNode] == 0) {
+                        bfsQueue.add(parentNode);
+                    }
+                }
+            }
+
+            // 4. Collect all verified safe nodes in ascending order
+            List<Integer> safeNodesList = new ArrayList<>();
+                for (int node = 0; node < totalNodes; node++) {
+                if (isSafeNode[node]) {
+                    safeNodesList.add(node);
+                }
+            }
+
+                return safeNodesList;
+        }
+        }
+
+     */
+
 }
