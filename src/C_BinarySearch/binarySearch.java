@@ -286,46 +286,96 @@ public class binarySearch {
     }
 
     //FIND SINGLE ELEMENT IN SORTED ARRAY
-    public static int findSingleElement(int arr[]) {
-        //edge cases
-        int n = arr.length;
-        if (arr.length == 1) return arr[0];
-        if (arr[0] != arr[1]) return arr[0];
-        if (arr[n - 2] != arr[n - 1]) return arr[n - 1];
 
-        int start = 1, end = arr.length - 2;
-        while (start <= end) {
-            int mid = start + (end - start) / 2;
-            if (arr[mid - 1] != arr[mid] && arr[mid + 1] != arr[mid]) return arr[mid];
-            if ((mid % 2 == 0 && arr[mid] == arr[mid + 1]) || (mid % 2 == 1 && arr[mid - 1] == arr[mid]))
-                start = mid + 1;
-            else end = mid - 1;
-        }
-        return -1;
-    }
+    /*
 
-    //FIND PEAK ELEMENT
-    public static int peakElement(int arr[]) {
-        if (arr.length == 1 || arr[0] > arr[1]) return 0;
+            class Solution {
+            public int singleNonDuplicate(int[] nums) {
 
-        if (arr[arr.length - 1] > arr[arr.length - 2]) return arr.length - 1;
+                // Base Case 1: Array has only one element
+                if (nums.length == 1) {
+                    return nums[0];
+                }
 
-        int start = 1, end = arr.length - 2;
+                // Base Case 2: First element is the single element
+                if (nums[0] != nums[1]) {
+                    return nums[0];
+                }
 
-        while (start <= end) {
-            int mid = (start + end) / 2;
-            if (arr[mid] >= arr[mid - 1] && arr[mid] >= arr[mid + 1]) {
-                return mid;
-            } else if (arr[mid] > arr[mid - 1]) {
-                start = mid + 1;
-            } else if (arr[mid] > arr[mid + 1]) {
-                end = mid - 1;
-            } else {
-                start = mid + 1;
+                // Base Case 3: Last element is the single element
+                if (nums[nums.length - 1] != nums[nums.length - 2]) {
+                    return nums[nums.length - 1];
+                }
+
+                // Inner boundaries to safely prevent array index out of bounds
+                int start = 1;
+                int end = nums.length - 2;
+
+                while (start < end) {
+                    int mid = start + (end - start) / 2;
+
+                    // Found it! Assign mid to start and break out of the loop
+                    if (nums[mid] != nums[mid + 1] && nums[mid] != nums[mid - 1]) {
+                        start = mid;
+                        break;
+                    }
+                    // If the pair pattern is perfectly normal up to 'mid'
+                    else if ((mid % 2 == 0 && nums[mid] == nums[mid + 1]) ||
+                             (mid % 2 != 0 && nums[mid] == nums[mid - 1])) {
+                        start = mid + 1;
+                    }
+                    // If the pattern is disrupted (single element is to the left)
+                    else {
+                        end = mid - 1;
+                    }
+                }
+
+                // Outside the loop, return the value at index 'start'
+                return nums[start];
             }
         }
-        return -1;
-    }
+
+     */
+
+    //FIND PEAK ELEMENT
+
+    /*
+
+            class Solution {
+            public int findPeakElement(int[] nums) {
+                // Base case: if array has only one element, it is the peak
+                if (nums.length == 1) return 0;
+
+                // Check if the first element is a peak
+                if (nums[0] > nums[1]) return 0;
+
+                // Check if the last element is a peak
+                if (nums[nums.length - 1] > nums[nums.length - 2]) return nums.length - 1;
+
+                // Search the inner elements safely without boundary overflows
+                int start = 1;
+                int end = nums.length - 2;
+
+                while (start < end) {
+                    int mid = start + (end - start) / 2;
+
+                    if (nums[mid] > nums[mid + 1]) {
+                        // We are on a downward slope.
+                        // mid could be the peak, or the peak is to the left.
+                        end = mid;
+                    } else {
+                        // We are on an upward slope.
+                        // The peak must be strictly to the right of mid.
+                        start = mid + 1;
+                    }
+                }
+
+                // start and end will converge on a peak element
+                return start;
+            }
+        }
+
+     */
 
     /// //////////// BS ON ANSWERS ////////////////////
 
