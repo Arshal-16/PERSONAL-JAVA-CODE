@@ -231,26 +231,45 @@ public class binarySearch {
     }
 
     //MINIMUM IN ROTATED SORTED ARRAY
-    public static int minInRotatedSorted(int arr[]) {
-        int start = 0, end = arr.length - 1, min = Integer.MAX_VALUE;
 
-        while (start <= end) {
-            int mid = start + (end - start) / 2;
-            //left half is sorted
-            if (arr[start] <= arr[mid]) {
-                min = Math.min(min, arr[start]);
-                //after taking min discard the sorted half and search in remaining half
-                start = mid + 1;
+    /*
 
-            }
-            //right half is sorted
-            else {
-                min = Math.min(min, arr[mid]);
-                end = mid - 1;
+            class Solution {
+            public int findMin(int[] nums) {
+
+                int start = 0;
+                int end = nums.length - 1;
+
+                int min = Integer.MAX_VALUE;
+
+                while (start <= end) {
+                    // Optimization: If the current subarray is already sorted,
+                    // the minimum must be at nums[start].
+                    if (nums[start] <= nums[end]) {
+                        min = Math.min(min, nums[start]);
+                        break;
+                    }
+
+                    int mid = start + (end - start) / 2;
+                    min = Math.min(min, nums[mid]);
+
+                    // Check which half is sorted
+                    if (nums[start] <= nums[mid]) {
+                        // Left half is sorted, so nums[start] is a candidate.
+                        min = Math.min(min, nums[start]);
+                        // The inflection point (and actual minimum) must be in the un-sorted right half.
+                        start = mid + 1;
+                    } else {
+                        // Right half is sorted, so nums[mid] is a candidate (already captured).
+                        // The inflection point must be in the un-sorted left half.
+                        end = mid - 1;
+                    }
+                }
+                return min;
             }
         }
-        return min;
-    }
+
+     */
 
     //HOW MANY TIMES ARRAY HAS BEEN ROTATED
     public static int timesRotated(int arr[]) {
