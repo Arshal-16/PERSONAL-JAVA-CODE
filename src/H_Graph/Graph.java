@@ -1663,6 +1663,59 @@ public class Graph {
             }
         }
 
+        The above algorithm will fail silently if it is not a DAG and will return incorrect order, optimized algo to fix that
+
+        class Solution {
+            public int[] topoSort(int numVertices, List<List<Integer>> adjList) {
+                // 0 = Unvisited, 1 = Visiting (in current recursion path), 2 = Visited (fully processed)
+                int[] visitedState = new int[numVertices];
+                Stack<Integer> topoOrderStack = new Stack<>();
+
+                for (int node = 0; node < numVertices; node++) {
+                    if (visitedState[node] == 0) {
+                        // If DFS returns false, a cycle was detected!
+                        if (!findTopoSortDFS(node, visitedState, topoOrderStack, adjList)) {
+                            return new int[0]; // Return an empty array indicating Topo Sort is impossible
+                        }
+                    }
+                }
+
+                int[] topologicalOrder = new int[numVertices];
+                int index = 0;
+                while (!topoOrderStack.isEmpty()) {
+                    topologicalOrder[index++] = topoOrderStack.pop();
+                }
+                return topologicalOrder;
+            }
+
+            private boolean findTopoSortDFS(int currentNode, int[] visitedState, Stack<Integer> topoOrderStack, List<List<Integer>> adjList) {
+                // Mark as State 1: Currently visiting (active in the recursion stack)
+                visitedState[currentNode] = 1;
+
+                for (int neighbor : adjList.get(currentNode)) {
+                    // Case 1: If the neighbor is currently being visited in this path, we found a back-edge (CYCLE!)
+                    if (visitedState[neighbor] == 1) {
+                        return false;
+                    }
+
+                    // Case 2: If the neighbor is unvisited, recursively explore it
+                    if (visitedState[neighbor] == 0) {
+                        if (!findTopoSortDFS(neighbor, visitedState, topoOrderStack, adjList)) {
+                            return false;
+                        }
+                    }
+
+                    // Case 3: If visitedState[neighbor] == 2, we safely ignore it (it's already in the stack)
+                }
+
+                // Post-order processing: Mark as State 2 (fully processed) and push to stack
+                visitedState[currentNode] = 2;
+                topoOrderStack.push(currentNode);
+
+                return true; // No cycles found along this path
+            }
+        }
+
      */
 
     /*
@@ -2155,5 +2208,189 @@ public class Graph {
         }
 
      */
+
+    //////////////////// SHORTEST PATH ALGORITHMS AND PROBLEMS ////////////////////////////
+
+    // Shortest path in undirected graph with unit weights
+
+    /*
+
+            Time Complexity : O ( V + E )
+
+            class Solution {
+
+            public int[] findShortestPaths(int totalNodes, List<List<Integer>> adjacencyList, int sourceNode) {
+
+                // Step 1: Initialize the distances array.
+                // We set all distances to infinity initially to represent unvisited/unreachable states.
+                int[] distances = new int[totalNodes];
+                Arrays.fill(distances, Integer.MAX_VALUE);
+
+                // Step 2: Set up the BFS queue.
+                // Standard Queue handles the level-by-level traversal essential for unweighted graphs.
+                Queue<Integer> bfsQueue = new ArrayDeque<>();
+
+                // Step 3: Base case setup.
+                // Distance from a node to itself is always 0. Then, kick off the BFS by queuing the source.
+                distances[sourceNode] = 0;
+                bfsQueue.add(sourceNode);
+
+                // Step 4: Process the graph layer-by-layer (BFS execution).
+                while (!bfsQueue.isEmpty()) {
+
+                    int currentNode = bfsQueue.remove();
+
+                    // Because every edge has a unit weight of 1, any unvisited neighbor
+                    // will naturally be 1 step further away than the currentNode.
+                    int tentativeDistance = distances[currentNode] + 1;
+
+                    // Explore all immediate neighbors of the current node.
+                    for (int neighbor : adjacencyList.get(currentNode)) {
+
+                        // If the newly calculated distance is shorter than the known distance,
+                        // update it. (In BFS, the first time we see a node is always its shortest path).
+                        if (tentativeDistance < distances[neighbor]) {
+                            distances[neighbor] = tentativeDistance;
+
+                            // Add neighbor to queue so we can later explore its neighbors in turn.
+                            bfsQueue.add(neighbor);
+                        }
+                    }
+                }
+
+                // Step 5: Post-processing for unreachable nodes.
+                // If a node's distance is still Infinity, it means there is no path connecting
+                // the source to that node. Per convention, we convert these to -1.
+                for (int i = 0; i < totalNodes; i++) {
+                    if (distances[i] == Integer.MAX_VALUE) {
+                        distances[i] = -1;
+                    }
+                }
+
+                return distances;
+            }
+        }
+
+     */
+
+    // Shortest path in DAG
+
+    /*
+
+
+        class Solution {
+
+            public int[] findShortestPathInDAG(int totalNodes, int sourceNode, int[][] edges) {
+
+                // edges = [[sourceNode, destinationNode, edgeWeight]]
+
+                // Step 1: Build the Adjacency List
+                // Each entry in the list holds an array of size 2: [neighborNode, edgeWeight]
+                List<List<int[]>> adjacencyList = new ArrayList<>();
+                for (int i = 0; i < totalNodes; i++) {
+                    adjacencyList.add(new ArrayList<>());
+                }
+
+                for (int edge[] : edges) {
+                    int u = edge[0];
+                    int v = edge[1];
+                    int weight = edge[2];
+                    adjacencyList.get(u).add(new int[]{v, weight});
+                }
+
+                // Step 2: Generate Topological Ordering using DFS
+                // A Topological Sort ensures that for any directed edge u -> v, u comes before v.
+                Stack<Integer> topologicalOrderStack = new Stack<>();
+
+                boolean[] isVisited = new boolean[totalNodes];
+
+                for (int node = 0; node < totalNodes; node++) {
+                    if (!isVisited[node]) {
+                        generateTopologicalSortDFS(node, topologicalOrderStack, isVisited, adjacencyList);
+                    }
+                }
+
+                // Step 3: Initialize the Distances Array
+                // We set all distances to infinity initially to represent unvisited/unreachable states.
+                int[] distances = new int[totalNodes];
+                Arrays.fill(distances, Integer.MAX_VALUE);
+
+                // Distance from the source to itself is 0
+                distances[sourceNode] = 0;
+
+                // Step 4: Process vertices in Topological Order (Relaxing Edges)
+                while (!topologicalOrderStack.isEmpty()) {
+                    int currentNode = topologicalOrderStack.pop();
+
+                    // Optimization/Safety Check: If the current node has a distance of Infinity,
+                    // it means it cannot be reached from the specified sourceNode.
+                    // We skip it to avoid processing unreachable paths and to prevent integer overflow.
+                    if (distances[currentNode] == Integer.MAX_VALUE) {
+                        continue;
+                    }
+
+                    int currentDistance = distances[currentNode];
+
+                    // Relax all outgoing edges from the current node
+                    for (int neighborPair[] : adjacencyList.get(currentNode)) {
+                        int neighborNode = neighborPair[0];
+                        int edgeWeight = neighborPair[1];
+
+                        int calculatedDistance = currentDistance + edgeWeight;
+
+                        // If the new calculated path is shorter than what we currently know, update it
+                        if (calculatedDistance < distances[neighborNode]) {
+                            distances[neighborNode] = calculatedDistance;
+                        }
+                    }
+                }
+
+                // Step 5: Post-processing for Unreachable Nodes
+                // Any node that still retains its initialization value of Integer.MAX_VALUE
+                // is genuinely unreachable from the source. Convert these values to -1 per constraints.
+                for (int i = 0; i < totalNodes; i++) {
+                    if (distances[i] == Integer.MAX_VALUE) {
+                        distances[i] = -1;
+                    }
+                }
+
+                return distances;
+            }
+
+            private void generateTopologicalSortDFS(int currentNode, Stack<Integer> topologicalOrderStack,
+                                                    boolean[] isVisited, List<List<int[]>> adjacencyList) {
+                isVisited[currentNode] = true;
+
+                for (int neighborPair[] : adjacencyList.get(currentNode)) {
+                    int neighbor = neighborPair[0];
+                    if (!isVisited[neighbor]) {
+                        generateTopologicalSortDFS(neighbor, topologicalOrderStack, isVisited, adjacencyList);
+                    }
+                }
+
+                // Push to stack only after all deeper dependencies are fully explored
+                topologicalOrderStack.push(currentNode);
+            }
+        }
+
+        Time Complexity : Here is the time complexity calculation:
+
+        Step 1: Building the adjacency list takes O(V + E) time because we initialize V lists and then iterate through E edges.
+
+        Step 2: The topological sort via DFS takes O(V + E) time because every node is visited exactly once and every edge is explored once.
+
+        Step 3: Initializing the distances array using Arrays.fill takes O(V) time.
+
+        Step 4: Processing the stack and relaxing the edges takes O(V + E) time because we pop V nodes in total, and across the entire loop,
+        we traverse all E edges exactly once.
+
+        Step 5: The final loop to convert unreachable infinity values to -1 takes O(V) time.
+
+        Adding these up: O(V + E) + O(V + E) + O(V) + O(V + E) + O(V) = O(3V + 3E).
+        Dropping the constants leaves a final time complexity of O(V + E).
+
+     */
+
+
 
 }
