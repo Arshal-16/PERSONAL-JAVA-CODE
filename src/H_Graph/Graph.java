@@ -2277,6 +2277,18 @@ public class Graph {
 
     /*
 
+        Topological sort works because it creates a linear ordering based entirely on dependencies.
+        In a directed acyclic graph, if there is a directed edge pointing from node A to node B, it means node B depends on node A.
+        Therefore, node A must appear before node B in the topological sequence.
+
+        When your algorithm processes the nodes by popping them one by one from the topological stack, it follows this exact order.
+        By the time the algorithm pops a particular node from the stack to relax its edges,
+        every single ancestor node that could possibly reach it has already been popped and processed.
+
+        Because all incoming paths to that particular node have already been completely explored,
+        the shortest distance to that node is guaranteed to be locked in and accurate.
+        The algorithm will never encounter a scenario where a later node updates an earlier node,
+        ensuring that a single pass through the graph is enough to find all shortest paths.
 
         class Solution {
 
