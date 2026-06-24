@@ -2584,6 +2584,70 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
+    // Best time complexity derivation of Dijkstra using PQ
+
+    /*
+
+        Dijkstra's Time Complexity Derivation for Dense Graphs
+
+        Legend:
+        V = Total Vertices (Nodes)
+        E = Total Edges
+        ne = Number of edges connected to a single active vertex
+
+        Step 1: The Core Operations per Vertex
+        At its foundational level, Dijkstra processes every vertex (V) and handles its respective edges (ne).
+        For each vertex, the algorithm performs two heavy collection operations:
+
+        1. Pop from Min-Heap: Extracts the minimum element from the priority queue.
+        2. Push into PQ (Relaxation): For each edge connected to that vertex (ne),
+        it might push an updated distance into the queue.
+
+        Mathematical Representation:
+        O(V * (pop vertex from min-heap + (no. of edges on each vertex * push into PQ)))
+
+        Substituting the time complexities of binary heap operations O(log(heap size)):
+        O(V * (log(heap size) + ne * log(heap size)))
+
+        Step 2: Factoring and the Dense Graph Assumption
+        By factoring out the common log(heap size) term, the formula simplifies to:
+        O(V * log(heap size) * (ne + 1))
+
+        Worst-Case Boundary: One vertex can have up to (V - 1) edges. In a worst-case dense graph scenario,
+        the number of edges per vertex (ne) is roughly equal to V.
+
+        Substituting (ne + 1) with V yields:
+        O(V * log(heap size) * V) -> O(V^2 * log(heap size))
+
+        Step 3: Determining Maximum Heap Size
+        Next, evaluate how large the priority queue can actually grow.
+        Because standard Dijkstra allows duplicate/stale nodes to pile up in the heap rather than updating them in place,
+        the heap size can grow to match the total number of edges (E) in the graph.
+
+        In a dense graph, the total number of edges E is roughly equal to V^2 (E = V^2).
+        Therefore, the maximum heap size can be substituted with V^2:
+        O(V^2 * log(V^2))
+
+        Step 4: Final Algebraic Simplification
+        Using logarithmic properties, the exponent inside a logarithm can be moved out front as a constant multiplier: log(x^a) = a * log(x).
+
+        Thus, log(V^2) transforms into 2 * log(V):
+        O(V^2 * 2 * log(V))
+
+        Finally, since V^2 represents the maximum capacity of total edges (E = V^2), we substitute V^2 back with E:
+        O(E * 2 * log(V))
+
+        Dropping the constant multiplier 2 brings us to the finalized, textbook asymptotic time complexity:
+        FINAL TIME COMPLEXITY: O(E log V)
+
+        Undirected Edge Logic:
+        In an undirected graph, a unique edge is formed by picking any 2 distinct vertices.
+        The total number of ways to choose 2 vertices out of V total nodes is defined by combinations as VC2.
+        This formula expands to (V * (V - 1)) / 2, which mathematically eliminates double-counting common edges.
+        Asymptotically, this simplifies to O(V^2), validating why E is substituted with V^2 in dense graph analysis.
+
+     */
+
     // Using TreeSet
 
     /*
