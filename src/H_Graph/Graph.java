@@ -2403,6 +2403,327 @@ public class Graph {
 
      */
 
+    // Dijkstra's algorithm
+
+    // Using Priority Queue
+
+    /*
+
+        Using Priority Queue:
+
+        class Solution {
+
+            static class NodeDistancePair {
+                int nodeVertex;
+                int distanceFromSource;
+
+                NodeDistancePair(int nodeVertex, int distanceFromSource) {
+                    this.nodeVertex = nodeVertex;
+                    this.distanceFromSource = distanceFromSource;
+                }
+            }
+
+            public int[] dijkstra(int totalNodes, ArrayList<ArrayList<Integer>> edgeList, int sourceNode) {
+
+                // Step 1: Initialize the adjacency list representing the graph
+                // Structure: adjList.get(u) -> returns a list of [neighborNode, edgeWeight] pairs
+                List<List<int[]>> adjacencyList = new ArrayList<>();
+                for (int i = 0; i < totalNodes; i++) {
+                    adjacencyList.add(new ArrayList<>());
+                }
+
+                // Step 2: Convert the raw edge list into an adjacency list graph
+                for (ArrayList<Integer> edge : edgeList) {
+                    int source = edge.get(0);
+                    int destination = edge.get(1);
+                    int weight = edge.get(2);
+
+                    // Build bi-directional paths (if Undirected Graph)
+                    adjacencyList.get(source).add(new int[]{destination, weight});
+                    adjacencyList.get(destination).add(new int[]{source, weight});
+                }
+
+                // Step 3: Track min-distances from the source node to all other nodes
+                int shortestDistances[] = new int[totalNodes];
+                Arrays.fill(shortestDistances, Integer.MAX_VALUE); // Default all distances to infinity
+
+                // Step 4: Initialize Min-Heap Priority Queue sorted by distance
+                PriorityQueue<NodeDistancePair> minHeap = new PriorityQueue<>(
+                    (pairA, pairB) -> Integer.compare(pairA.distanceFromSource, pairB.distanceFromSource)
+                );
+                // Uses Integer.compare() instead of subtraction (pairA.distanceFromSource - pairB.distanceFromSource)
+                // to prevent integer overflow/underflow bugs with large distances.
+
+                // Step 5: Seed the algorithm with the starting source node
+                shortestDistances[sourceNode] = 0;
+                minHeap.add(new NodeDistancePair(sourceNode, 0));
+
+                // Step 6: Process the graph dynamically
+                while (!minHeap.isEmpty()) {
+
+                    NodeDistancePair currentPair = minHeap.remove();
+                    int currentNode = currentPair.nodeVertex;
+                    int currentDistance = currentPair.distanceFromSource;
+
+                    // Optimization: If we found a shorter path to this node already,
+                    // skip processing its stale neighbors
+                    if (currentDistance > shortestDistances[currentNode]) {
+                        continue;
+                    }
+
+                    // Step 7: Relax edges for all neighbors of the current node
+                    for (int neighborData[] : adjacencyList.get(currentNode)) {
+                        int neighborNode = neighborData[0];
+                        int edgeWeight = neighborData[1];
+                        int calculatedDistance = currentDistance + edgeWeight;
+
+                        // If a shorter path to the neighbor is discovered, update and queue it
+                        if (calculatedDistance < shortestDistances[neighborNode]) {
+                            shortestDistances[neighborNode] = calculatedDistance;
+                            minHeap.add(new NodeDistancePair(neighborNode, calculatedDistance));
+                        }
+                    }
+                }
+
+                return shortestDistances;
+            }
+        }
+
+        ### Time Complexity: O((V + E) log V)
+
+        Where:
+
+        * V = Total number of nodes (totalNodes)
+        * E = Total number of edges (edgeList.size())
+
+        ---
+
+        ### Step-by-Step Breakdown
+
+        * Graph Construction (Steps 1 & 2): O(V + E)
+        * Priority Queue Operations (Steps 6 & 7): O(E log V)
+        * Each vertex can be pushed and popped from the minHeap. In the worst-case scenario (dense graph),
+        we might insert up to E elements into the heap.
+        * Every insertion (minHeap.add()) and deletion (minHeap.remove()) in a heap of size V takes O(log V) time.
+        * Therefore, processing the edges takes O(E log V) time.
+
+        Combining these gives O(V + E + E log V), which simplifies to O((V + E) log V).
+
+        To simplify the expression using Big O notation, we look at which terms grow the fastest as V and E become very large.
+
+        Here is the step-by-step mathematical breakdown:
+
+        Step 1: Compare E and E log V
+        This means: E + E log V simplifies to just E log V.
+
+        Now our expression is: V + E log V.
+
+        Step 2: Compare V and V log V
+        To group the V and E terms together, we can look at the upper bound.
+        Since log V is greater than 1 for any graph of a reasonable size, the term V is strictly less than or equal to V log V.
+        Therefore, we can safely upper-bound V to V log V to find a clean, factored expression.
+
+        This changes the expression to: V log V + E log V.
+
+        This gives us the final simplified complexity of O((V + E) log V).
+
+        (For a connected graph where E >= V, this is often written simply as O(E log V)).
+
+        ---
+
+        ### Space Complexity: O(V + E)
+
+        * O(V + E) to store the graph inside the adjacencyList.
+        * O(V) for the shortestDistances tracking array.
+        * O(V) for the elements held inside the minHeap.
+
+     */
+
+    // Why Dijkstra doesn't work with negative edge weights
+
+    /*
+
+        Dijkstra's Algorithm and Negative Cycles
+
+        Your trace perfectly captures how Dijkstra's algorithm breaks down on an undirected graph with negative edge weights.
+        It hits a true infinite loop condition.
+
+        1. The Setup
+
+        * There is an undirected edge between Node 0 and Node 1 with a weight of -2.
+        * Because the graph is undirected, the adjacency list builds two separate paths:
+        * Node 0 to Node 1 (weight: -2)
+        * Node 1 to Node 0 (weight: -2)
+
+
+        * This creates a negative cycle right between these two nodes (0 -> 1 -> 0) with a total round-trip cost of -4.
+
+        2. Tracing the Steps
+
+        * Start at Source (Node 0):
+        * The shortest distances array is initialized to [0, INF].
+        * The Priority Queue (PQ) holds {node: 0, distance: 0}.
+
+
+        * Process Node 0:
+        * The algorithm checks neighbor Node 1.
+        * The calculated distance to Node 1 is 0 + (-2) = -2.
+        * Since -2 is less than INF, the distances array updates to [0, -2] and {1, -2} is added to the PQ.
+
+
+        * Process Node 1:
+        * The algorithm checks neighbor Node 0.
+        * The calculated distance to Node 0 is -2 + (-2) = -4.
+        * Since -4 is less than 0, the distances array updates to [-4, -2] and {0, -4} is added to the PQ.
+
+
+        * Process Node 0 again:
+        * The algorithm checks neighbor Node 1.
+        * The calculated distance to Node 1 is -4 + (-2) = -6.
+        * Since -6 is less than -2, the distances array updates to [-4, -6] and {1, -6} is added to the PQ.
+
+
+
+        3. Why the Code Gets Trapped
+        Because the values keep dropping infinitely (0 -> -2 -> -4 -> -6 -> -8...),
+        the core relaxation condition in the code will always evaluate to true:
+        if (calculatedDistance < shortestDistances[neighborNode])
+
+        Furthermore, because the newly pulled distance is always equal to the current minimum recorded value,
+        the stale-check optimization will never trigger to stop it:
+        if (currentDistance > shortestDistances[currentNode]) continue;
+
+        As a result, the while loop never empties, the Priority Queue keeps filling up with smaller negative numbers,
+        and the program gets stuck in an infinite loop until it runs out of memory.
+
+     */
+
+    // Using TreeSet
+
+    /*
+
+                class Solution {
+
+                // Helper data carrier class to pair a graph vertex with its computed distance from the source
+                static class NodeDistancePair {
+                    int nodeVertex;
+                    int distanceFromSource;
+
+                    NodeDistancePair(int nodeVertex, int distanceFromSource) {
+                        this.nodeVertex = nodeVertex;
+                        this.distanceFromSource = distanceFromSource;
+                    }
+                }
+
+                public int[] dijkstraWithSet(int totalNodes, ArrayList<ArrayList<Integer>> edgeList, int sourceNode) {
+
+                    // Step 1: Initialize the adjacency list structure to represent the graph.
+                    // Each index 'u' will hold a nested list of arrays in the format: [neighborNode, edgeWeight]
+                    List<List<int[]>> adjacencyList = new ArrayList<>();
+                    for (int i = 0; i < totalNodes; i++) {
+                        adjacencyList.add(new ArrayList<>());
+                    }
+
+                    // Step 2: Populate the adjacency list by parsing the raw input edge data.
+                    // This configuration models an undirected graph, processing two-way pathways.
+                    for (ArrayList<Integer> edge : edgeList) {
+                        int source = edge.get(0);
+                        int destination = edge.get(1);
+                        int weight = edge.get(2);
+
+                        adjacencyList.get(source).add(new int[]{destination, weight});
+                        adjacencyList.get(destination).add(new int[]{source, weight});
+                    }
+
+                    // Step 3: Create an array to maintain the minimum calculated distance to each node.
+                    // Initialize all values to Integer.MAX_VALUE to simulate an unvisited state of infinity.
+                    int[] shortestDistances = new int[totalNodes];
+                    Arrays.fill(shortestDistances, Integer.MAX_VALUE);
+
+                    // Step 4: Configure a TreeSet to act as our self-sorting tracking structure.
+                    // CRITICAL DESIGN RULE: A TreeSet identifies duplicate objects when its comparator returns 0.
+                    // If evaluated strictly by distance, different nodes with identical distances would overwrite
+                    // each other. We use a mandatory two-tiered sorting strategy to preserve distinct elements.
+
+                    TreeSet<NodeDistancePair> set = new TreeSet<>((pairA, pairB) -> {
+                        // Tier 1: Primary sort dynamically structures elements by path distance in ascending order.
+                        if (pairA.distanceFromSource != pairB.distanceFromSource) {
+                            return Integer.compare(pairA.distanceFromSource, pairB.distanceFromSource);
+                        }
+                        // Tier 2: If distances are a tie, unique vertex IDs break the tie to prevent data erasure.
+                        return Integer.compare(pairA.nodeVertex, pairB.nodeVertex);
+                    });
+
+                    // Step 5: Seed the processing cycle with the initial root source node.
+                    shortestDistances[sourceNode] = 0;
+                    set.add(new NodeDistancePair(sourceNode, 0));
+
+                    // Step 6: Process the graph dynamically until the set runs completely out of elements
+                    while (!set.isEmpty()) {
+
+                        // pollFirst() returns and removes the element containing the lowest distance metric
+
+                        NodeDistancePair currentPair = set.pollFirst();
+                        int currentNode = currentPair.nodeVertex;
+                        int currentDistance = currentPair.distanceFromSource;
+
+                         *  THE OMISSION OF THE "CONTINUE" OPTIMIZATION:
+                         * In alternative priority-queue-based implementations of Dijkstra, old, stale, and duplicate versions
+                         * of a vertex are allowed to remain trapped inside the collection. This requires a defensive
+                         * 'if (currentDistance > shortestDistances[currentNode]) continue;' statement to prune them out later.
+                         *
+                         * When employing a TreeSet, this optimization check is entirely useless and redundant. Because
+                         * the logic explicitly cleanses and eliminates an old node configuration from the tree hierarchy
+                         * *prior* to inserting its newly discovered optimal distance, the TreeSet is guaranteed to maintain
+                         * exactly one unique, absolute best-case reference pair per discovered node. Stale entries are
+                         * completely prevented from accumulating.
+                         *
+
+                // Step 7: Step through each immediate neighboring node connected to the active vertex
+                        for (int neighborData[] : adjacencyList.get(currentNode)) {
+                    int neighborNode = neighborData[0];
+                    int edgeWeight = neighborData[1];
+                    int calculatedDistance = currentDistance + edgeWeight;
+
+                    // Evaluate if the newly uncovered route provides a cheaper path than previously tracked
+                    if (calculatedDistance < shortestDistances[neighborNode]) {
+
+                         * Step 8: The Erase-and-Replace Sequence
+                         * If the target neighbor node was reached on a prior loop iteration (meaning its value
+                         * is no longer set to infinity), its old, less efficient distance pair is still actively
+                         * tracking inside the TreeSet. We must search out and remove that old pairing using its
+                         * exact current distance profile so the tree structure does not break or desynchronize.
+
+                        if (shortestDistances[neighborNode] != Integer.MAX_VALUE) {
+                            set.remove(new NodeDistancePair(neighborNode, shortestDistances[neighborNode]));
+                        }
+
+                        // Step 9: Re-record the updated minimum path and commit the fresh element into the sorted set
+                        shortestDistances[neighborNode] = calculatedDistance;
+                        set.add(new NodeDistancePair(neighborNode, calculatedDistance));
+                    }
+                }
+            }
+
+            // Return the finalized tracking array containing absolute shortest distances across all vertices
+                    return shortestDistances;
+                }
+            }
+
+            Time Complexity: When you combine all the graph processing steps, the total time complexity adds up to:
+            O(V + E) + O(V log V) + O(E log V)
+
+            For any standard connected graph where the number of edges is greater than or equal to the number of nodes (E >= V),
+            the expression simplifies directly to: O((V + E) log V) — which is commonly written as O(E log V).
+
+            Even though both approaches share the exact same theoretical complexity of O(E log V),
+            a TreeSet is slower in practice compared to PQ, PriorityQueue wins on real-world speed
+            because it avoids the heavy memory management and pointer-shuffling required to maintain a balanced tree.
+
+     */
+
+
+
 
 
 }
