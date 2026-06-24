@@ -2539,62 +2539,48 @@ public class Graph {
 
      */
 
-    // Why Dijkstra doesn't work with negative edge weights
+    // Why do we use a PQ even when using a queue will also give us the correct result
 
     /*
 
-        Dijkstra's Algorithm and Negative Cycles
+Why We Use a Priority Queue Instead of a Regular Queue in Dijkstra
 
-        Your trace perfectly captures how Dijkstra's algorithm breaks down on an undirected graph with negative edge weights.
-        It hits a true infinite loop condition.
+While it is true that using a regular Queue can eventually give you the correct answer
+(provided you allow nodes to re-enter the queue when a shorter path is found),
+it completely destroys the efficiency of the algorithm.
 
-        1. The Setup
+Here is the exact reason why a Priority Queue is mandatory for performance.
 
-        * There is an undirected edge between Node 0 and Node 1 with a weight of -2.
-        * Because the graph is undirected, the adjacency list builds two separate paths:
-        * Node 0 to Node 1 (weight: -2)
-        * Node 1 to Node 0 (weight: -2)
+1. The Greediness and Finalization
+A Priority Queue always pulls out the node with the absolute smallest tentative distance.
+Because it chooses the minimum distance first, it guarantees that for graphs with positive weights,
+the distance to that popped node is finalized and cannot get any shorter. Each node is effectively processed and finalized exactly once.
+2. The Regular Queue Problem (The Re-processing Avalanche)
+A regular Queue operates on a First-In, First-Out (FIFO) basis.
+It does not care about the size of the distance; it only cares about which node arrived first.
 
+If you use a regular Queue, you might find a long,
+inefficient path to Node X early on (for example, a distance of 100).
+The algorithm will pop Node X and waste computational time updating all of Node X's neighbors based on that bad distance of 100.
 
-        * This creates a negative cycle right between these two nodes (0 -> 1 -> 0) with a total round-trip cost of -4.
+Much later, the regular Queue will discover a much shorter path to Node X (for example, a distance of 5).
+Because 5 is less than 100, the algorithm updates the distance. But now,
+it must push Node X back into the Queue to re-update all of Node X's neighbors all over again.
 
-        2. Tracing the Steps
+3. Time Complexity Explosion
+This constant rewriting and re-pushing of nodes means the same node can enter and leave a regular queue multiple times.
 
-        * Start at Source (Node 0):
-        * The shortest distances array is initialized to [0, INF].
-        * The Priority Queue (PQ) holds {node: 0, distance: 0}.
+With a Priority Queue, the time complexity is a highly efficient O(E log V)
+because nodes are finalized in order of their true shortest distance.
 
+With a regular Queue, the algorithm degrades into a variation of the Shortest Path Faster Algorithm (SPFA).
+In the worst-case scenario, this repeated re-processing causes the time complexity to skyrocket to O(V * E).
+On large graphs, this difference means the regular Queue version will run incredibly slow or hit a time-limit exceeded error.
 
-        * Process Node 0:
-        * The algorithm checks neighbor Node 1.
-        * The calculated distance to Node 1 is 0 + (-2) = -2.
-        * Since -2 is less than INF, the distances array updates to [0, -2] and {1, -2} is added to the PQ.
-
-
-        * Process Node 1:
-        * The algorithm checks neighbor Node 0.
-        * The calculated distance to Node 0 is -2 + (-2) = -4.
-        * Since -4 is less than 0, the distances array updates to [-4, -2] and {0, -4} is added to the PQ.
-
-
-        * Process Node 0 again:
-        * The algorithm checks neighbor Node 1.
-        * The calculated distance to Node 1 is -4 + (-2) = -6.
-        * Since -6 is less than -2, the distances array updates to [-4, -6] and {1, -6} is added to the PQ.
-
-
-
-        3. Why the Code Gets Trapped
-        Because the values keep dropping infinitely (0 -> -2 -> -4 -> -6 -> -8...),
-        the core relaxation condition in the code will always evaluate to true:
-        if (calculatedDistance < shortestDistances[neighborNode])
-
-        Furthermore, because the newly pulled distance is always equal to the current minimum recorded value,
-        the stale-check optimization will never trigger to stop it:
-        if (currentDistance > shortestDistances[currentNode]) continue;
-
-        As a result, the while loop never empties, the Priority Queue keeps filling up with smaller negative numbers,
-        and the program gets stuck in an infinite loop until it runs out of memory.
+Summary
+A Priority Queue ensures you explore the most promising paths first,
+guaranteeing you only process each node's neighbors efficiently.
+A regular Queue blindly processes paths as they appear, leading to a massive avalanche of redundant recalculations.
 
      */
 
@@ -2721,6 +2707,67 @@ public class Graph {
             because it avoids the heavy memory management and pointer-shuffling required to maintain a balanced tree.
 
      */
+
+    // Why Dijkstra doesn't work with negative edge weights
+
+    /*
+
+        Dijkstra's Algorithm and Negative Cycles
+
+        Your trace perfectly captures how Dijkstra's algorithm breaks down on an undirected graph with negative edge weights.
+        It hits a true infinite loop condition.
+
+        1. The Setup
+
+        * There is an undirected edge between Node 0 and Node 1 with a weight of -2.
+        * Because the graph is undirected, the adjacency list builds two separate paths:
+        * Node 0 to Node 1 (weight: -2)
+        * Node 1 to Node 0 (weight: -2)
+
+
+        * This creates a negative cycle right between these two nodes (0 -> 1 -> 0) with a total round-trip cost of -4.
+
+        2. Tracing the Steps
+
+        * Start at Source (Node 0):
+        * The shortest distances array is initialized to [0, INF].
+        * The Priority Queue (PQ) holds {node: 0, distance: 0}.
+
+
+        * Process Node 0:
+        * The algorithm checks neighbor Node 1.
+        * The calculated distance to Node 1 is 0 + (-2) = -2.
+        * Since -2 is less than INF, the distances array updates to [0, -2] and {1, -2} is added to the PQ.
+
+
+        * Process Node 1:
+        * The algorithm checks neighbor Node 0.
+        * The calculated distance to Node 0 is -2 + (-2) = -4.
+        * Since -4 is less than 0, the distances array updates to [-4, -2] and {0, -4} is added to the PQ.
+
+
+        * Process Node 0 again:
+        * The algorithm checks neighbor Node 1.
+        * The calculated distance to Node 1 is -4 + (-2) = -6.
+        * Since -6 is less than -2, the distances array updates to [-4, -6] and {1, -6} is added to the PQ.
+
+
+
+        3. Why the Code Gets Trapped
+        Because the values keep dropping infinitely (0 -> -2 -> -4 -> -6 -> -8...),
+        the core relaxation condition in the code will always evaluate to true:
+        if (calculatedDistance < shortestDistances[neighborNode])
+
+        Furthermore, because the newly pulled distance is always equal to the current minimum recorded value,
+        the stale-check optimization will never trigger to stop it:
+        if (currentDistance > shortestDistances[currentNode]) continue;
+
+        As a result, the while loop never empties, the Priority Queue keeps filling up with smaller negative numbers,
+        and the program gets stuck in an infinite loop until it runs out of memory.
+
+     */
+
+    //
 
 
 
