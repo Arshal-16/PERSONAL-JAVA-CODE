@@ -2831,9 +2831,105 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
+    // Print Shortest Path
+
+    /* Question
+
+    You are given a weighted undirected graph with n vertices numbered from 1 to n and m edges along with their weights.
+    Find the shortest path between vertex 1 and vertex n. Each edge is given as {a, b, w}, denoting an edge between vertices a and b with weight w.
+    If a path exists, return a list of integers where the first element is the total weight of the shortest path,
+    and the remaining elements are the nodes along that path (from 1 to n). If no path exists, return a list containing only {-1}.
+
+     */
+
+    /*
+
+        class Solution {
+            public List<Integer> shortestPath(int n, int m, int edges[][]) {
+
+                // 1. Initialize adjacency list for 1-based indexing (0 to n)
+                List<List<int[]>> adjList = new ArrayList<>(); // Stores [neighborNode, edgeWeight]
+                for (int i = 0; i <= n; i++) {
+                    adjList.add(new ArrayList<>());
+                }
+
+                // 2. Build the undirected graph
+                for (int[] edge : edges) {
+                    int u = edge[0];
+                    int v = edge[1];
+                    int weight = edge[2];
+
+                    adjList.get(u).add(new int[] {v, weight});
+                    adjList.get(v).add(new int[] {u, weight});
+                }
+
+                // 3. Setup tracking arrays for Dijkstra
+                int[] distances = new int[n + 1];
+                int[] parent = new int[n + 1];
+                Arrays.fill(distances, Integer.MAX_VALUE);
+
+                for (int i = 1; i <= n; i++) {
+                    parent[i] = i;
+                }
+
+                // 4. Initialize source node
+                distances[1] = 0;
+                PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1])); // [node, distance]
+                minHeap.add(new int[]{1, 0});
+
+                // 5. Run Dijkstra's Algorithm
+                while (!minHeap.isEmpty()) {
+                    int[] current = minHeap.remove();
+                    int currNode = current[0];
+                    int currDist = current[1];
+
+                    // Skip stale node processing if a shorter path to this node was already found
+                    if (distances[currNode] < currDist) {
+                        continue;
+                    }
+
+                    // Relax adjacent edges
+                    for (int[] neighbor : adjList.get(currNode)) {
+                        int neighborNode = neighbor[0];
+                        int edgeWeight = neighbor[1];
+                        int newDist = currDist + edgeWeight;
+
+                        if (distances[neighborNode] > newDist) {
+                            distances[neighborNode] = newDist;
+                            parent[neighborNode] = currNode;
+                            minHeap.add(new int[]{neighborNode, newDist});
+                        }
+                    }
+                }
+
+                // 6. Path Reconstruction (Moved safely outside the while loop)
+                // If the destination node 'n' was never reached, return [-1]
+                if (distances[n] == Integer.MAX_VALUE) {
+                    ArrayList<Integer> noPathResult = new ArrayList<>();
+                    noPathResult.add(-1);
+                    return noPathResult;
+                }
+
+                ArrayList<Integer> shortestPath = new ArrayList<>();
+                int currentNode = n;
+
+                // Trace back from destination to source using the parent tracker
+                while (currentNode != parent[currentNode]) {
+                    shortestPath.add(currentNode);
+                    currentNode = parent[currentNode];
+                }
+                shortestPath.add(1); // Add the source node
+
+                // Reverse to orient path from source -> destination
+                Collections.reverse(shortestPath);
+
+                return shortestPath;
+            }
+        }
+
+     */
+
     //
-
-
 
 
 
