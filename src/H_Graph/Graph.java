@@ -2929,8 +2929,165 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
-    //
+    // Shortest Distance in a Binary Maze
 
+    /*
+
+    class Solution {
+
+	public int shortestPath(int[][] mat, int[] src, int[] dest) {
+
+		// Edge Case: If source or destination is blocked, or they are the same
+		if (mat[src[0]][src[1]] == 0 || mat[dest[0]][dest[1]] == 0)
+			return - 1;
+		if (src[0] == dest[0] && src[1] == dest[1])
+			return 0;
+
+		int numRows = mat.length;
+		int numCols = mat[0].length;
+
+		// Initialize distances matrix with infinity
+		int minDistance[][] = new int[numRows][numCols];
+		for (int row[] : minDistance) {
+			Arrays.fill(row, Integer.MAX_VALUE);
+		}
+
+		// BFS Queue storing coordinates: {row, col}
+		// (We don't need to store distance inside the queue since minDistance tracks it)
+
+		* WHY A STANDARD QUEUE INSTEAD OF A PRIORITY QUEUE (Dijkstra's)?
+		* 1. Uniform Edge Weights: Every step from one cell to an adjacent cell has a constant weight of exactly 1.
+		* 2. Monotonicity of BFS: In an unweighted graph, a standard First - In - First - Out (FIFO) queue naturally processes
+		* nodes level by level. It first processes all nodes at distance 0, then all nodes at distance 1, then distance 2, etc.
+		* 3. Efficiency: Since the distance values of elements added to the queue are monotonically increasing (e.g., 0, 1, 1, 2, 2, 2...),
+		* a standard Queue gives us O(1) insertion and deletion. A Priority Queue would incur an unnecessary O(log N) overhead
+		* just to sort elements that are already inherently sorted by the order of insertion.
+
+    Queue<int[]> cellQueue = new ArrayDeque<>();
+
+    // Initialize source
+    minDistance[src[0]][src[1]] = 0;
+		cellQueue.add(new int[] {src[0], src[1]});
+
+    // Direction vectors for moving Up, Down, Left, Right
+    int[] rowOffsets = {-1, 1, 0, 0};
+    int[] colOffsets = {0, 0, -1, 1};
+
+		while (!cellQueue.isEmpty()) {
+
+        int[] currentCell = cellQueue.remove();
+        int currRow = currentCell[0];
+        int currCol = currentCell[1];
+        int currDist = minDistance[currRow][currCol];
+
+        // Explore all 4 adjacent directions
+        for (int i = 0; i < 4; i++) {
+            int nextRow = currRow + rowOffsets[i];
+            int nextCol = currCol + colOffsets[i];
+            int nextDist = currDist + 1;
+
+            // Validate boundaries, traversability, and if a shorter path is found
+            if (nextRow >= 0 && nextRow < numRows &&
+                    nextCol >= 0 && nextCol < numCols &&
+                    mat[nextRow][nextCol] == 1 &&
+                    nextDist < minDistance[nextRow][nextCol]) {
+
+                 * WHY THE EARLY RETURN ON FIRST HIT IS CORRECT:
+                 * Because BFS expands outward uniformly like a ripple in water, it explores paths in order of length.
+                 * The very first time we touch the destination cell, it is guaranteed to be via the shortest possible
+                 * sequence of steps. Any subsequent discovery of the destination from a later queue element would
+                 * represent a path that took more or equal steps. Returning instantly saves us from traversing
+                 * the rest of the grid pointlessly.
+                 *
+                if (nextRow == dest[0] && nextCol == dest[1]) {
+                    return nextDist;
+                }
+
+                minDistance[nextRow][nextCol] = nextDist;
+                cellQueue.add(new int[] {nextRow, nextCol});
+            }
+        }
+    }
+
+    // Return -1 if the destination is unreachable after exhausting the queue
+		return - 1;
+}
+}
+
+
+        */
+
+    // Shortest Path in Binary Matrix ( LC 1091 )
+
+    /*
+
+            class Solution {
+
+            public int shortestPathBinaryMatrix(int[][] grid) {
+                int n = grid.length;
+
+                // Edge case: If starting or ending cell is blocked
+                if (grid[0][0] == 1 || grid[n - 1][n - 1] == 1) {
+                    return -1;
+                }
+
+                // Edge case: Single cell matrix that is clear
+                if (n == 1) {
+                    return 1;
+                }
+
+                // Stores the shortest path length to reach each cell
+                int pathLength[][] = new int[n][n];
+                for (int[] row : pathLength) {
+                    Arrays.fill(row, Integer.MAX_VALUE);
+                }
+
+                // Queue stores coordinates: {row, col}
+                Queue<int[]> cellQueue = new ArrayDeque<>();
+
+                // Initialize the starting cell (0, 0)
+                cellQueue.add(new int[]{0, 0});
+                pathLength[0][0] = 1;
+
+                while (!cellQueue.isEmpty()) {
+
+                    int[] currentCell = cellQueue.remove();
+                    int currRow = currentCell[0];
+                    int currCol = currentCell[1];
+                    int currLen = pathLength[currRow][currCol];
+
+                    // Explore all 8 directions using nested offsets (-1, 0, 1)
+                    for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+                        for (int colOffset = -1; colOffset <= 1; colOffset++) {
+
+                            int nextRow = currRow + rowOffset;
+                            int nextCol = currCol + colOffset;
+                            int nextLen = currLen + 1;
+
+                            if (nextRow >= 0 && nextRow < n &&
+                                nextCol >= 0 && nextCol < n &&
+                                grid[nextRow][nextCol] == 0 &&
+                                nextLen < pathLength[nextRow][nextCol]) {
+
+                                // Early return: First time hitting the bottom-right corner is the shortest path
+                                if (nextRow == n - 1 && nextCol == n - 1) {
+                                    return nextLen;
+                                }
+
+                                pathLength[nextRow][nextCol] = nextLen;
+                                cellQueue.add(new int[]{nextRow, nextCol});
+                            }
+                        }
+                    }
+                }
+
+                return -1;
+            }
+        }
+
+     */
+
+    //
 
 
 }
