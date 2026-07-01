@@ -3087,7 +3087,72 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
-    //
+    // Path With Minimum Effort
+
+    /*
+
+            class Solution {
+
+            public int minimumEffortPath(int[][] heights) {
+
+                int totalRows = heights.length;
+                int totalCols = heights[0].length;
+
+                // Track the minimum effort required to reach each cell
+                int minEffortToCell[][] = new int[totalRows][totalCols];
+                for (int[] row : minEffortToCell) {
+                    Arrays.fill(row, Integer.MAX_VALUE);
+                }
+
+                // Min-Heap stores: {row, col, effortSoFar} sorted by effortSoFar
+                PriorityQueue<int[]> minHeap = new PriorityQueue<>((pairA, pairB) -> Integer.compare(pairA[2], pairB[2]));
+
+                // Initialize the starting cell
+                minHeap.add(new int[]{0, 0, 0});
+                minEffortToCell[0][0] = 0;
+
+                // Direction arrays for moving Right, Left, Down, Up
+                int[] rowOffsets = {0, 0, 1, -1};
+                int[] colOffsets = {1, -1, 0, 0};
+
+                while (!minHeap.isEmpty()) {
+
+                    int currentCell[] = minHeap.remove();
+                    int currRow = currentCell[0];
+                    int currCol = currentCell[1];
+                    int currEffort = currentCell[2];
+
+                    // Since we use a Min-Heap, the first time we reach the destination is guaranteed to be the minimum effort
+                    if (currRow == totalRows - 1 && currCol == totalCols - 1) {
+                        return currEffort;
+                    }
+
+                    // Explore all 4 neighboring directions
+                    for (int i = 0; i < 4; i++) {
+                        int nextRow = currRow + rowOffsets[i];
+                        int nextCol = currCol + colOffsets[i];
+
+                        // Check boundary conditions
+                        if (nextRow >= 0 && nextRow < totalRows && nextCol >= 0 && nextCol < totalCols) {
+                            // Effort to move to the next cell is the max of our current path's effort
+                            // and the absolute difference between the current and next cell heights
+                            int absoluteDifference = Math.abs(heights[currRow][currCol] - heights[nextRow][nextCol]);
+                            int nextEffort = Math.max(currEffort, absoluteDifference);
+
+                            // If we found a path with less effort to the next cell, update it and push to heap
+                            if (nextEffort < minEffortToCell[nextRow][nextCol]) {
+                                minEffortToCell[nextRow][nextCol] = nextEffort;
+                                minHeap.add(new int[]{nextRow, nextCol, nextEffort});
+                            }
+                        }
+                    }
+                }
+
+                return 0; // Fallback return to satisfy Java compiler
+            }
+        }
+
+     */
 
 
 }
