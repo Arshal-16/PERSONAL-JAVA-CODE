@@ -3154,5 +3154,307 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
+    // Cheapest Flights Within K Stops
+
+    /* Using Dijkstra
+
+
+         * ============================================================================
+         * WHY STANDARD DIJKSTRA FAILS HERE:
+         * ============================================================================
+         * 1. Standard Dijkstra relies on a 1D 'dist[]' array to track the absolute
+         * cheapest cost to reach each node. Once a node is popped from the min-heap,
+         * it assumes that path is permanently optimal and discards any subsequent
+         * paths to that same node that have a higher cost.
+         * * 2. However, this problem introduces a second constraint: at most 'K' stops.
+         * A path that is cheaper might consume too many stops, blocking a later,
+         * slightly more expensive path that has plenty of stops left to reach the
+         * actual destination.
+         * * ============================================================================
+         * THE SOLUTION (2D DIJKSTRA):
+         * ============================================================================
+         * Instead of tracking the absolute minimum cost globally per city, we track the
+         * minimum cost *relative to the number of stops taken* using a 2D array:
+         * 'minCost[city][stops]'.
+         * * This isolates paths based on their length. A more expensive path is no longer
+         * blindly discarded by a cheaper path unless that cheaper path *also* used the
+         * exact same number of flights. This allows the Min-Heap to naturally find the
+         * cheapest overall valid route without cutting off viable paths prematurely.
+         * ============================================================================
+
+
+            class Solution {
+
+                private static class FlightEdge {
+                    int targetCity;
+                    int price;
+
+                    FlightEdge(int targetCity, int price) {
+                        this.targetCity = targetCity;
+                        this.price = price;
+                    }
+                }
+
+                private static class TravelState implements Comparable<TravelState> {
+                    int currentCity;
+                    int totalCost;
+                    int stopsCount;
+
+                    TravelState(int currentCity, int totalCost, int stopsCount) {
+                        this.currentCity = currentCity;
+                        this.totalCost = totalCost;
+                        this.stopsCount = stopsCount;
+                    }
+
+                    @Override
+                    public int compareTo(TravelState other) {
+                        return Integer.compare(this.totalCost, other.totalCost);
+                    }
+                }
+
+                public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+                    // 1. Build the Adjacency List
+                    List<List<FlightEdge>> graph = new ArrayList<>();
+                    for (int i = 0; i < n; i++) {
+                        graph.add(new ArrayList<>());
+                    }
+
+                    for (int[] flight : flights) {
+                        graph.get(flight[0]).add(new FlightEdge(flight[1], flight[2]));
+                    }
+
+                    // 2. Initialize 2D tracking array: minCost[city][stops]
+                    // stops can range from 0 to k + 1 (where k + 1 means k intermediate stops + 1 final destination flight)
+                    int[][] minCost = new int[n][k + 2];
+                    for (int[] row : minCost) {
+                        Arrays.fill(row, Integer.MAX_VALUE);
+                    }
+
+                    PriorityQueue<TravelState> minHeap = new PriorityQueue<>();
+
+                    // Base case: 0 cost and 0 stops to be at the source
+                    minHeap.add(new TravelState(src, 0, 0));
+                    minCost[src][0] = 0;
+
+                    // 3. Process routes
+                    while (!minHeap.isEmpty()) {
+                        TravelState current = minHeap.poll();
+
+                        int currCity = current.currentCity;
+                        int currCost = current.totalCost;
+                        int currStops = current.stopsCount;
+
+                        // Since it's a Min-Heap sorted by cost, the first time we pop
+                        // the destination, it is guaranteed to be the cheapest valid route.
+                        if (currCity == dst) {
+                            return currCost;
+                        }
+
+                        // If we have already taken k + 1 flights (edges), we cannot go further.
+                        if (currStops > k) {
+                            continue;
+                        }
+
+                        // Optimize: If we found a cheaper way to reach this city with the exact same
+                        // number of stops before this state popped out of the heap, skip it.
+                        if (currCost > minCost[currCity][currStops]) {
+                            continue;
+                        }
+
+                        // Explore neighbors
+                        for (FlightEdge edge : graph.get(currCity)) {
+                            int nextCity = edge.targetCity;
+                            int flightPrice = edge.price;
+                            int nextCost = currCost + flightPrice;
+                            int nextStops = currStops + 1;
+
+                            // CRUCIAL: Only push to heap if this cost is strictly better than
+                            // any previously recorded cost for reaching 'nextCity' with this EXACT number of stops.
+                            if (nextCost < minCost[nextCity][nextStops]) {
+                                minCost[nextCity][nextStops] = nextCost;
+                                minHeap.add(new TravelState(nextCity, nextCost, nextStops));
+                            }
+                        }
+                    }
+
+                    return -1;
+                }
+            }
+
+         * ============================================================================
+         * TIME COMPLEXITY DERIVATION (DEEP ANALYSIS):
+         * ============================================================================
+         * Let V = Number of cities (n), E = Number of flights (flights.length),
+         * and K = Maximum allowed intermediate stops.
+         * * 1. STATE SPACE RESTRUCTURING:
+         * Because we must respect the stop constraint, a "node" in our search is no
+         * longer just a city. It is now a unique tuple: (City, Stops Used).
+         * Since 'Stops Used' ranges from 0 to K + 1, the total number of unique
+         * explorable states is bounded by: O(K * V).
+         * * 2. PRIORITY QUEUE (HEAP) OPERATION COST:
+         * The maximum number of items residing in our min-heap at any given time
+         * is bounded by the total number of unique states: O(K * V).
+         * Therefore, the time complexity for any single push (add) or pop (poll)
+         * operation is: O(log(K * V)).
+         * * 3. TOTAL WORK BREAKDOWN:
+         * Total Time = Graph Construction + Heap Extraction + Edge Relaxation
+         * * A. Graph Construction:
+         * Iterating over all flights to build the adjacency list takes: O(V + E).
+         * * B. Heap Extractions (Pops):
+         * Each unique (City, Stops Used) state is processed and popped at most
+         * once due to our 'currCost > minCost[currCity][currStops]' pruning.
+         * Work done: O(K * V * log(K * V)).
+         * * C. Edge Relaxations (Pushes):
+         * In the worst-case dense graph, every flight connection (E) can potentially
+         * be evaluated across each of the valid stop layers.
+         * Work done: O(E * log(K * V)).
+         * * 4. FINAL MATHEMATICAL SUM & SIMPLIFICATION:
+         * Total Time = O(V + E) + O(K * V * log(K * V)) + O(E * log(K * V))
+         * * Grouping terms and simplifying to the tight upper bound yields:
+         * 👉 TIME COMPLEXITY: O(K * V + E * log(K * V))
+         * * Note: If K is very small, this converges to standard Dijkstra O(E * log V).
+         * If K approaches V, the runtime scales up heavily as the search
+         * space multiplies across all available stop layers.
+         * ============================================================================
+
+
+     */
+
+    /* BFS / BELLMAN FORD ALGO ( OPTIMAL SOLN FOR THIS QSN )
+
+            class Solution {
+
+            // Represents a flight destination and its ticket price
+            private static class FlightEdge {
+                int targetCity;
+                int price;
+
+                FlightEdge(int targetCity, int price) {
+                    this.targetCity = targetCity;
+                    this.price = price;
+                }
+            }
+
+            // Represents the structural state of our path tracking inside the BFS queue
+            private static class TravelState {
+                int currentCity;
+                int accumulatedCost;
+                int stopsCount; // Tracking intermediate stops used so far
+
+                TravelState(int currentCity, int accumulatedCost, int stopsCount) {
+                    this.currentCity = currentCity;
+                    this.accumulatedCost = accumulatedCost;
+                    this.stopsCount = stopsCount;
+                }
+            }
+
+            public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+
+                // 1. Build the Graph Adjacency List
+                List<List<FlightEdge>> graph = new ArrayList<>();
+                for (int i = 0; i < n; i++) {
+                    graph.add(new ArrayList<>());
+                }
+
+                for (int[] flight : flights) {
+                    int fromCity = flight[0];
+                    int toCity = flight[1];
+                    int price = flight[2];
+                    graph.get(fromCity).add(new FlightEdge(toCity, price));
+                }
+
+                // 2. Track globally optimal costs per city
+                int[] minCostToCity = new int[n];
+                Arrays.fill(minCostToCity, Integer.MAX_VALUE);
+                minCostToCity[src] = 0;
+
+                // 3. Setup standard FIFO Queue for Level-Order BFS
+                Queue<TravelState> queue = new LinkedList<>();
+
+                // Base state: Standing at 'src' with 0 cost and 0 stops used
+                queue.add(new TravelState(src, 0, 0));
+
+                // 4. Execute layer-by-layer BFS traversal
+
+                 * Note on standard FIFO Queue Ordering:
+                 * A standard Queue processes elements strictly by the order they are inserted (First-In, First-Out).
+                 * Because taking a flight to a neighbor transitions us to the next layer of stops, the queue
+                 * naturally groups and processes paths level-by-level based on the number of intermediate stops:
+                 * * Queue Sequence: [0 stops paths] -> [1 stop paths] -> [2 stops paths] -> ...
+                 * Example: [src (0 stops)] -> [cityA (1 stop), cityB (1 stop)] -> [cityC (2 stops), cityD (2 stops)] -> ...
+                 * * This structural guarantee ensures that a path with fewer intermediate stops is always evaluated
+                 * before a path with more stops, eliminating the complex pruning bugs found in standard Dijkstra.
+
+                while (!queue.isEmpty()) {
+                TravelState current = queue.remove();
+
+                int currCity = current.currentCity;
+                int currCost = current.accumulatedCost;
+                int currStops = current.stopsCount;
+
+                // If this city is already past our intermediate stop limit,
+                // it cannot be used to branch out to any more neighbors.
+                if (currStops > k) {
+                    continue;
+                }
+
+                // Explore all routes expanding from the current city
+                for (FlightEdge flight : graph.get(currCity)) {
+                    int nextCity = flight.targetCity;
+                    int ticketPrice = flight.price;
+                    int nextTotalCost = currCost + ticketPrice;
+
+                    // CRUCIAL CONDITION:
+                    // Because standard BFS processes paths level-by-level (fewer stops processed first),
+                    // a deeper path with MORE stops is only valid if it yields a strictly CHEAPER cost
+                    // than what we've previously recorded.
+                    if (nextTotalCost < minCostToCity[nextCity]) {
+
+                        minCostToCity[nextCity] = nextTotalCost;
+                        queue.add(new TravelState(nextCity, nextTotalCost, currStops + 1));
+
+                    }
+                }
+            }
+
+            // 5. Final validation and extraction
+                return minCostToCity[dst] == Integer.MAX_VALUE ? -1 : minCostToCity[dst];
+        }
+        }
+
+
+         * ============================================================================
+         * COMPLEXITY ANALYSIS DERIVATION (BFS APPROACH):
+         * ============================================================================
+         * Let V = Number of cities (n), E = Number of flights (flights.length),
+         * and K = Maximum allowed intermediate stops.
+         * * 1. TIME COMPLEXITY: O(V + K * E)
+         * - Graph Construction: Iterating over all flights to build the adjacency list
+         * takes linear time: O(V + E).
+         * - BFS Traversal: The algorithm processes the graph layer-by-layer (by number
+         * of stops) using a standard FIFO Queue.
+         * - Because of the pruning condition 'if (currStops > k) continue;', the search
+         * tree has a strict maximum depth of K + 1 levels. The algorithm completely
+         * halts any path deeper than this.
+         * - In the worst-case scenario (such as a highly dense or fully-connected graph),
+         * every single flight edge 'E' might be traversed, checked, and relaxed at
+         * every single level of stops because paths can keep getting cheaper.
+         * - Multiplying the maximum number of layers by the maximum work done per layer
+         * gives: Total Operations = (K + 1) levels * E edges per level.
+         * - Combining Graph Construction and BFS yields: O(V + E) + O(K * E), which
+         * simplifies to the final asymptotic tight upper bound: 👉 O(V + K * E)
+         * * 2. SPACE COMPLEXITY: O(V + E)
+         * - Adjacency List: Requires O(V + E) space to store all 'V' cities and 'E'
+         * flight connections.
+         * - Distance Array (minCostToCity): Requires a simple 1D array of O(V) space to
+         * store the global minimum cost for each city (unlike Dijkstra which requires a
+         * 2D O(K * V) matrix).
+         * - BFS Queue: In the worst case, the queue stores paths layer-by-layer. A single
+         * layer will never hold more than O(V) unique city states at any given time.
+         * - Combining these terms: O(V + E) + O(V) + O(V) = 👉 O(V + E)
+         * ============================================================================
+
+
+     */
 
 }
