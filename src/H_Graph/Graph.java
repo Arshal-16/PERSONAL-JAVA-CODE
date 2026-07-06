@@ -3457,7 +3457,6 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
-
     // Number of Ways to Arrive at Destination
 
     /*
@@ -3594,6 +3593,101 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
                 // Target cannot be reached
                 return -1;
+            }
+        }
+
+     */
+
+    // Bellman Ford Algorithm
+
+    // Concept:
+
+    /*
+
+The Bellman-Ford Algorithm: Complete Overview
+
+1. Core Purpose & Advantages
+Single-Source Shortest Path (SSSP): It finds the shortest distance from one source node to all other nodes in the graph.
+Beats Dijkstra on Negative Weights: Dijkstra's algorithm acts greedily and fails when negative edge weights or negative cycles are present.
+Bellman-Ford handles negative weights flawlessly.
+Negative Cycle Detection: It doesn't just fail silently; it explicitly detects if a graph contains a negative weight cycle.
+2. Graph Prerequisites & Representation
+Directed Graphs Only: Bellman-Ford strictly requires a directed graph.
+Handling Undirected Graphs: If given an undirected graph with negative weights,
+you must convert it into a directed graph by duplicating every edge in both directions (e.g., an edge A - B becomes A → B and B → A).
+Best Data Structure: Instead of an adjacency list, an Edge List is highly recommended.
+Representing the graph as a simple array/list of [src, dest, wt] makes iterating through all edges much cleaner.
+3. Initialization Strategy
+Create a dist array of size $N$ (number of nodes) and fill it with infinity (∞), representing that they are initially unreachable.
+Set the distance of your starting node to zero: dist[src] = 0.
+4. The Core Mechanism: Edge Relaxation
+"Relaxing" an edge means checking if you can find a shorter path to a destination node by going through a specific source node.
+The Formula: if (dist[u] + wt < dist[v]) { dist[v] = dist[u] + wt }
+You must sequentially relax all edges in the graph. The edges can be processed in absolutely any order.
+5. The N-1 Rule
+You must run the edge relaxation process on all edges exactly N-1 times.
+The "Why": In a graph of N nodes, the absolute longest simple path (a path with no cycles) will contain exactly N-1 edges.
+Relaxing all edges N-1 times guarantees that the shortest path information has fully cascaded through every possible valid route in the graph.
+6. Detecting Negative Weight Cycles
+After completing your N-1 iterations, the shortest paths should be mathematically locked in.
+The Trap: Run the relaxation loop for one final, N-th iteration.
+If dist[v] gets updated again during this N-th run, it proves that a shorter path was found by infinitely looping through a cycle.
+You can instantly flag the graph as containing a negative weight cycle.
+
+Bonus DSA Addition: Complexity Analysis
+Time Complexity: O(V x E) — You iterate through all edges (E) exactly Vertices minus one times (V-1).
+This makes it slower than Dijkstra's O(E log V), which is why we only use Bellman-Ford when negative weights are involved.
+Space Complexity: O(V) — You only need a 1D array of size V to store the shortest distances.
+
+     */
+
+    /*
+
+            class Solution {
+
+            public int[] bellmanFord(int V, int[][] edges, int src) {
+
+                // Step 1: Initialization
+                // Create the distance array and fill it with 10^8 (infinity proxy)
+                int distances[] = new int[V];
+                int infinity = (int) 1e8;
+
+                Arrays.fill(distances, infinity);
+
+                // Distance to the source node is always 0
+                distances[src] = 0;
+
+                // Step 2: The N-1 Rule (Edge Relaxation)
+                // Relax all edges V - 1 times to guarantee shortest paths
+                for (int i = 0; i < V - 1; i++) {
+                    for (int edge[] : edges) {
+                        int u = edge[0];
+                        int v = edge[1];
+                        int weight = edge[2];
+
+                        // If node 'u' has been reached, check if the path through 'u' is shorter
+                        if (distances[u] != infinity && distances[u] + weight < distances[v]) {
+                            distances[v] = distances[u] + weight;
+                        }
+                    }
+                }
+
+                // Step 3: Detecting Negative Weight Cycles
+                // Run the relaxation logic one final (N-th) time
+                for (int edge[] : edges) {
+                    int u = edge[0];
+                    int v = edge[1];
+                    int weight = edge[2];
+
+                    // If an edge can STILL be relaxed, we are trapped in a negative cycle
+                    if (distances[u] != infinity && distances[u] + weight < distances[v]) {
+                        // Return an array with -1 to indicate failure to compute reliable paths
+                        return new int[]{-1};
+                    }
+                }
+
+                // Step 4: Return the finalized shortest distances
+                return distances;
             }
         }
 
