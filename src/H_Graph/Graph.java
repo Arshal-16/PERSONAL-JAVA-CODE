@@ -3457,4 +3457,146 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
+
+    // Number of Ways to Arrive at Destination
+
+    /*
+
+            class Solution {
+
+            // Static nested class to store node information for the PriorityQueue
+            static class Node implements Comparable<Node> {
+                int id;
+                long time;
+
+                Node(int id, long time) {
+                    this.id = id;
+                    this.time = time;
+                }
+
+                @Override
+                public int compareTo(Node other) {
+                    return Long.compare(this.time, other.time);
+                }
+            }
+
+            public int countPaths(int n, int[][] roads) {
+                final int MOD = 1_000_000_007;
+
+                // 1. Build Adjacency List
+                List<List<int[]>> adj = new ArrayList<>();
+                for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+                for (int[] road : roads) {
+                    adj.get(road[0]).add(new int[]{road[1], road[2]});
+                    adj.get(road[1]).add(new int[]{road[0], road[2]});
+                }
+
+                // 2. Initialize tracking arrays
+                // minTime stores the shortest time found to each intersection
+                long minTime[] = new long[n];
+                Arrays.fill(minTime, Long.MAX_VALUE);
+
+                // numWays stores the number of ways to reach the intersection in minTime
+                long numWays[] = new long[n];
+
+                minTime[0] = 0;
+                numWays[0] = 1;
+
+                // 3. Dijkstra's Algorithm using Min-Heap
+                PriorityQueue<Node> pq = new PriorityQueue<>();
+                pq.add(new Node(0, 0));
+
+                while (!pq.isEmpty()) {
+
+                    Node current = pq.poll();
+                    int u = current.id;
+                    long timeU = current.time;
+
+                    // Optimization: Skip if we already processed a shorter path to this node
+                    if (timeU > minTime[u]) continue;
+
+                    for (int edge[] : adj.get(u)) {
+                        int v = edge[0];
+                        int weight = edge[1];
+
+                        // Case 1: Found a strictly shorter path
+                        if (minTime[u] + weight < minTime[v]) {
+                            minTime[v] = minTime[u] + weight;
+                            numWays[v] = numWays[u];
+                            pq.add(new Node(v, minTime[v]));
+                        }
+                        // Case 2: Found another path with the same shortest time
+                        else if (minTime[u] + weight == minTime[v]) {
+                            numWays[v] = (numWays[v] + numWays[u]) % MOD;
+                        }
+                    }
+                }
+
+                return (int) numWays[n - 1];
+            }
+        }
+
+     */
+
+    // Minimum Multiplications to reach End
+
+    /*
+
+            class Solution {
+
+            public int minSteps(int[] arr, int start, int end) {
+
+                // Edge case: If we are already at the destination
+                if (start == end) {
+                    return 0;
+                }
+
+                final int MOD = 1000;
+
+                // Array to store the minimum steps to reach each number (0 to 999)
+                // Initialized to -1 to represent unvisited numbers
+                int minSteps[] = new int[MOD];
+                Arrays.fill(minSteps, -1);
+                minSteps[start] = 0;
+
+                Queue<Integer> queue = new LinkedList<>();
+                queue.add(start);
+
+                // BFS guarantees we process nodes level by level.
+                // The queue will naturally order the processing as:
+                // [0 steps, 0 steps...] -> [1 step, 1 step...] -> [2 steps...]
+                // Because of this strict order, the very first time we calculate
+                // a 'nextNum', it is guaranteed to be via the minimum steps required.
+
+                while (!queue.isEmpty()) {
+
+                    int currentNum = queue.remove();
+                    int currentSteps = minSteps[currentNum];
+
+                    // Try multiplying the current number by every element in the array
+                    for (int multiplier : arr) {
+
+                        int nextNum = (currentNum * multiplier) % MOD;
+
+                        // If this number hasn't been visited yet, we found the shortest path to it
+                        if (minSteps[nextNum] == -1) {
+                            minSteps[nextNum] = currentSteps + 1;
+
+                            // If we reached our target, we can return immediately
+                            if (nextNum == end) {
+                                return minSteps[nextNum];
+                            }
+
+                            queue.add(nextNum);
+                        }
+                    }
+                }
+
+                // Target cannot be reached
+                return -1;
+            }
+        }
+
+     */
+
 }
