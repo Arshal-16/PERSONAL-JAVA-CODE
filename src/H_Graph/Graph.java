@@ -3693,4 +3693,143 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Floyd Warshall Algorithm
+
+    // Concept
+
+    /*
+
+        The Floyd-Warshall Algorithm: Complete Overview
+
+        1. Core Purpose and Advantages
+        Multi-Source Shortest Path: Unlike Dijkstra or Bellman-Ford which work from a single source,
+        Floyd-Warshall is an All-Pairs Shortest Path algorithm. It finds the shortest distance from every single node to every other node in the graph.
+        Negative Cycle Detection: It can successfully help detect negative weight cycles in a graph.
+        If the distance from any node to itself becomes negative, a negative cycle exists.
+        2. Graph Prerequisites and Representation
+        Adjacency Matrix Representation: The graph must be stored in a 2D grid format of size N x N, where N is the number of nodes.
+        Handling Undirected Graphs: If given an undirected graph,
+        you must convert it into a directed graph by duplicating the edge in both opposite directions.
+        Handling No Edges: If there is no direct edge between two nodes i and j,
+        fill that position in the matrix with infinity to signify that they are initially unreachable.
+        3. Algorithm Intuition and Dynamic Programming Mechanics
+        Brute Force on All Combinations: The algorithm is essentially a structured brute force that tries all possible combinations of paths.
+        It relies on three nested loops to systematically compute paths.
+        Dynamic Programming Nature: It utilizes dynamic programming because it updates distances incrementally by building upon previously computed optimal sub-paths.
+        The Core State Transition: To find the shortest path from a node i to a node j,
+        the algorithm calculates the minimum of its current known distance and the distance obtained by traveling from i to j through an intermediate node k.
+        The Formula: matrix[i][j] = Math.min(matrix[i][j], matrix[i][k] + matrix[k][j])
+        4. Step-by-Step Execution Strategy
+        Initialize the DP matrix of size N x N with infinity.
+        Set the base condition where the distance from a node to itself is zero: matrix[i][i] = 0.
+        Populate the matrix with the direct edge weights given in the input graph.
+        Run three nested loops to find the minimum distance from i to j via every possible node k.
+        The loop structure must strictly place the intermediate node k as the outermost loop,
+        followed by the source node i and destination node j.
+        As a result of this comprehensive evaluation, the matrix will hold the true shortest paths between any two nodes in the graph.
+        5. Optimization and Row-Column Insight
+        When evaluating paths via an intermediate node k,
+        the entire k-th row (matrix[k][j]) and the entire k-th column (matrix[i][k]) remain completely unchanged from the previous iteration.
+        This serves as a useful conceptual shortcut when tracing the algorithm manually.
+        6. Complexity Analysis
+        Time Complexity: O(V^3) - Driven by the three nested loops running from 0 to V-1.
+        While slow for sparse graphs, it is highly efficient and straightforward for dense graphs when all-pairs distances are needed.
+        Space Complexity: O(V^2) - Required to maintain the 2D adjacency matrix to track distances dynamically.
+
+        The Floyd-Warshall Algorithm: Negative Cycle Detection
+
+        How to detect a negative cycle
+        If a graph contains a cycle whose total edge weight sum is negative, it is a negative weight cycle.
+        The Floyd-Warshall algorithm can easily identify this condition
+        by checking the main diagonal of the distance matrix after the main loops finish executing.
+
+        The Logic
+        In any valid graph without negative cycles, the shortest distance from any node i to itself should always be zero (matrix[i][i] = 0).
+        However, if there is a negative cycle, a path can travel through the cycle and return to node i with a total cost that is less than zero.
+
+        Detection Step
+        After running the three nested loops for all intermediate nodes, iterate through all vertices from 0 to N-1 and check the diagonal elements.
+
+        for (int i = 0; i < N; i++) {
+        if (matrix[i][i] < 0) {
+        System.out.println("Negative cycle exists");
+        }
+        }
+
+        Example Scenario
+        Consider a cycle with three nodes: 0, 1, and 2.
+        The edge weights are:
+        From 0 to 1 with a weight of -2
+        From 1 to 2 with a weight of -3
+        From 2 to 0 with a weight of +2
+
+        Calculating the path cost to complete the cycle yields:
+        -2 + -3 + 2 = -3
+
+        Because the overall sum of the cycle path is -3,
+        the algorithm will dynamically update the self-distance matrix[0][0] to a value below zero during its execution.
+        Identifying any negative value along the main diagonal accurately flags the presence of a negative cycle.
+
+     */
+
+    /*
+
+            class Solution {
+
+            public void floydWarshall(int[][] matrix) {
+
+                int n = matrix.length;
+                int infinity = (int) 1e9; // Standard high threshold to prevent overflow on additions
+
+                // Step 1: Pre-processing and Initialization
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        // If the input indicates unreachable paths via -1, change to infinity proxy
+                        if (matrix[i][j] == -1) {
+                            matrix[i][j] = infinity;
+                        }
+                        // Distance from a node to itself is always 0
+                        if (i == j) {
+                            matrix[i][j] = 0;
+                        }
+                    }
+                }
+
+                // Step 2: The Core 3-Loop Brute Force
+                // Outer loop 'via' represents the intermediate node we try to route through
+                for (int via = 0; via < n; via++) {
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            // Check if paths through the intermediate node are valid and shorter
+                            if (matrix[i][via] != infinity && matrix[via][j] != infinity) {
+                                matrix[i][j] = Math.min(matrix[i][j], matrix[i][via] + matrix[via][j]);
+                            }
+                        }
+                    }
+                }
+
+                // Step 3: Check for Negative Weight Cycles (Optional/Safety Step)
+                // If any diagonal element drops below zero, a negative cycle exists
+                for (int i = 0; i < n; i++) {
+                    if (matrix[i][i] < 0) {
+                        // Handle negative cycle scenario based on specific problem requirements
+                        // e.g., flag it, or clear data. For now, we note its presence.
+                    }
+                }
+
+                // Step 4: Post-processing back to standard format
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        if (matrix[i][j] == infinity) {
+                            matrix[i][j] = -1;
+                        }
+                    }
+                }
+            }
+        }
+
+     */
+
+
+
 }
