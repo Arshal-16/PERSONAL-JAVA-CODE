@@ -3996,8 +3996,25 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
         You can also completely remove the conditional parent check loop inside the algorithm's main iteration.
 
 
+        Time Complexity: E*logE
+
+        Heap Operations Complexity in Prim's Algorithm
+
+        1. Insertion Performance
+        In the absolute worst-case scenario, such as a complete graph where every node connects to every other node,
+        every single edge in the graph can be pushed into the priority queue.
+        Inserting an individual edge into a min-heap takes logarithmic time relative to the current size of the heap, resulting in a runtime of O(log E).
+        Because there are E edges total to evaluate, the total time spent pushing all elements into the heap accumulates to O(E log E).
+        2. Extraction Performance
+        The maximum number of extraction operations performed on the min-heap is directly equal to the total number of edges that were inserted.
+        Removing the minimum-weight edge from the heap also requires logarithmic time per operation.
+        Therefore, processing and extracting these elements across the entire execution of the algorithm takes O(E log E) time.
+
+
 
      */
+
+
 
 
 
