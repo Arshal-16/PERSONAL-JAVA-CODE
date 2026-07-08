@@ -3770,6 +3770,15 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
         the algorithm will dynamically update the self-distance matrix[0][0] to a value below zero during its execution.
         Identifying any negative value along the main diagonal accurately flags the presence of a negative cycle.
 
+        Alternative for Graphs with Non-Negative Weights
+        If a graph contains absolutely no negative edge weights, using the Floyd-Warshall algorithm is usually inefficient.
+        Instead, you can run Dijkstra's algorithm independently from every single vertex as the source.
+
+        Since a single run of Dijkstra's algorithm using a min-heap priority queue takes O(E log V) time,
+        running it for all V vertices results in a total time complexity of O(V x E log V).
+        In a sparse graph where the number of edges E is much smaller than V squared,
+        this approach is significantly faster than Floyd-Warshall's rigid O(V cubed) runtime.
+
      */
 
     /*
@@ -3827,6 +3836,166 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
                 }
             }
         }
+
+     */
+
+    // Minimum Spanning Tree
+
+    // Theory
+
+    /*
+
+        Minimum Spanning Trees: Complete Overview
+
+        1. Core Definition of a Spanning Tree
+        Given an undirected, weighted graph with N nodes and M edges, a spanning tree is a subset of the graph that connects all N nodes together using exactly N-1 edges.
+        Every single node in the graph must be reachable from every other node within this tree structure.
+        2. Defining a Tree in Graph Theory
+        By mathematical definition, a tree is an acyclic connected graph. This means that a valid spanning tree must be fully connected,
+        and it cannot contain any cycles. If a cycle forms, it is no longer a tree.
+        3. The Minimum Spanning Tree (MST)
+        A single graph can have multiple valid spanning trees depending on which edges you choose to include.
+        The spanning tree that has the minimum possible total edge weight sum among all available spanning trees is called the Minimum Spanning Tree.
+        4. Algorithmic Approaches
+        There are two primary greedy algorithms used to construct a Minimum Spanning Tree:
+        Prims Algorithm: This approach grows the MST outwardly from a single starting node.
+        It maintains a pool of available edges connected to the current tree and greedily picks the minimum weight edge that connects an unvisited node to the tree.
+        Kruskals Algorithm: This approach sorts all available edges of the graph by weight in ascending order.
+        It greedily picks the absolute smallest edge and adds it to the MST,
+        using a Disjoint Set Union (DSU) data structure to ensure that adding the edge does not accidentally close a cycle.
+        5. Critical Missing Points to Remember
+        If the graph is disconnected (made of separate components), it is impossible to form a single Spanning Tree.
+        In that scenario, the algorithm will find a Minimum Spanning Forest instead.
+        If all edge weights in the graph are completely unique, the graph is guaranteed to have exactly one unique Minimum Spanning Tree.
+        If there are duplicate edge weights, multiple distinct MSTs can exist with the same total minimum cost.
+
+     */
+
+    // Prim's Algorithm
+
+    /*
+
+
+        class Solution {
+
+            // Represents a basic neighbor node connection within the adjacency list
+            static class NodeConnection {
+                int targetNode;
+                int edgeWeight;
+
+                NodeConnection(int targetNode, int edgeWeight) {
+                    this.targetNode = targetNode;
+                    this.edgeWeight = edgeWeight;
+                }
+            }
+
+            // Represents the dynamic state of an edge inside our Min-Heap structure
+            static class HeapState implements Comparable<HeapState> {
+                int weightToNode;
+                int currentNode;
+                int parentNode;
+
+                HeapState(int weightToNode, int currentNode, int parentNode) {
+                    this.weightToNode = weightToNode;
+                    this.currentNode = currentNode;
+                    this.parentNode = parentNode;
+                }
+
+                // Ensure the PriorityQueue always pops the smallest edge weight first
+                @Override
+                public int compareTo(HeapState other) {
+                    return Integer.compare(this.weightToNode, other.weightToNode);
+                }
+            }
+
+            public int spanningTree(int V, int[][] edges) {
+
+                // Step 1: Build the Adjacency List
+                List<List<NodeConnection>> adjacencyList = new ArrayList<>();
+                for (int i = 0; i < V; i++) {
+                    adjacencyList.add(new ArrayList<>());
+                }
+
+                for (int[] edge : edges) {
+                    int source = edge[0];
+                    int destination = edge[1];
+                    int weight = edge[2];
+
+                    adjacencyList.get(source).add(new NodeConnection(destination, weight));
+                    adjacencyList.get(destination).add(new NodeConnection(source, weight));
+                }
+
+                // Tracking structures for our Minimum Spanning Tree
+                List<int[]> mstEdges = new ArrayList<>(); // To track actual edges [node, parent] if needed
+                int totalMstWeight = 0;
+                boolean inMinimumSpanningTree[] = new boolean[V];
+
+                // Priority Queue to always fetch the minimum weight cut edge
+                PriorityQueue<HeapState> minHeap = new PriorityQueue<>();
+
+                // Seed the heap with an initial arbitrary starting node (Wt 0, Current 0, Parent -1)
+                minHeap.add(new HeapState(0, 0, -1));
+
+                // Step 2: The Core Prim's Loop
+                while (!minHeap.isEmpty()) {
+
+                    HeapState current = minHeap.remove();
+
+                    int currentWeight = current.weightToNode;
+                    int currentNode = current.currentNode;
+                    int parentNode = current.parentNode;
+
+                    // If the node is already absorbed into our growing MST structure, skip it
+                    if (inMinimumSpanningTree[currentNode]) {
+                        continue;
+                    }
+
+                    // Absorb the node into the MST structure
+                    inMinimumSpanningTree[currentNode] = true;
+                    totalMstWeight += currentWeight;
+
+                    // If it isn't the root seed node, record the edge
+                    if (parentNode != -1) {
+                        mstEdges.add(new int[]{currentNode, parentNode});
+                    }
+
+                    // Step 3: Explore neighbors and add valid cut edges to the heap
+                    for (NodeConnection connection : adjacencyList.get(currentNode)) {
+
+                        int neighborNode = connection.targetNode;
+                        int neighborEdgeWeight = connection.edgeWeight;
+
+                        // Only push edges leading to nodes not yet part of the MST
+                        if (!inMinimumSpanningTree[neighborNode]) {
+
+                        The Importance of Delayed Visited Marking :
+                        In Prim's algorithm, a node must only be marked as visited (or added to the MST) when it is extracted out of the priority queue,
+                        not when it is pushed into the queue.
+
+                        Because the graph can have multiple paths to the same node, a larger weight edge might get pushed into the priority queue first.
+                        If you mark the node as visited right when it is pushed,
+                        you would block the algorithm from ever accepting a smaller weight edge to that same node that gets discovered later.
+                        By waiting until the node actually pops out of the min-heap,
+                        you guarantee that the edge being processed is the absolute smallest possible connection to that node.
+
+                            minHeap.add(new HeapState(neighborEdgeWeight, neighborNode, currentNode));
+                        }
+                    }
+                }
+
+                return totalMstWeight;
+            }
+        }
+
+        Optimizing Prim's Algorithm for Total Weight Only
+        If a coding problem only asks you to find the total minimum weight of the Spanning Tree (the sum) and does not
+        require you to track or print the actual parent-child edges that form the tree, you can optimize your code and save memory.
+
+        You can entirely remove the parent tracking variable from your data structures.
+        This means your Heap State class only needs to track two variables instead of three: the node index and the minimum edge weight to reach it.
+        You can also completely remove the conditional parent check loop inside the algorithm's main iteration.
+
+
 
      */
 
