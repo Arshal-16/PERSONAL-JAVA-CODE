@@ -4014,8 +4014,200 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Disjoint Set
 
+    // Concept
 
+    /*
+
+        ================================================================================
+         DISJOINT SET UNION (DSU) / UNION-FIND: ARCHITECTURAL & THEORETICAL BLUEPRINT
+        ================================================================================
+
+        1. CORE OBJECTIVE & ADVANTAGE OVER TRADITIONAL GRAPH TRAVERSALS
+        --------------------------------------------------------------------------------
+        - Purpose: Efficiently manages and queries partition states of a graph to check
+          if two nodes reside in the same connected component.
+        - Performance Disparity:
+          * Traversal (BFS/DFS): Determining dynamic connectivity requires traversing the
+            graph structure, incurring a time complexity of O(V + E) per operational query.
+          * Disjoint Set: By managing direct parent pointers, connectivity questions are
+            resolved in near-constant time, O(1), bypassing full path discovery.
+
+        2. OPERATIONAL PILLARS: FIND & UNION
+        --------------------------------------------------------------------------------
+        - findUltimateParent(node): Traverses parent chains upward to locate the absolute
+          representative (root) of a component. If two distinct nodes yield identical
+          ultimate parents, they belong to the same connected component.
+        - union(u, v): Merges two disjoint components if they are disconnected. To protect
+          the tree structures from degrading into linear chains, tracking matrices are
+          introduced via two methodologies: Rank or Size.
+
+        3. UNION BY RANK MECHANICS
+        --------------------------------------------------------------------------------
+        - State Arrays: `componentRank[]` and `parentNodes[]`.
+        - Initialization: Ranks default to 0 (approximate depth level). Every node points
+          to itself as its own parent, establishing independent, single-node components.
+        - Execution Logic:
+          1. Resolve the ultimate parents of nodes 'u' and 'v' (`ult_u`, `ult_v`).
+          2. Evaluate and compare the depths (ranks) of `ult_u` and `ult_v`.
+          3. Graft the tree with the smaller rank beneath the root of the tree with the
+             larger rank.
+        - Rank Mutability Policies:
+          * Asymmetrical Ranks: Grafting a smaller tree under a larger tree creates no
+            change in the maximum depth of the parent component. No rank modification occurs.
+          * Identical Ranks: Grafting either tree under the other increases the total
+            depth of the combined component by exactly 1 level. The new root's rank increments.
+
+        4. MATHEMÁTICAL INTUITION: THE BIAS TO CONNECT SMALLER TO LARGER
+        --------------------------------------------------------------------------------
+        - Lowering Traversal Costs: When merging a smaller tree under a larger tree, the
+          distance to the root increases by 1 level *only* for the nodes residing in the
+          smaller component.
+        - The Counterfactual: Merging a larger tree under a smaller tree would shift the
+          distance to the root by +1 for the absolute majority of nodes in the system,
+          rapidly escalating future `find` lookup paths.
+
+        5. THE TRANSITION FROM RANK TO SIZE
+        --------------------------------------------------------------------------------
+        - Structural Change: Path compression actively flattens the tree structure during
+          every `find` query. Consequently, the literal depth values stored in `rank`
+          lose accurate geometric meaning.
+        - Size Alternative: Rather than tracking depth approximations, tracking the
+          absolute element count (`componentSize[]`) achieves the same optimization goal:
+          attaching the smaller entity to the larger entity.
+        - Initialization: Every standalone node starts with an initial component size of 1.
+        - Size Mutability Policies:
+          * Grafting: The absolute parent of the smaller component is linked directly to
+            the root of the larger component.
+          * Aggregation: The size representation of the chosen root must absorb the size of
+            the child component (`size[larger] += size[smaller]`). If component sizes
+            are equal, the selection is arbitrary, and aggregation behaves identically.
+
+        6. OPTIMIZATION STRATEGIES & TIME COMPLEXITY JUSTIFICATION
+        --------------------------------------------------------------------------------
+        - Path Compression: During execution of `findUltimateParent`, the recursive call
+          dynamically rewires every visited node's parent pointer to point directly to the
+          ultimate root parent. This flattens the depth profile of the tree.
+        - Algorithmic Bounds: Combining Path Compression with either Union by Rank or
+          Union by Size suppresses lookup degradation. The resulting amortized time
+          complexity per operation is capped at O(4α), where α represents the Inverse
+          Ackermann function. Given that α grows so exceptionally slowly that it never
+          exceeds 4 for any practical universe size ($N < 2^{2^{2^{65536}}}$), operations
+          execute in effective constant time, O(1).
+
+        ================================================================================
+         CODE IMPLEMENTATION JUSTIFICATIONS & SANITIZATION POLICIES
+        ================================================================================
+        - Encapsulation Strategy (`private final`): Declaring array variables as `final`
+          guarantees pointer-reference immutability. It forces compile-time security
+          against unintended runtime structural reinstantiation, while allowing internal state
+          mutability of individual elements.
+        - Index Neutrality Strategy (`n + 1`): Internal buffer allocations scale to `n + 1`.
+          This acts as a universal buffer layer that accepts 0-based graphs (indices 0 to N-1)
+          and 1-based graphs (indices 1 to N) interchangeably without requiring client-side
+          index manipulations.
+        - Short-Circuit Validation (`if (ult_u == ult_v) return;`): Guard conditions check
+          for shared absolute parents prior to executing merging protocols. This prevents
+          redundant mutations, cycle generation, and erroneous self-aggregation behaviors.
+        ================================================================================
+
+*/
+
+    /*
+
+        // The Fine Distinction:
+        // - Disjoint Set (The Data Structure): A mathematical concept and data structure
+        //   that models a collection of distinct, non-overlapping (disjoint) sets.
+        // - Disjoint Set Union / DSU (The Algorithm/Action): Focuses on the primary
+        //   operations you perform on that data structure—specifically finding sets
+        //   and uniting them (Union).
+        // Also widely known as the "Union-Find" algorithm.
+
+        class DisjointSet {
+
+            private final int[] componentRank;
+            private final int[] componentSize;
+            private final int[] parentNodes;
+
+            public DisjointSet(int n) {
+
+                // Allocate N + 1 to safely accommodate both 0 to N-1 and 1 to N indexing systems
+                int allocationSize = n + 1;
+
+                componentRank = new int[allocationSize];
+                componentSize = new int[allocationSize];
+                parentNodes = new int[allocationSize];
+
+                // Initially, every node is its own independent component parent
+                for (int node = 0; node < allocationSize; node++) {
+                    parentNodes[node] = node;
+                }
+
+                // Every standalone node initially forms a component of size 1
+                Arrays.fill(componentSize, 1);
+                // Note: componentRank array defaults to 0 automatically in Java
+            }
+
+            public int findUltimateParent(int node) {
+                // Base case: If the node points to itself, it is the root of its tree
+                if (node == parentNodes[node]) {
+                    return node;
+                }
+
+                // Path Compression: Re-link the current node directly to its ultimate parent
+                // by recursively backtracking up the tree.
+                return parentNodes[node] = findUltimateParent(parentNodes[node]);
+            }
+
+            public void unionByRank(int u, int v) {
+
+                int ultimateParentU = findUltimateParent(u);
+                int ultimateParentV = findUltimateParent(v);
+
+                // If they already share the same ultimate parent, they are already part of the same component
+                if (ultimateParentU == ultimateParentV) {
+                    return;
+                }
+
+                // Attach the tree with the smaller depth (rank) underneath the root of the deeper tree
+                if (componentRank[ultimateParentU] < componentRank[ultimateParentV]) {
+                    parentNodes[ultimateParentU] = ultimateParentV;
+                } else if (componentRank[ultimateParentV] < componentRank[ultimateParentU]) {
+                    parentNodes[ultimateParentV] = ultimateParentU;
+                } else {
+                    // Ranks are identical: Attach either one under the other arbitrarily,
+                    // and increment the rank of the new ultimate parent by 1.
+                    parentNodes[ultimateParentV] = ultimateParentU;
+                    componentRank[ultimateParentU]++;
+                }
+            }
+
+            public void unionBySize(int u, int v) {
+
+                int ultimateParentU = findUltimateParent(u);
+                int ultimateParentV = findUltimateParent(v);
+
+                // If they already share the same ultimate parent, they are already part of the same component
+                if (ultimateParentU == ultimateParentV) {
+                    return;
+                }
+
+                // Attach the smaller component under the larger component.
+                // Update the size of the larger component by absorbing the smaller component's size.
+                if (componentSize[ultimateParentU] < componentSize[ultimateParentV]) {
+                    parentNodes[ultimateParentU] = ultimateParentV;
+                    componentSize[ultimateParentV] += componentSize[ultimateParentU];
+                } else {
+                    // Handles both ultimateParentV < ultimateParentU AND equal sizes perfectly.
+                    // When sizes match, order doesn't matter; adding sizes works exactly the same.
+                    parentNodes[ultimateParentV] = ultimateParentU;
+                    componentSize[ultimateParentU] += componentSize[ultimateParentV];
+                }
+            }
+        }
+
+     */
 
 
 }
