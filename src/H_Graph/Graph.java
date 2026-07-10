@@ -4374,5 +4374,90 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Number of Provinces using Disjoint Set Data Structure
+
+    /*
+
+            class Solution {
+
+            static class DisjointSet {
+                private final int[] componentSize;
+                private final int[] ultimateParent;
+
+                public DisjointSet(int numberOfVertices) {
+                    // Allocate V + 1 to easily handle both 0-indexed and 1-indexed problems
+                    int allocationSize = numberOfVertices + 1;
+                    componentSize = new int[allocationSize];
+                    ultimateParent = new int[allocationSize];
+
+                    // Initially, every node is its own independent component of size 1
+                    for (int node = 0; node < allocationSize; node++) {
+                        ultimateParent[node] = node;
+                        componentSize[node] = 1;
+                    }
+                }
+
+                public int findUltimateParent(int node) {
+                    // Base case: If a node points to itself, it is the root parent
+                    if (ultimateParent[node] == node) {
+                        return node;
+                    }
+
+                    // Path Compression: Dynamically flatten the tree structures
+                    return ultimateParent[node] = findUltimateParent(ultimateParent[node]);
+                }
+
+                public void unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    // Guard check: If they share the same root, they are already connected
+                    if (rootU == rootV) {
+                        return;
+                    }
+
+                    // Attach the smaller component under the larger component
+                    if (componentSize[rootU] < componentSize[rootV]) {
+                        ultimateParent[rootU] = rootV;
+                        componentSize[rootV] += componentSize[rootU];
+                    } else {
+                        ultimateParent[rootV] = rootU;
+                        componentSize[rootU] += componentSize[rootV];
+                    }
+                }
+            }
+
+            public int findCircleNum(int[][] isConnected) {
+
+                int totalVertices = isConnected.length;
+                DisjointSet disjointSet = new DisjointSet(totalVertices);
+
+                // 1. Process the adjacency matrix to merge connected cities
+                // Optimization: Loop v starts at (u + 1) because the graph is undirected/symmetrical (isConnected[u][v] == isConnected[v][u])
+                for (int u = 0; u < totalVertices; u++) {
+                    for (int v = u + 1; v < totalVertices; v++) {
+                        if (isConnected[u][v] == 1) {
+                            disjointSet.unionBySize(u, v);
+                        }
+                    }
+                }
+
+                int provinceCount = 0;
+
+                // 2. Count independent provinces
+                // Intuition: The number of distinct components equals the number of nodes
+                // that still act as their own ultimate parent.
+                for (int vertex = 0; vertex < totalVertices; vertex++) {
+                    if (vertex == disjointSet.findUltimateParent(vertex)) {
+                        provinceCount++;
+                    }
+                }
+
+                return provinceCount;
+            }
+        }
+
+     */
+
 
 }
