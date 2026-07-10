@@ -4209,5 +4209,170 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Kruskal's Algorithm
+
+    // Concept
+
+    /*
+
+    ================================================================================
+     KRUSKAL'S ALGORITHM FOR MINIMUM SPANNING TREE (MST) — OVERVIEW
+    ================================================================================
+
+    1. Core Strategy: The Greedy Edge Approach
+    --------------------------------------------------------------------------------
+    - Kruskal's algorithm is a greedy graph algorithm used to find the Minimum Spanning
+      Tree (MST) of a connected, weighted, undirected graph.
+    - Unlike Prim's algorithm, which grows a tree outward from a starting vertex,
+      Kruskal's algorithm works purely edge-by-edge. It focuses on globally picking the
+      cheapest valid paths available across the entire graph.
+
+    2. Algorithmic Steps
+    --------------------------------------------------------------------------------
+    - Step 1 (Sort): Flatten and sort all edges in the graph in non-decreasing order
+      of their weights. This positions the minimum weight edges at the front line.
+    - Step 2 (Iterate & Filter): Step through the sorted edge stream one by one.
+    - Step 3 (Cycle Check via DSU): For each edge connecting node 'u' and node 'v',
+      query the Disjoint Set to find if they are already in the same connected component:
+      * If findUltimateParent(u) == findUltimateParent(v): It means that they are part of the same component so skip the edge.
+        Adding it would close a loop, violating the structural constraint of a tree.
+      * If findUltimateParent(u) != findUltimateParent(v): Accept the edge. Merge
+        the components using union, add the weight to our running tally, and record
+        the edge details.
+
+    3. Complete Output Tracking
+    --------------------------------------------------------------------------------
+    - Total MST Weight: A cumulative integer counting the sum of chosen edge weights.
+    - MST Graph Visual: An edge collection tracking the precise node pairs (u, v) and
+      weights that compose the final minimal layout.
+
+    4. Computational Complexities
+    --------------------------------------------------------------------------------
+    - Time Complexity: O(E log E) or O(E log V). Sorting the collection takes O(E log E)
+      time. The subsequent loop runs E times, calling DSU operations that take nearly
+      constant time O(4α). Hence, the sorting step dominates the total runtime.
+    - Space Complexity: O(V + E). Requires space to hold parent/size tracking structures
+      within the DSU layout (O(V)) and storage to save the output MST edge lists (O(V)).
+    ================================================================================
+
+     */
+
+    /*
+
+
+        class Solution {
+
+            static class DisjointSet {
+
+                private final int[] componentRank;
+                private final int[] componentSize;
+                private final int[] parentNodes;
+
+                public DisjointSet(int n) {
+                    // Allocate N + 1 to safely accommodate both 0 to N-1 and 1 to N indexing systems
+                    int allocationSize = n + 1;
+
+                    componentRank = new int[allocationSize];
+                    componentSize = new int[allocationSize];
+                    parentNodes = new int[allocationSize];
+
+                    // Initially, every node is its own independent component parent
+                    for (int node = 0; node < allocationSize; node++) {
+                        parentNodes[node] = node;
+                    }
+
+                    // Every standalone node initially forms a component of size 1
+                    Arrays.fill(componentSize, 1);
+                }
+
+                public int findUltimateParent(int node) {
+                    if (node == parentNodes[node]) {
+                        return node;
+                    }
+                    // Path Compression: Point current node directly to ultimate parent
+                    return parentNodes[node] = findUltimateParent(parentNodes[node]);
+                }
+
+                public void unionByRank(int u, int v) {
+                    int ultimateParentU = findUltimateParent(u);
+                    int ultimateParentV = findUltimateParent(v);
+
+                    if (ultimateParentU == ultimateParentV) {
+                        return;
+                    }
+
+                    // Attach tree with smaller depth (rank) under tree with larger depth
+                    if (componentRank[ultimateParentU] < componentRank[ultimateParentV]) {
+                        parentNodes[ultimateParentU] = ultimateParentV;
+                    } else if (componentRank[ultimateParentV] < componentRank[ultimateParentU]) {
+                        parentNodes[ultimateParentV] = ultimateParentU;
+                    } else {
+                        parentNodes[ultimateParentV] = ultimateParentU;
+                        componentRank[ultimateParentU]++;
+                    }
+                }
+
+                public void unionBySize(int u, int v) {
+                    int ultimateParentU = findUltimateParent(u);
+                    int ultimateParentV = findUltimateParent(v);
+
+                    if (ultimateParentU == ultimateParentV) {
+                        return;
+                    }
+
+                    // Attach smaller component under larger component and merge size counters
+                    if (componentSize[ultimateParentU] < componentSize[ultimateParentV]) {
+                        parentNodes[ultimateParentU] = ultimateParentV;
+                        componentSize[ultimateParentV] += componentSize[ultimateParentU];
+                    } else {
+                        parentNodes[ultimateParentV] = ultimateParentU;
+                        componentSize[ultimateParentU] += componentSize[ultimateParentV];
+                    }
+                }
+            }
+
+            public int spanningTree(int numberOfVertices, int[][] edgeList) {
+
+                // 1. Sort all available edges globally in non-decreasing order based on their weights (index 2)
+                Arrays.sort(edgeList, (edgeA, edgeB) -> Integer.compare(edgeA[2], edgeB[2]));
+
+                // 2. Initialize our Union-Find structure and structural storage collections
+                DisjointSet disjointSet = new DisjointSet(numberOfVertices);
+                int totalMstWeight = 0;
+                ArrayList<int[]> minimumSpanningTreeEdges = new ArrayList<>();
+
+                // 3. Process the sorted edge stream greedily
+                for (int[] currentEdge : edgeList) {
+                    int sourceNode = currentEdge[0];
+                    int destinationNode = currentEdge[1];
+                    int edgeWeight = currentEdge[2];
+
+                    int ultimateParentSource = disjointSet.findUltimateParent(sourceNode);
+                    int ultimateParentDestination = disjointSet.findUltimateParent(destinationNode);
+
+                    // Cycle Check Intuition:
+                    // If both nodes return the exact same ultimate root parent, it means they
+                    // are already connected and belong to the same component via a different path.
+                    // Introducing this edge would create an alternative path between them, forming a loop (cycle).
+                    // Therefore, if the ultimate parents match, we silently skip the edge to protect the tree structure.
+                    if (ultimateParentSource != ultimateParentDestination) {
+
+                        // If they are in separate components, merge them together safely using size tracking
+                        disjointSet.unionBySize(sourceNode, destinationNode);
+
+                        // Accumulate the current valid path weight into our aggregate tally
+                        totalMstWeight += edgeWeight;
+
+                        // Simultaneously capture the complete structural edge data for graph layout tracking
+                        minimumSpanningTreeEdges.add(new int[]{sourceNode, destinationNode, edgeWeight});
+                    }
+                }
+
+                return totalMstWeight;
+            }
+        }
+
+     */
+
 
 }
