@@ -4459,5 +4459,230 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Number of operations to make network connected
+
+    /*
+
+            class Solution {
+
+            static class DisjointSet {
+                private final int[] size;
+                private final int[] parent;
+
+                public DisjointSet(int V) {
+                    int allocationSize = V + 1;
+                    size = new int[allocationSize];
+                    parent = new int[allocationSize];
+
+                    for (int idx = 0; idx < allocationSize; idx++) {
+                        parent[idx] = idx;
+                        size[idx] = 1;
+                    }
+                }
+
+                public int findUltimateParent(int node) {
+                    if (node == parent[node]) {
+                        return node;
+                    }
+                    // Path compression
+                    return parent[node] = findUltimateParent(parent[node]);
+                }
+
+                public boolean unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    if (rootU == rootV) {
+                        return false;
+                    }
+
+                    if (size[rootU] < size[rootV]) {
+                        parent[rootU] = rootV;
+                        size[rootV] += size[rootU];
+                    } else {
+                        parent[rootV] = rootU;
+                        size[rootU] += size[rootV];
+                    }
+                    return true;
+                }
+            }
+
+            public int makeConnected(int n, int[][] connections) {
+
+                // Fast-fail constraint check:
+                // To fully connect N nodes in a graph, we absolutely need at least (N - 1) total edges.
+                // If we have fewer cables than that, it is mathematically impossible to connect them.
+                if (connections.length < n - 1) {
+                    return -1;
+                }
+
+                DisjointSet disjointSet = new DisjointSet(n);
+                int extraCables = 0;
+
+                // 1. Process connections to build network groups and find redundant cables
+                for (int connection[] : connections) {
+                    int u = connection[0];
+                    int v = connection[1];
+
+                    // If unionBySize returns false, the two computers are already connected.
+                    // This cable is redundant (can be unplugged/reused).
+                    if (!disjointSet.unionBySize(u, v)) {
+                        extraCables++;
+                    }
+                }
+
+                // 2. Count independent, disconnected computer networks (components)
+                int components = 0;
+                for (int idx = 0; idx < n; idx++) {
+                    if (idx == disjointSet.parent[idx]) {
+                        components++;
+                    }
+                }
+
+                // 3. Determine if we have enough spare cables
+                // To join C isolated components into a single unified network, we need exactly (C - 1) connections.
+                int requiredCables = components - 1;
+                if (extraCables >= requiredCables) {
+                    return requiredCables;
+                } else {
+                    return -1;
+                }
+            }
+        }
+
+     */
+
+    //
+
+    // Accounts Merge
+
+    /*
+
+        class Solution {
+
+            static class DisjointSet {
+                private final int[] size;
+                private final int[] parent;
+
+                DisjointSet(int V) {
+                    int allocationSize = V + 1;
+                    size = new int[allocationSize];
+                    parent = new int[allocationSize];
+
+                    for (int idx = 0; idx < allocationSize; idx++) {
+                        parent[idx] = idx;
+                        size[idx] = 1;
+                    }
+                }
+
+                int findUltimateParent(int u) {
+                    if (u == parent[u]) {
+                        return u;
+                    }
+                    return parent[u] = findUltimateParent(parent[u]);
+                }
+
+                void unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    if (rootU == rootV) {
+                        return;
+                    }
+
+                    if (size[rootU] < size[rootV]) {
+                        parent[rootU] = rootV;
+                        size[rootV] += size[rootU];
+                    } else {
+                        parent[rootV] = rootU;
+                        size[rootU] += size[rootV];
+                    }
+                }
+            }
+
+            public List<List<String>> accountsMerge(List<List<String>> accounts) {
+                int totalAccounts = accounts.size();
+                DisjointSet disjointSet = new DisjointSet(totalAccounts);
+
+                // Step 1: Map each unique email to its corresponding Account ID (index).
+                Map<String, Integer> emailToAccountMap = new HashMap<>();
+
+                for (int accountIndex = 0; accountIndex < totalAccounts; accountIndex++) {
+                    List<String> accountDetails = accounts.get(accountIndex);
+
+                    for (int emailIdx = 1; emailIdx < accountDetails.size(); emailIdx++) {
+                        String currentEmail = accountDetails.get(emailIdx);
+
+                        if (emailToAccountMap.containsKey(currentEmail)) {
+                            int originalAccountIndex = emailToAccountMap.get(currentEmail);
+                            disjointSet.unionBySize(accountIndex, originalAccountIndex);
+                        } else {
+                            emailToAccountMap.put(currentEmail, accountIndex);
+                        }
+                    }
+                }
+
+                 * ---------------------------------------------------------------------
+                 * Map.Entry EXPLANATION REFERENCE:
+                 * ---------------------------------------------------------------------
+                 * 1. .entrySet(): Returns a collection framework Set containing objects
+                 * of type Set<Map.Entry<K, V>>. Instead of executing isolated lookups
+                 * for keys or values, it pulls both dimensions simultaneously.
+                 * * 2. Map.Entry<K, V>: A nested interface in Java representing a single,
+                 * unified key-value container pair object stored within that Set.
+                 * * 3. entry: The temporary loop iterator variable holding the active
+                 * Map.Entry<K, V> object instance for the current iteration step.
+                 * * 4. .getKey(): A method called on the 'entry' object to cleanly fetch
+                 * the Key component (in this case, the email String or Root ID).
+                 * * 5. .getValue(): A method called on the 'entry' object to cleanly fetch
+                 * the mapped Value component (the original account Index or List<String>).
+                 * ---------------------------------------------------------------------
+
+            // Step 2: Group all unique emails under their respective component's Root ID.
+            // We use .entrySet() to pull both the email (Key) and the raw account index (Value) at once.
+            Map<Integer, List<String>> mergedEmailGroups = new HashMap<>();
+
+                for (Map.Entry<String, Integer> entry : emailToAccountMap.entrySet()) {
+                String email = entry.getKey(); // Extract the email string
+                int mappedAccountIndex = entry.getValue(); // Extract the original account index
+
+                // Find the ultimate representative (root) index for this email's component group
+                int ultimateParentIndex = disjointSet.findUltimateParent(mappedAccountIndex);
+
+                // Fetch or create the list of emails associated with this root parent group
+                if (mergedEmailGroups.containsKey(ultimateParentIndex)) {
+                    mergedEmailGroups.get(ultimateParentIndex).add(email);
+                } else {
+                    List<String> temp = new ArrayList<>();
+                    temp.add(email);
+                    mergedEmailGroups.put(ultimateParentIndex, temp);
+                }
+            }
+
+            // Step 3: Format the grouped results into the final output list.
+            List<List<String>> finalMergedAccounts = new ArrayList<>();
+
+                for (Map.Entry<Integer, List<String>> entry : mergedEmailGroups.entrySet()) {
+                int rootAccountIndex = entry.getKey();
+                List<String> sortedEmails = entry.getValue();
+
+                // Sort the emails lexicographically
+                Collections.sort(sortedEmails);
+
+                String ownerName = accounts.get(rootAccountIndex).get(0);
+
+                List<String> combinedAccountRecord = new ArrayList<>();
+                combinedAccountRecord.add(ownerName);
+                combinedAccountRecord.addAll(sortedEmails);
+
+                finalMergedAccounts.add(combinedAccountRecord);
+            }
+
+                return finalMergedAccounts;
+        }
+        }
+
+     */
+
 
 }
