@@ -4552,7 +4552,187 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
-    //
+    // Most Stones Removed with Same Row or Column
+
+    // Brute force approach ( still a good soln )
+
+    /*
+
+            class Solution {
+
+            public int removeStones(int[][] stones) {
+                int totalStones = stones.length;
+                boolean visited[] = new boolean[totalStones];
+                int componentCount = 0;
+
+                // Traverse through each stone node
+                for (int i = 0; i < totalStones; i++) {
+                    // If the stone hasn't been visited, it belongs to a new component
+                    if (!visited[i]) {
+                        dfs(i, stones, visited);
+                        componentCount++; // Finished exploring one complete component
+                    }
+                }
+
+                // Formula remains: Total Stones - Number of Connected Components
+                return totalStones - componentCount;
+            }
+
+            private void dfs(int currentStoneIdx, int stones[][], boolean visited[]) {
+                visited[currentStoneIdx] = true;
+
+                // O(N) scan to find all neighbors sharing the same row or column
+                for (int nextStoneIdx = 0; nextStoneIdx < stones.length; nextStoneIdx++) {
+                    if (!visited[nextStoneIdx]) {
+                        // Check if the next stone shares the same row OR column with the current stone
+                        if (stones[currentStoneIdx][0] == stones[nextStoneIdx][0] ||
+                            stones[currentStoneIdx][1] == stones[nextStoneIdx][1]) {
+
+                            // Recursive call to traverse deeper into the component
+                            dfs(nextStoneIdx, stones, visited);
+                        }
+                    }
+                }
+            }
+        }
+
+     */
+
+    // Optimal approach ( next level thought process )
+
+    /*
+
+        class Solution {
+
+            static class DisjointSet {
+                private final int[] size;
+                private final int[] parent;
+
+                DisjointSet(int V) {
+                    int allocationSize = V + 1;
+                    size = new int[allocationSize];
+                    parent = new int[allocationSize];
+
+                    for (int idx = 0; idx < allocationSize; idx++) {
+                        parent[idx] = idx;
+                        size[idx] = 1;
+                    }
+                }
+
+                int findUltimateParent(int u) {
+                    if (u == parent[u]) {
+                        return u;
+                    }
+                    return parent[u] = findUltimateParent(parent[u]);
+                }
+
+                void unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    if (rootU == rootV) {
+                        return;
+                    }
+
+                    if (size[rootU] < size[rootV]) {
+                        parent[rootU] = rootV;
+                        size[rootV] += size[rootU];
+                    } else {
+                        parent[rootV] = rootU;
+                        size[rootU] += size[rootV];
+                    }
+                }
+            }
+
+
+             * Calculates the maximum number of stones that can be removed.
+             * * =========================================================================
+             * WHY WE TREAT ROWS AND COLUMNS AS NODES (THE INTUITION):
+             * =========================================================================
+             * 1. THE TRADITIONAL APPROACH (Stones as Nodes):
+             * Normally, you might think of each stone as a node. If Stone A and Stone B
+             * share the same row/col, you draw an edge between them. While this works,
+             * building this graph requires checking every pair of stones, resulting in
+             * an O(N^2) time complexity to find which stones are connected.
+             * * 2. THE OPTIMIZED APPROACH (Rows and Columns as Nodes):
+             * Instead of connecting stones to stones, we treat the grid's gridlines
+             * (Row indices and Column indices) as the actual vertices of our graph.
+             * * - When we see a stone at coordinate (r, c), it acts as a "bridge".
+             * It tells us: "Row 'r' and Column 'c' are now connected."
+             * - By calling union(r, c), we merge Row 'r' and Column 'c' into the
+             * same component.
+             * * 3. WHY THIS MATHEMATICALLY WORKS:
+             * - If Stone 1 is at (row 1, col 2), we connect:  Row 1 <---> Col 2
+             * - If Stone 2 is at (row 3, col 2), we connect:  Row 3 <---> Col 2
+             * * Because both are now connected to Col 2, Row 1 and Row 3 are transitively
+             * merged into the exact same connected component: Row 1 <---> Col 2 <---> Row 3.
+             * * Every stone in this component shares a row or col pathway. In any connected
+             * component of size 'S' (representing 'S' connected rows/columns containing stones),
+             * we can recursively delete stones one-by-one until only 1 representative "anchor"
+             * stone remains to hold the component together.
+             * * Therefore: Max Stones Removed = Total Stones - Number of Connected Components.
+             * =========================================================================
+
+
+             *
+             * Calculates the maximum number of stones that can be removed.
+             * Core Concept:
+             * 1. Stones sharing a row or column belong to the same connected component.
+             * 2. From any component of size 'S', we can safely remove 'S - 1' stones.
+             * 3. Total stones removed = Total Stones - Number of Connected Components.
+             *
+            public int removeStones(int[][] stones) {
+                int totalStones = stones.length;
+
+                // Step 1: Scan stones to find the maximum row and col index present.
+                // We need this to determine the structural size boundaries of our Disjoint Set.
+                int maxRow = 0;
+                int maxCol = 0;
+                for (int[] stone : stones) {
+                    maxRow = Math.max(maxRow, stone[0]);
+                    maxCol = Math.max(maxCol, stone[1]);
+                }
+
+                // Column indices are offset by (maxRow + 1) to completely separate
+                // row nodes from column nodes in our single Disjoint Set array space.
+                int colOffset = maxRow + 1;
+                int totalGraphNodes = maxRow + maxCol + 1;
+
+                DisjointSet disjointSet = new DisjointSet(totalGraphNodes);
+
+                // Track only the unique row and column IDs that actually contain a stone.
+                // This helps us filter out completely empty rows/columns during the component count.
+                Set<Integer> activeNodes = new HashSet<>();
+
+                // Step 2: Connect coordinates and populate active nodes
+                for (int[] stone : stones) {
+                    int rowNode = stone[0];
+                    int colNode = stone[1] + colOffset;
+
+                    // Connect the row index with the offset column index
+                    disjointSet.unionBySize(rowNode, colNode);
+
+                    // Mark these nodes as containing stones
+                    activeNodes.add(rowNode);
+                    activeNodes.add(colNode);
+                }
+
+                // Step 3: Count independent components (Optimized Approach)
+                // Instead of searching through every slot, we check only our active nodes.
+                // An active component root is found whenever an active node points to itself.
+                int componentCount = 0;
+                for (int node : activeNodes) {
+                    if (disjointSet.findUltimateParent(node) == node) {
+                        componentCount++;
+                    }
+                }
+
+                // Return the maximum removable stones formula
+                return totalStones - componentCount;
+            }
+        }
+
+     */
 
     // Accounts Merge
 
