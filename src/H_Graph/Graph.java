@@ -4864,5 +4864,263 @@ Space Complexity: O(V) — You only need a 1D array of size V to store the short
 
      */
 
+    // Number of islands II
+
+    /*
+
+        class Solution {
+
+            static class DisjointSet {
+                private final int[] size;
+                private final int[] parent;
+
+                DisjointSet(int V) {
+                    int allocationSize = V + 1;
+                    size = new int[allocationSize];
+                    parent = new int[allocationSize];
+
+                    for (int idx = 0; idx < allocationSize; idx++) {
+                        parent[idx] = idx;
+                        size[idx] = 1;
+                    }
+                }
+
+                int findUltimateParent(int u) {
+                    if (u == parent[u]) {
+                        return u;
+                    }
+                    return parent[u] = findUltimateParent(parent[u]);
+                }
+
+                void unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    if (rootU == rootV) {
+                        return;
+                    }
+
+                    if (size[rootU] < size[rootV]) {
+                        parent[rootU] = rootV;
+                        size[rootV] += size[rootU];
+                    } else {
+                        parent[rootV] = rootU;
+                        size[rootU] += size[rootV];
+                    }
+                }
+            }
+
+            public List<Integer> numOfIslands(int rows, int cols, int[][] operators) {
+
+                // Compute total linear matrix size to accurately size our data structures
+                int totalNodes = rows * cols;
+                DisjointSet disjointSet = new DisjointSet(totalNodes);
+
+                int currentIslandCount = 0;
+                List<Integer> islandCountHistory = new ArrayList<>();
+
+
+                boolean isVisitedLand[] = new boolean[totalNodes];
+
+                // Direction vectors to inspect Up, Down, Left, and Right neighbors cleanly
+                int[] rowOffset = {0, 1, -1, 0};
+                int[] colOffset = {1, 0, 0, -1};
+
+                for (int operator[] : operators) {
+                    int row = operator[0];
+                    int col = operator[1];
+
+                    // Map the 2D matrix coordinates onto a distinct 1D array index slot
+                    int nodeIdx = row * cols + col;
+
+                    // EDGE CASE: If this exact coordinate was already flipped to land previously,
+                    // we skip redundant recalculations and record the ongoing active island count.
+                    if (isVisitedLand[nodeIdx]) {
+                        islandCountHistory.add(currentIslandCount);
+                        continue;
+                    }
+
+                    // Step 1: Mark this unique 1D node cell as active land, provisionally adding to total counts
+                    isVisitedLand[nodeIdx] = true;
+                    currentIslandCount++;
+
+                    // Step 2: Traverse all 4 cardinal directions to discover neighboring components
+                    for (int i = 0; i < 4; i++) {
+                        int neighborRow = row + rowOffset[i];
+                        int neighborCol = col + colOffset[i];
+
+                        // CRITICAL BOUNDARY CHECK: Eliminates Row Wrapping mathematical anomalies
+                        // where the end boundary of one line bridges into the start boundary of the next line.
+                        if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols) {
+                            int neighborNodeIdx = neighborRow * cols + neighborCol;
+
+                            // We only evaluate valid operations if that specific neighbor node contains active land
+                            if (isVisitedLand[neighborNodeIdx]) {
+                                int currentLandRoot = disjointSet.findUltimateParent(nodeIdx);
+                                int neighborLandRoot = disjointSet.findUltimateParent(neighborNodeIdx);
+
+                                // If their top roots don't match, they belong to disconnected islands.
+                                // We link them together and safely reduce our net island tracker count.
+                                if (currentLandRoot != neighborLandRoot) {
+                                    disjointSet.unionBySize(nodeIdx, neighborNodeIdx);
+                                    currentIslandCount--;
+                                }
+                            }
+                        }
+                    }
+
+                    // Save the definitive state calculation milestone achieved after this operation
+                    islandCountHistory.add(currentIslandCount);
+                }
+
+                return islandCountHistory;
+            }
+        }
+
+     */
+
+    // Making A Large Island
+
+    /*
+
+        class Solution {
+
+            static class DisjointSet {
+                private final int[] size;
+                private final int[] parent;
+
+                DisjointSet(int V) {
+                    int allocationSize = V + 1;
+                    size = new int[allocationSize];
+                    parent = new int[allocationSize];
+
+                    for (int idx = 0; idx < allocationSize; idx++) {
+                        parent[idx] = idx;
+                        size[idx] = 1;
+                    }
+                }
+
+                int findUltimateParent(int u) {
+                    if (u == parent[u]) {
+                        return u;
+                    }
+                    return parent[u] = findUltimateParent(parent[u]);
+                }
+
+                void unionBySize(int u, int v) {
+                    int rootU = findUltimateParent(u);
+                    int rootV = findUltimateParent(v);
+
+                    if (rootU == rootV) {
+                        return;
+                    }
+
+                    if (size[rootU] < size[rootV]) {
+                        parent[rootU] = rootV;
+                        size[rootV] += size[rootU];
+                    } else {
+                        parent[rootV] = rootU;
+                        size[rootU] += size[rootV];
+                    }
+                }
+
+                // Returns the total size of the connected component that element 'u' belongs to
+                int getSize(int u) {
+                    int root = findUltimateParent(u);
+                    return size[root];
+                }
+            }
+
+            public int largestIsland(int[][] grid) {
+
+                int n = grid.length;
+                int totalNodes = n * n;
+                DisjointSet ds = new DisjointSet(totalNodes);
+
+                // Direction offsets for traversing Up, Down, Left, and Right neighbors
+                int rowOffset[] = {0, 0, 1, -1};
+                int colOffset[] = {1, -1, 0, 0};
+
+                // STEP 1: Scan the grid to group and union all existing land mass components
+                for (int row = 0; row < n; row++) {
+                    for (int col = 0; col < n; col++) {
+                        if (grid[row][col] == 1) {
+
+                            int nodeIdx = row * n + col;
+
+                            // Check all 4 cardinal directions for neighboring land
+                            for (int i = 0; i < 4; i++) {
+                                int newRow = row + rowOffset[i];
+                                int newCol = col + colOffset[i];
+
+                                // Ensure neighbor is inside the grid matrix boundaries
+                                if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n) {
+
+                                    if (grid[newRow][newCol] == 1) {
+                                        int neighborIdx = newRow * n + newCol;
+                                        ds.unionBySize(nodeIdx, neighborIdx);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // EDGE CASE GUARD: If the grid contains absolutely no '0's (it's 100% land),
+                // the largest island size is simply the total grid capacity size (n * n).
+                // We initialize this using the component size of the first cell if it is land.
+                int largestIslandSize = 0;
+                if (grid[0][0] == 1) {
+                    largestIslandSize = ds.getSize(0);
+                }
+
+                // STEP 2: Find every '0' and simulate turning it into a '1'
+                for (int row = 0; row < n; row++) {
+                    for (int col = 0; col < n; col++) {
+
+                        if (grid[row][col] == 0) {
+
+                            // A HashSet ensures that if multiple neighbors belong to the exact
+                            // same island component, we only add its size contribution exactly once.
+                            Set<Integer> uniqueComponentParents = new HashSet<>();
+
+                            // Inspect the 4 surrounding neighbors of this water cell
+                            for (int i = 0; i < 4; i++) {
+                                int newRow = row + rowOffset[i];
+                                int newCol = col + colOffset[i];
+
+                                // Validate boundary safety constraints
+                                if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n) {
+
+                                    if (grid[newRow][newCol] == 1) {
+                                        int neighborIdx = newRow * n + newCol;
+                                        // Identify the ultimate structural parent root of this neighbor island
+                                        uniqueComponentParents.add(ds.findUltimateParent(neighborIdx));
+                                    }
+
+                                }
+                            }
+
+                            // Base size starts at 1 (the current '0' cell transformed into land)
+                            int currentIslandSize = 1;
+
+                            // Combine the sizes of all unique adjacent island components
+                            for (int parentRoot : uniqueComponentParents) {
+                                currentIslandSize += ds.getSize(parentRoot);
+                            }
+
+                            // Keep track of the peak maximum size recorded across all simulated flips
+                            largestIslandSize = Math.max(largestIslandSize, currentIslandSize);
+                        }
+                    }
+                }
+
+                return largestIslandSize;
+            }
+        }
+
+     */
+
 
 }
