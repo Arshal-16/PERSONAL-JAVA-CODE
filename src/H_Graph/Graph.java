@@ -1312,6 +1312,140 @@ public class Graph {
 
      */
 
+    // Optimal and easy solution REVISE and REMEMBER this approach
+
+    /*
+
+
+         *
+         * Strategy:
+         * 1. BFS Phase: Computes the shortest distance (level) from 'beginWord' to every reachable
+         *    word and stores it in 'levelMap'. This avoids storing full path lists in memory.
+         * 2. Reverse DFS Phase: Backtracks starting from 'endWord' back to 'beginWord' by moving only
+         *    to parent words that have a level exactly 1 less than the current word's level.
+         *
+            class Solution {
+
+                public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+
+                    // Local data structures
+                    List<List<String>> result = new ArrayList<>();
+                    Map<String, Integer> levelMap = new HashMap<>();
+
+                    // Convert wordList to a HashSet for O(1) lookups and removals
+                    Set<String> wordSet = new HashSet<>(wordList);
+
+                    // Early exit: If endWord is not in wordList, no transformation sequence exists
+                    if (!wordSet.contains(endWord)) {
+                        return result;
+                    }
+
+                    // ==========================================
+                    // STEP 1: BFS to build the level map
+                    // ==========================================
+                    Queue<String> queue = new ArrayDeque<>();
+
+                    // Start BFS at beginWord with level 1
+                    queue.add(beginWord);
+                    levelMap.put(beginWord, 1);
+
+                    // Remove beginWord to avoid visiting it again
+                    if (wordSet.contains(beginWord)) {
+                        wordSet.remove(beginWord);
+                    }
+
+                    while (!queue.isEmpty()) {
+                        String word = queue.remove();
+                        int currentLevel = levelMap.get(word);
+
+                        // Once endWord is processed, stop expanding further levels
+                        if (word.equals(endWord)) {
+                            break;
+                        }
+
+                        char[] chars = word.toCharArray();
+
+                        // Try changing each character to find all valid 1-letter transformations
+                        for (int i = 0; i < chars.length; i++) {
+                            char originalChar = chars[i];
+
+                            for (char ch = 'a'; ch <= 'z'; ch++) {
+                                chars[i] = ch;
+                                String nextWord = new String(chars);
+
+                                // If the neighbor exists in the dictionary, record its shortest distance
+                                if (wordSet.contains(nextWord)) {
+                                    queue.add(nextWord);
+                                    wordSet.remove(nextWord); // Mark visited so it's not processed twice in BFS
+                                    levelMap.put(nextWord, currentLevel + 1);
+                                }
+                            }
+
+                            chars[i] = originalChar; // Restore original character for next position
+                        }
+                    }
+
+                    // ==========================================
+                    // STEP 2: Reverse DFS to construct paths
+                    // ==========================================
+                    // Only trigger DFS if endWord was actually reached during BFS
+                    if (levelMap.containsKey(endWord)) {
+                        List<String> path = new ArrayList<>();
+                        path.add(endWord); // Start backtracking from endWord
+                        dfs(endWord, beginWord, levelMap, path, result);
+                    }
+
+                    return result;
+                }
+
+                 *
+                 * Recursively walks backwards from endWord to beginWord using levelMap as a guide.
+                 *
+                private void dfs(String currentWord, String beginWord, Map<String, Integer> levelMap,
+                                 List<String> path, List<List<String>> result) {
+
+                    // Base case: We have successfully backtracked all the way to beginWord
+                    if (currentWord.equals(beginWord)) {
+                        List<String> validPath = new ArrayList<>(path);
+
+                        // Reverse the path because we generated it backwards (from endWord to beginWord)
+                        Collections.reverse(validPath);
+                        result.add(validPath);
+                        return;
+                    }
+
+                    int currentLevel = levelMap.get(currentWord);
+
+                    char chars[] = currentWord.toCharArray();
+
+                    // Mutate characters to find parent words that are 1 edit distance away
+                    for (int i = 0; i < chars.length; i++) {
+                        char originalChar = chars[i];
+
+                        for (char ch = 'a'; ch <= 'z'; ch++) {
+                            chars[i] = ch;
+                            String prevWord = new String(chars);
+
+                            // KEY CONDITION: Only step onto a parent word if it exists in levelMap
+                            // AND its distance level is exactly (currentLevel - 1)
+                            if (levelMap.containsKey(prevWord) && levelMap.get(prevWord) == currentLevel - 1) {
+                                // Choose
+                                path.add(prevWord);
+                                // Explore
+                                dfs(prevWord, beginWord, levelMap, path, result);
+                                // Backtrack (Unchoose)
+                                path.remove(path.size() - 1);
+                            }
+                        }
+
+                        // Restore character
+                        chars[i] = originalChar;
+                    }
+                }
+            }
+
+     */
+
     // Number of Islands
 
     /*
