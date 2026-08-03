@@ -701,6 +701,183 @@ public class binaryTree {
 
     /////////////////////// LEARNING ////////////////////////////
 
+    /*
+
+    Binary Tree Notes
+
+        Binary Tree:
+        A binary tree is a tree data structure in which each node can have at most two children, called the left child and the right child.
+
+        Node:
+        A node is a basic element of a tree that stores data and links to its children.
+
+        Edge:
+        An edge is the connection between a parent node and its child.
+
+        Root:
+        The root is the topmost node of the tree. It has no parent.
+
+        Parent:
+        A parent is a node that has one or more child nodes.
+
+        Child:
+        A child is a node directly connected below a parent node.
+
+        Sibling:
+        Sibling nodes are nodes that share the same parent.
+
+        Leaf (External Node):
+        A leaf node is a node that has no children.
+
+        Internal Node (Non-leaf Node):
+        An internal node is any node that has at least one child. (The root is also an internal node if it has children.)
+
+        Ancestor:
+        An ancestor of a node is any node on the path from the root to that node, including its parent, grandparent, etc.
+
+        Descendant:
+        A descendant of a node is any node that can be reached by moving downward from that node, including its children, grandchildren, etc.
+
+        Degree of a Node:
+        The degree of a node is the number of children it has.
+        In a binary tree, the maximum degree of a node is 2.
+
+        Degree of a Tree:
+        The degree of a tree is the maximum degree of any node in the tree.
+        For a binary tree, the degree of the tree is at most 2.
+
+        Level:
+        The level of a node is its position from the root.
+        If the root is considered Level 0:
+        Root = Level 0
+        Children of root = Level 1
+        Grandchildren = Level 2
+        (Some books start the root at Level 1.)
+
+        Depth:
+        The depth of a node is the number of edges from the root to that node.
+        Root depth = 0.
+
+        Height of a Node:
+        The height of a node is the number of edges on the longest path from that node to a leaf.
+        Leaf node height = 0.
+
+        Height of a Tree:
+        The height of a tree is the height of the root.
+        It is equal to the maximum depth of any node.
+
+        Subtree:
+        A subtree is a tree formed by any node and all of its descendants.
+
+        Path:
+        A path is a sequence of nodes connected by edges.
+
+        Path Length:
+        The path length is the number of edges in the path.
+
+        Distance:
+        The distance between two nodes is the number of edges in the shortest path connecting them.
+
+        Binary Tree Traversals
+
+        Inorder Traversal (Left → Root → Right)
+        Visit the left subtree, then the root, then the right subtree.
+        For Binary Search Trees (BST), inorder traversal gives nodes in sorted order.
+
+        Preorder Traversal (Root → Left → Right)
+        Visit the root first, then the left subtree, then the right subtree.
+        Useful for copying a tree or creating a prefix expression.
+
+        Postorder Traversal (Left → Right → Root)
+        Visit the left subtree, then the right subtree, and finally the root.
+        Useful for deleting a tree or evaluating postfix expressions.
+
+        Level Order Traversal (Breadth-First Traversal)
+        Visit nodes level by level from left to right using a queue.
+
+        Types of Binary Trees
+
+        Full Binary Tree (Strict / Proper Binary Tree):
+        A full binary tree is a binary tree in which every node has either exactly two children or no children. No node has only one child.
+        All internal nodes have exactly two children, and all remaining nodes are leaf nodes.
+
+        Complete Binary Tree:
+        A complete binary tree is a binary tree in which all levels are completely filled except possibly the last level,
+        and all nodes in the last level are as far left as possible.
+
+        Perfect Binary Tree:
+        A perfect binary tree is a binary tree in which all internal nodes have exactly two children and all leaf nodes are at the same level.
+        Every level is completely filled.
+
+        Balanced Binary Tree:
+        A balanced binary tree is a binary tree in which the heights of the left and right subtrees of every node differ by at most one.
+        This keeps the tree height small, making operations efficient.
+
+        Degenerate Binary Tree (Skewed Tree):
+        A degenerate binary tree is a binary tree in which every parent node has only one child. It behaves like a linked list,
+        making the tree height equal to the number of nodes and reducing efficiency.
+
+        Left Skewed Tree:
+        A degenerate tree where every node has only a left child.
+
+        Right Skewed Tree:
+        A degenerate tree where every node has only a right child.
+
+        Binary Search Tree (BST):
+        A binary tree where:
+
+        * Left subtree contains values smaller than the node.
+        * Right subtree contains values greater than the node.
+        * Both left and right subtrees are also BSTs.
+
+        Other Important Terms
+
+        Null Node:
+        A missing child pointer is called a null node.
+
+        Empty Tree:
+        A tree with no nodes.
+
+        Size of a Tree:
+        The total number of nodes in the tree.
+
+        Width of a Tree:
+        The maximum number of nodes present at any level.
+
+        Diameter of a Tree:
+        The number of edges in the longest path between any two nodes in the tree.
+
+        Lowest Common Ancestor (LCA):
+        The deepest node that is a common ancestor of two given nodes.
+
+        Forest:
+        A collection of one or more disjoint trees.
+
+        Key Formulas
+
+        Maximum nodes at level l:
+        2^l (when root is at level 0)
+
+        Maximum nodes in a binary tree of height h:
+        2^(h+1) - 1
+
+        Minimum nodes in a binary tree of height h:
+        h + 1 (degenerate tree)
+
+        Leaf nodes in a perfect binary tree:
+        2^h
+
+        Total nodes in a perfect binary tree:
+        2^(h+1) - 1
+
+        Edges in a tree with n nodes:
+        n - 1
+
+        Maximum children of a node in a binary tree:
+        2
+
+     */
+
 
 
 }
