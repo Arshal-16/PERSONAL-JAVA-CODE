@@ -6,20 +6,7 @@ public class binaryTree {
 
     /*
 
-    //Non-static inner class → like a child always carrying a parent with them
-    //Static nested class → independent person, no dependency
 
-    static class Node {
-        int data;
-        Node left;
-        Node right;
-
-        Node(int data) {
-            this.data = data;
-            this.left = null;
-            this.right = null;
-        }
-    }
 
     /// ///////// TRAVERSALS //////////////////
 
@@ -74,31 +61,6 @@ public class binaryTree {
         solution.add(inorder);
         solution.add(postorder);
         return solution;
-    }
-
-    //PREORDER TRAVERSAL OF BINARY TREE
-    public void preorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-
-        al.add(root.data);
-        preorderTraversal(root.left, al);
-        preorderTraversal(root.right, al);
-    }
-
-    //INORDER TRAVERSAL OF BINARY TREE
-    public void inorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        inorderTraversal(root.left, al);
-        al.add(root.data);
-        inorderTraversal(root.right, al);
-    }
-
-    //POSTORDER TRAVERSAL OF BINARY TREE
-    public void postorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        postorderTraversal(root.left, al);
-        postorderTraversal(root.right, al);
-        al.add(root.data);
     }
 
     //LEVEL ORDER TRAVERSAL OF BINARY TREE
@@ -876,9 +838,206 @@ public class binaryTree {
         Maximum children of a node in a binary tree:
         2
 
+            static class Node {
+                int data;
+                Node left;
+                Node right;
+
+                Node(int data) {
+                    this.data = data;
+                    this.left = null;
+                    this.right = null;
+                }
+            }
+
      */
 
+    /////////////////////// TRAVERSALS ////////////////////////////
 
+    static class Node {
+        int data;
+        Node left;
+        Node right;
+
+        Node(int data){
+            this.data = data;
+            this.left = null;
+            this.right = null;
+        }
+    }
+
+    // Binary Tree Traversals:
+    // DFS (Depth-First Search): Preorder, Inorder, and Postorder traversals.
+    // Naming of DFS traversals is based on when the root node is visited:
+    // Preorder  : Root is visited before its left and right subtrees.
+    // Inorder   : Root is visited between the left and right subtrees.
+    // Postorder : Root is visited after both the left and right subtrees.
+    // BFS (Breadth-First Search): Level Order traversal.
+
+    // Preorder Traversal
+
+    /*
+
+            class Solution {
+
+         Time Complexity: O(N) - Every node is visited exactly once.
+         Space Complexity: O(N) - In the worst case (skewed/degenerate tree), the call stack grows up to N frames deep.
+
+            public List<Integer> preorder(Node root) {
+
+                List<Integer> preorderResult = new ArrayList<>();
+                traversePreorder(root, preorderResult);
+
+                return preorderResult;
+            }
+
+            private void traversePreorder(Node currentNode, List<Integer> preorderResult) {
+
+                // Base case:
+                if (currentNode == null) {
+                    return;
+                }
+
+                // Process current node first (Root)
+                preorderResult.add(currentNode.data);
+
+                // Recursively visit left and right subtrees
+                traversePreorder(currentNode.left, preorderResult);
+                traversePreorder(currentNode.right, preorderResult);
+            }
+        }
+
+     */
+
+    // Inorder Traversal
+
+    /*
+
+            class Solution {
+
+
+         Time Complexity: O(N) - Every node is visited exactly once.
+         Space Complexity: O(N) - In the worst case (skewed/degenerate tree),
+                           the call stack grows up to N frames deep.
+
+            public List<Integer> inorder(Node root) {
+
+                List<Integer> inorderResult = new ArrayList<>();
+                traverseInorder(root, inorderResult);
+
+                return inorderResult;
+            }
+
+            private void traverseInorder(Node currentNode, List<Integer> inorderResult) {
+                // Base case:
+                if (currentNode == null) {
+                    return;
+                }
+
+                // Recursively visit left subtree
+                traverseInorder(currentNode.left, inorderResult);
+
+                // Process current node (Root)
+                inorderResult.add(currentNode.data);
+
+                // Recursively visit right subtree
+                traverseInorder(currentNode.right, inorderResult);
+            }
+        }
+
+     */
+
+    // Postorder Traversal
+
+    /*
+
+            class Solution {
+
+         Performs a postorder traversal on a binary tree (Left -> Right -> Root).
+
+         Time Complexity: O(N) - Every node is visited exactly once.
+         Space Complexity: O(N) - In the worst case (skewed/degenerate tree),
+                           the call stack grows up to N frames deep.
+
+            public List<Integer> postorder(Node root) {
+
+                List<Integer> postorderResult = new ArrayList<>();
+                traversePostorder(root, postorderResult);
+
+                return postorderResult;
+            }
+
+            private void traversePostorder(Node currentNode, List<Integer> postorderResult) {
+
+                // Base case:
+                if (currentNode == null) {
+                    return;
+                }
+
+                // Recursively visit left and right subtrees
+                traversePostorder(currentNode.left, postorderResult);
+                traversePostorder(currentNode.right, postorderResult);
+
+                // Process current node last (Root)
+                postorderResult.add(currentNode.data);
+            }
+        }
+
+     */
+
+    // Level Order Traversal
+
+    /*
+
+            class Solution {
+
+         Performs a level-order (breadth-first) traversal on a binary tree.
+
+         Time Complexity: O(N) - Every node is processed exactly once.
+         Space Complexity: O(W) - Where W is the maximum width of the tree.
+                           In the worst case (perfectly balanced tree),
+                           the queue holds up to N / 2 leaf nodes at the last level.
+
+            public List<List<Integer>> levelOrder(Node root) {
+
+                List<List<Integer>> levelOrderResult = new ArrayList<>();
+
+                if (root == null) {
+                    return levelOrderResult;
+                }
+
+                Queue<Node> bfsQueue = new ArrayDeque<>();
+                bfsQueue.add(root);
+
+                while (!bfsQueue.isEmpty()) {
+
+                    int currentLevelSize = bfsQueue.size();
+                    List<Integer> currentLevelNodes = new ArrayList<>();
+
+                    for (int i = 0; i < currentLevelSize; i++) {
+
+                        Node currentNode = bfsQueue.remove();
+                        currentLevelNodes.add(currentNode.val);
+
+                        // Enqueue left and right children if they exist
+                        if (currentNode.left != null) {
+                            bfsQueue.add(currentNode.left);
+                        }
+
+                        if (currentNode.right != null) {
+                            bfsQueue.add(currentNode.right);
+                        }
+                    }
+
+                    // Append the collected nodes for this level to the main result
+                    levelOrderResult.add(currentLevelNodes);
+                }
+
+                return levelOrderResult;
+            }
+        }
+
+     */
 
 
 
