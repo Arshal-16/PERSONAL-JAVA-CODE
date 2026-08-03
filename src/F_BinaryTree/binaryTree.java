@@ -4,6 +4,8 @@ import java.util.*;
 
 public class binaryTree {
 
+    /*
+
     //Non-static inner class → like a child always carrying a parent with them
     //Static nested class → independent person, no dependency
 
@@ -694,4 +696,13 @@ public class binaryTree {
         return result;
     }
 
+
+     */
+
+    /////////////////////// LEARNING ////////////////////////////
+
+
+
 }
+
+
