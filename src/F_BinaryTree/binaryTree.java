@@ -6,8 +6,6 @@ public class binaryTree {
 
     /*
 
-
-
     /// ///////// TRAVERSALS //////////////////
 
     //PREORDER INORDER POSTORDER TRAVERSALS IN ONE TRAVERSAL
@@ -61,177 +59,6 @@ public class binaryTree {
         solution.add(inorder);
         solution.add(postorder);
         return solution;
-    }
-
-    //LEVEL ORDER TRAVERSAL OF BINARY TREE
-    public void levelOrderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-
-        Queue<Node> q = new ArrayDeque<>();
-        q.add(root);
-        q.add(null);
-        while (!q.isEmpty()) {
-            Node current = q.remove();
-            if (current == null) {
-                if (q.isEmpty()) return;
-                q.add(null);
-            } else {
-                al.add(current.data);
-                if (current.left != null) q.add(current.left);
-                if (current.right != null) q.add(current.right);
-            }
-        }
-    }
-
-    //ITERATIVE PREORDER TRAVERSAL OF BINARY TREE
-    class NodeAndState {
-        Node node;
-        int state;
-
-        NodeAndState(Node node, int state) {
-            this.node = node;
-            this.state = state;
-        }
-    }
-
-    //using state
-    public void iterativePreorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        Stack<NodeAndState> s = new Stack<>();
-        s.push(new NodeAndState(root, 1));
-        while (!s.isEmpty()) {
-            NodeAndState current = s.pop();
-            if (current.state == 1) { // we are visiting node for the first time
-                al.add(current.node.data);
-                current.state = 2;
-                s.push(current);
-                if (current.node.left != null)
-                    s.push(new NodeAndState(current.node.left, 1)); // add the left child
-            } else if (current.state == 2) { // root and left subtree are traversed
-                if (current.node.right != null)
-                    s.push(new NodeAndState(current.node.right, 1));
-            }
-        }
-    }
-
-    //without using state(less complex and preferred)
-    public void iterativePreorder(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        Stack<Node> s = new Stack<>();
-        s.push(root);
-        while (!s.isEmpty()) {
-            Node current = s.pop();
-            al.add(current.data);
-            if (current.right != null) s.push(current.right);
-            if (current.left != null) s.push(current.left);
-        }
-    }
-
-    //ITERATIVE INORDER TRAVERSAL OF BINARY TREE
-    //using state
-    public void iterativeInorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        Stack<NodeAndState> s = new Stack<>();
-        s.push(new NodeAndState(root, 1));
-        while (!s.isEmpty()) {
-            NodeAndState top = s.pop();
-            if (top.state == 1) {
-                top.state = 2;
-                s.push(top);
-                if (top.node.left != null) s.push(new NodeAndState(top.node.left, 1));
-            } else if (top.state == 2) {
-                al.add(top.node.data);
-                if (top.node.right != null) s.push(new NodeAndState(top.node.right, 1));
-            }
-        }
-    }
-
-    //without using state (less complex and more clean)
-    public void iterativeInorder(Node root, ArrayList<Integer> al) {
-        Stack<Node> stack = new Stack<>();
-        Node current = root;
-
-        while (current != null || !stack.isEmpty()) {
-
-            // go as far left as possible
-            while (current != null) {
-                stack.push(current);
-                current = current.left;
-            }
-
-            // process node
-            current = stack.pop();
-            al.add(current.data);
-
-            // move to right subtree
-            current = current.right;
-        }
-    }
-
-    //POSTORDER TRAVERSAL OF BINARY TREE
-    //using state
-    public void iterativePostorderTraversal(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        Stack<NodeAndState> s = new Stack<>();
-        s.push(new NodeAndState(root, 1));
-        while (!s.isEmpty()) {
-            NodeAndState current = s.pop();
-            if (current.state == 1) {
-                current.state = 2;
-                s.push(current);
-                if (current.node.left != null) s.push(new NodeAndState(current.node.left, 1));
-            } else if (current.state == 2) {
-                current.state = 3;
-                s.push(current);
-                if (current.node.right != null) s.push(new NodeAndState(current.node.right, 1));
-            } else if (current.state == 3) {
-                al.add(current.node.data);
-            }
-        }
-    }
-
-    //without using state(less complex)
-    public void iterativePostorderUsing2Stacks(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-        Stack<Node> s1 = new Stack<>();
-        Stack<Integer> s2 = new Stack<>();
-        s1.push(root);
-        while (!s1.isEmpty()) {
-            Node current = s1.pop();
-            s2.push(current.data);
-            if (current.left != null) s1.push(current.left);
-            if (current.right != null) s1.push(current.right);
-            // like this when we are transferring elements from s1 to s2 it will be root at bottom then entire right
-            // subtree traversed in postorder then left subtree traversed in postorder at top
-        }
-        while (!s2.isEmpty()) al.add(s2.pop());
-
-    }
-
-    public void iterativePostorderUsing1Stack(Node root, ArrayList<Integer> al) {
-        if (root == null) return;
-
-        Node current = root;
-        Node lastVisited = null;
-        Stack<Node> s = new Stack<>();
-        while (current != null || !s.isEmpty()) {
-            //go as far left as possible
-            while (current != null) {
-                s.push(current);
-                current = current.left;
-            }
-            // look at the top node
-            Node topNode = s.peek();
-            //if right child exists and is not yet visited
-            if (topNode.right != null && topNode.right != lastVisited) {
-                //move to right subtree
-                current = topNode.right;
-            } else { //otherwise process the node and mark it as last visited
-                al.add(topNode.data);
-                lastVisited = s.pop(); //lastVisited = topNode
-            }
-        }
-
     }
 
     /// ///////// MEDIUM PROBLEMS //////////////////
@@ -1039,7 +866,138 @@ public class binaryTree {
 
      */
 
+    // Iterative Preorder Traversal of Binary Tree
 
+    /*
+
+            class Solution {
+
+            public List<Integer> preorder(Node root) {
+
+                List<Integer> preorderResult = new ArrayList<>();
+
+                if (root == null) {
+                    return preorderResult;
+                }
+
+                Stack<Node> traversalStack = new Stack<>();
+                traversalStack.push(root);
+
+                while (!traversalStack.isEmpty()) {
+
+                    Node currentNode = traversalStack.pop();
+                    preorderResult.add(currentNode.val);
+
+                    // Push right child first so left child is popped and processed first
+                    if (currentNode.right != null) {
+                        traversalStack.push(currentNode.right);
+                    }
+
+                    if (currentNode.left != null) {
+                        traversalStack.push(currentNode.left);
+                    }
+                }
+
+                return preorderResult;
+            }
+        }
+
+     */
+
+    // Iterative Inorder Traversal of Binary Tree
+
+    /*
+
+            class Solution {
+
+            public List<Integer> inorder(Node root) {
+
+                List<Integer> inorderResult = new ArrayList<>();
+
+                if (root == null) {
+                    return inorderResult;
+                }
+
+                Stack<Node> traversalStack = new Stack<>();
+                Node currentNode = root;
+
+                while (true) {
+                    // Keep going as far left as possible, pushing each node onto the stack
+                    if (currentNode != null) {
+                        traversalStack.push(currentNode);
+                        currentNode = currentNode.left;
+                    } else {
+                        // If current node is null and stack is empty, all nodes have been visited
+                        if (traversalStack.isEmpty()) {
+                            break;
+                        }
+
+                        // Pop the last visited left-most node whose left subtree is fully processed
+                        currentNode = traversalStack.pop();
+
+                        // Process the popped node (Root)
+                        inorderResult.add(currentNode.val);
+
+                        // Move to the right child to repeat the process for the right subtree
+                        currentNode = currentNode.right;
+                    }
+                }
+
+                return inorderResult;
+            }
+        }
+
+     */
+
+    // Iterative Postorder Traversal of Binary Tree (using 2 stacks)
+
+    /*
+
+            class Solution {
+
+            public List<Integer> postorder(Node root) {
+                List<Integer> postorderResult = new ArrayList<>();
+
+                if (root == null) {
+                    return postorderResult;
+                }
+
+                Stack<Node> traversalStack = new Stack<>();
+                Stack<Integer> resultStack = new Stack<>();
+
+                traversalStack.push(root);
+
+                // Step 1: Process nodes in (Root -> Right -> Left) order.
+                // Pushing nodes into resultStack reverses them to give (Left -> Right -> Root) order.
+                while (!traversalStack.isEmpty()) {
+                    Node currentNode = traversalStack.pop();
+
+                    // Store the processed node's value in the output stack
+                    resultStack.push(currentNode.val);
+
+                    // Push left child first, so right child is popped and processed next
+                    if (currentNode.left != null) {
+                        traversalStack.push(currentNode.left);
+                    }
+
+                    if (currentNode.right != null) {
+                        traversalStack.push(currentNode.right);
+                    }
+                }
+
+                // Step 2: Pop all elements from resultStack to get the final Postorder traversal
+                while (!resultStack.isEmpty()) {
+                    postorderResult.add(resultStack.pop());
+                }
+
+                // Note: As you mentioned, an alternative to using resultStack is directly
+                // adding values to postorderResult and calling Collections.reverse(postorderResult) at the end!
+
+                return postorderResult;
+            }
+        }
+
+     */
 
 }
 
