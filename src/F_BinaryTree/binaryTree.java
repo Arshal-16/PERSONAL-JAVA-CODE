@@ -1003,7 +1003,49 @@ public class binaryTree {
 
     /*
 
+            class Solution {
 
+            public List<Integer> postorder(Node root) {
+
+                List<Integer> postorderResult = new ArrayList<>();
+
+                if (root == null) {
+                    return postorderResult;
+                }
+
+                Node curr = root;
+                Stack<Node> traversalStack = new Stack<>();
+
+                while (curr != null || !traversalStack.isEmpty()) {
+
+                    // Step 1: Reach the leftmost node of the current subtree
+                    if (curr != null) {
+                        traversalStack.push(curr);
+                        curr = curr.left;
+                    } else {
+                        // Peek at the parent node to check its right child
+                        Node temp = traversalStack.peek().right;
+
+                        // Step 2: If a right child exists and hasn't been visited, move to it
+                        if (temp != null) {
+                            curr = temp;
+                        } else {
+                            // Step 3: Otherwise, process the node at the top of stack (Left & Right are done)
+                            temp = traversalStack.pop();
+                            postorderResult.add(temp.val);
+
+                            // Step 4: Backtrack up the tree if the popped node was a right child of its parent
+                            while (!traversalStack.isEmpty() && temp == traversalStack.peek().right) {
+                                temp = traversalStack.pop();
+                                postorderResult.add(temp.val);
+                            }
+                        }
+                    }
+                }
+
+                return postorderResult;
+            }
+        }
 
      */
 
