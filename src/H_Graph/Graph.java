@@ -2967,19 +2967,253 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
     // Print Shortest Path
 
-    /* Question
-
-    You are given a weighted undirected graph with n vertices numbered from 1 to n and m edges along with their weights.
-    Find the shortest path between vertex 1 and vertex n. Each edge is given as {a, b, w}, denoting an edge between vertices a and b with weight w.
-    If a path exists, return a list of integers where the first element is the total weight of the shortest path,
-    and the remaining elements are the nodes along that path (from 1 to n). If no path exists, return a list containing only {-1}.
-
-     */
+    // original question solution
 
     /*
 
+         ====================================================================================
+          PROBLEM: Shortest Path with Lexicographical Tie-Breaking
+          APPROACH: Backward Dijkstra + Forward Greedy Reconstruction
+         ====================================================================================
+
+          Problem Statement:
+          ------------------
+          Find the shortest path from 'src' to 'dest'. If multiple shortest paths exist
+          with the same total weight, pick the one that is lexicographically smallest
+          (i.e., smaller vertex IDs as early as possible on the path from src -> dest).
+
+          Why standard parent array tie-breaking fails:
+          ----------------------------------------------
+          Local tie-breaking at the destination node compares immediate predecessors near 'dest',
+          which can accidentally force the path onto larger node IDs earlier near 'src'.
+
+          Solution Strategy:
+          ------------------
+          1. Run Dijkstra starting from 'dest' backward to all other nodes. This calculates
+             the exact shortest distance from every node 'u' to 'dest' (distToDest[u]).
+          2. Reconstruct the path starting from 'src' to 'dest'. At any current node,
+             a neighbor is on a valid shortest path if:
+                 distToDest[neighbor] + edgeWeight == distToDest[currNode]
+          3. Among all valid neighbors, greedily select the one with the SMALLEST node ID.
+             Doing this step-by-step from 'src' guarantees the overall path is globally
+             lexicographically smallest.
+
+         ====================================================================================
+          LESSON & POST-MORTEM: Why Forward Dijkstra + Local Parent Tie-Breaking Fails
+         ====================================================================================
+
+          1. MY ORIGINAL ATTEMPT (INCORRECT IMPLEMENTATION)
+          ------------------------------------------------
+          public ArrayList<Integer> shortestPath(int V, int[][] edges, int src, int dest) {
+              // ... Adjacency List & Parent array initialization ...
+
+              PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
+              pq.add(new int[]{src, 0});
+              shortestDist[src] = 0;
+
+              while (!pq.isEmpty()) {
+                  int[] curr = pq.remove();
+                  int node = curr[0];
+                  int distFromSrc = curr[1];
+
+                  if (shortestDist[node] < distFromSrc) continue;
+
+                  for (int[] neighborPair : adjList.get(node)) {
+                      int neighborNode = neighborPair[0];
+                      int tentativeDist = distFromSrc + neighborPair[1];
+
+                      if (shortestDist[neighborNode] > tentativeDist) {
+                          shortestDist[neighborNode] = tentativeDist;
+                          parent[neighborNode] = node;
+                          pq.add(new int[]{neighborNode, tentativeDist});
+                      }
+                      // *** FAILED LOCAL TIE-BREAKING ***
+                      else if (shortestDist[neighborNode] == tentativeDist && parent[neighborNode] > node) {
+                          parent[neighborNode] = node;
+                      }
+                  }
+              }
+              // ... Backtrack using parent array from dest to src ...
+          }
+
+
+          2. WHY THIS APPROACH FAILS (THE FUNDAMENTAL FLAW)
+          ------------------------------------------------
+          - Lexicographical order is evaluated FORWARD from 'src' to 'dest' (left to right).
+          - The condition `parent[neighborNode] > node` checks LOCAL immediate predecessors.
+            It selects smaller node IDs closer to 'dest' (right-to-left), completely blind to
+            what the path looked like earlier near 'src'.
+
+
+          3. CONCRETE COUNTER-EXAMPLE
+          ---------------------------
+          Target: Find shortest path from src = 1 to dest = 4.
+          Suppose two distinct paths yield the exact same shortest distance of 10:
+
+            Path A: 1 -> 10 -> 2 -> 4
+            Path B: 1 ->  3 -> 5 -> 4
+
+          Lexicographical Comparison (Forward Evaluation):
+            - Index 0: 1 vs 1 (Equal)
+            - Index 1: 10 vs 3 -> 3 < 10, so Path B ([1, 3, 5, 4]) is LEXICOGRAPHICALLY SMALLER.
+
+          What the Local Parent Check Did:
+            When reaching node 4, Dijkstra evaluated its predecessors:
+              - Path A's predecessor for 4 is node 2.
+              - Path B's predecessor for 4 is node 5.
+
+            The local check evaluated: `if (2 < 5)` -> TRUE.
+            It selected node 2 as `parent[4]`, forcing the backtracked path:
+              4 <- 2 <- 10 <- 1  (Reversed: [1, 10, 2, 4] -> INCORRECT)
+         ====================================================================================
+
+
+            class Solution {
+
+                public ArrayList<Integer> shortestPath(int V, int[][] edges, int src, int dest) {
+
+                    // Edge case: source and destination are identical
+                    if (src == dest) {
+                        ArrayList<Integer> result = new ArrayList<>();
+                        result.add(src);
+                        return result;
+                    }
+
+                    // 1. Build Adjacency List (1-based indexing for graph with V nodes)
+                    List<List<int[]>> adjList = new ArrayList<>();
+                    for (int i = 0; i <= V; i++) {
+                        adjList.add(new ArrayList<>());
+                    }
+
+                    for (int[] edge : edges) {
+                        int u = edge[0];
+                        int v = edge[1];
+                        int wt = edge[2];
+
+                        // Undirected graph: add edges in both directions
+                        adjList.get(u).add(new int[]{v, wt});
+                        adjList.get(v).add(new int[]{u, wt});
+                    }
+
+                    // 2. Run Dijkstra's Algorithm starting from 'dest'
+                    int[] distToDest = new int[V + 1];
+                    Arrays.fill(distToDest, Integer.MAX_VALUE);
+
+                    // Min-PriorityQueue ordered by distance from 'dest'
+                    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+
+                    distToDest[dest] = 0;
+                    pq.add(new int[]{dest, 0});
+
+                    while (!pq.isEmpty()) {
+                        int[] curr = pq.poll();
+                        int currNode = curr[0];
+                        int currDist = curr[1];
+
+                        // Ignore stale priority queue entries
+                        if (currDist > distToDest[currNode]) {
+                            continue;
+                        }
+
+                        for (int[] neighbor : adjList.get(currNode)) {
+                            int neighborNode = neighbor[0];
+                            int edgeWeight = neighbor[1];
+
+                            // Standard relaxation step
+                            if (distToDest[neighborNode] > currDist + edgeWeight) {
+                                distToDest[neighborNode] = currDist + edgeWeight;
+                                pq.add(new int[]{neighborNode, distToDest[neighborNode]});
+                            }
+                        }
+                    }
+
+                    // If 'src' never received a valid distance, 'dest' is unreachable
+                    if (distToDest[src] == Integer.MAX_VALUE) {
+                        ArrayList<Integer> noPath = new ArrayList<>();
+                        noPath.add(-1);
+                        return noPath;
+                    }
+
+                    // 3. Reconstruct path greedily from 'src' to 'dest'
+                    ArrayList<Integer> path = new ArrayList<>();
+                    int currNode = src;
+                    path.add(currNode);
+
+                    while (currNode != dest) {
+                        int bestNextNode = -1;
+
+                        for (int[] neighbor : adjList.get(currNode)) {
+                            int neighborNode = neighbor[0];
+                            int edgeWeight = neighbor[1];
+
+                            // Condition to check if 'neighborNode' lies on a valid shortest path to 'dest'
+                            if (distToDest[neighborNode] != Integer.MAX_VALUE &&
+                                    distToDest[neighborNode] + edgeWeight == distToDest[currNode]) {
+
+                                // Greedily select the neighbor with the smallest vertex ID
+                                if (bestNextNode == -1 || neighborNode < bestNextNode) {
+                                    bestNextNode = neighborNode;
+                                }
+                            }
+                        }
+
+                        // Move to the chosen lexicographically smallest neighbor
+                        currNode = bestNextNode;
+                        path.add(currNode);
+                    }
+
+                    return path;
+                }
+            }
+
+     */
+
+    // pattern to learn from this question
+
+    /*
+
+         ====================================================================================
+          PROBLEM: Shortest Path in Weighted Undirected Graph (Standard Dijkstra)
+          APPROACH: Forward Dijkstra + Backtracking via Parent Array
+         ====================================================================================
+
+          Problem Statement:
+          ------------------
+          Given a weighted undirected graph with `n` vertices (1 to n) and `m` edges,
+          find the shortest path from vertex 1 to vertex `n`. Return a list where:
+          - The first element is the total weight of the shortest path.
+          - The remaining elements are the nodes along the path (1 -> n).
+          - Return [-1] if no path exists.
+
+          Why Forward Dijkstra Works Here:
+          --------------------------------
+          Unlike problems requiring lexicographical path ordering, standard shortest path
+          problems only care about total path distance. Finding *any* valid path that achieves
+          the minimum total weight is sufficient.
+
+          Therefore, standard forward Dijkstra with a `parent` array is optimal because:
+          1. It builds the shortest path tree rooted at source (vertex 1) in standard O((V + E) log V) time.
+          2. The `parent` array records immediate predecessors during distance relaxation (`distances[v] > newDist`).
+          3. Simple backtracking from vertex `n` back to vertex 1 using `parent[curr]` recovers
+             the shortest route in O(V) time.
+
+          Strategy Breakdown:
+          -------------------
+          1. Build Adjacency List for 1-based indexing (size n + 1).
+          2. Initialize `distances` array to `Integer.MAX_VALUE` and set `distances[1] = 0`.
+          3. Initialize `parent` array where each node points to itself (`parent[i] = i`).
+          4. Use a Min-PriorityQueue to process nodes ordered by distance `[node, dist]`.
+          5. Upon relaxing an edge to `neighborNode`, record `parent[neighborNode] = currNode`.
+          6. Check if `distances[n]` is reachable (`!= Integer.MAX_VALUE`). If not, return `[-1]`.
+          7. Reconstruct path from `n` to 1 using `parent` array, reverse it, and prepend
+             `distances[n]` as required by the problem specification.
+         ====================================================================================
+
+
+        import java.util.*;
+
         class Solution {
-            public List<Integer> shortestPath(int n, int m, int edges[][]) {
+            public List<Integer> shortestPath(int n, int m, int[][] edges) {
 
                 // 1. Initialize adjacency list for 1-based indexing (0 to n)
                 List<List<int[]>> adjList = new ArrayList<>(); // Stores [neighborNode, edgeWeight]
@@ -2993,8 +3227,8 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
                     int v = edge[1];
                     int weight = edge[2];
 
-                    adjList.get(u).add(new int[] {v, weight});
-                    adjList.get(v).add(new int[] {u, weight});
+                    adjList.get(u).add(new int[]{v, weight});
+                    adjList.get(v).add(new int[]{u, weight});
                 }
 
                 // 3. Setup tracking arrays for Dijkstra
@@ -3006,7 +3240,7 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
                     parent[i] = i;
                 }
 
-                // 4. Initialize source node
+                // 4. Initialize source node (vertex 1)
                 distances[1] = 0;
                 PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1])); // [node, distance]
                 minHeap.add(new int[]{1, 0});
@@ -3036,7 +3270,7 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
                     }
                 }
 
-                // 6. Path Reconstruction (Moved safely outside the while loop)
+                // 6. Path Reconstruction
                 // If the destination node 'n' was never reached, return [-1]
                 if (distances[n] == Integer.MAX_VALUE) {
                     ArrayList<Integer> noPathResult = new ArrayList<>();
@@ -3044,20 +3278,25 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
                     return noPathResult;
                 }
 
-                ArrayList<Integer> shortestPath = new ArrayList<>();
+                ArrayList<Integer> path = new ArrayList<>();
                 int currentNode = n;
 
                 // Trace back from destination to source using the parent tracker
                 while (currentNode != parent[currentNode]) {
-                    shortestPath.add(currentNode);
+                    path.add(currentNode);
                     currentNode = parent[currentNode];
                 }
-                shortestPath.add(1); // Add the source node
+                path.add(1); // Add the source node
 
                 // Reverse to orient path from source -> destination
-                Collections.reverse(shortestPath);
+                Collections.reverse(path);
 
-                return shortestPath;
+                // Prepend total path weight as required by the problem prompt
+                ArrayList<Integer> result = new ArrayList<>();
+                result.add(distances[n]);
+                result.addAll(path);
+
+                return result;
             }
         }
 
