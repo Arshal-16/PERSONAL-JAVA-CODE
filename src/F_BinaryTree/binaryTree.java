@@ -1049,6 +1049,180 @@ public class binaryTree {
 
      */
 
+    // Maximum Depth of Binary Tree
+
+    /* Using recursion
+
+             Note on "Depth" vs "Height":
+         - Technically, "Depth" measures top-down (distance from root to a node).
+         - "Height" measures bottom-up (distance from a node to its deepest leaf).
+         - The Maximum Depth of a tree is numerically equal to the Height of the root node.
+
+         This recursive approach computes the height of the root bottom-up,
+         which gives us the maximum depth cleanly without passing an extra depth parameter.
+
+            class Solution {
+
+                public int maxDepth(TreeNode root) {
+                    // Base case: An empty tree/sub-tree has a height/depth of 0
+                    if (root == null) {
+                        return 0;
+                    }
+
+                    // Recursively compute the height of left and right subtrees
+                    int maxLeftDepth = maxDepth(root.left);
+                    int maxRightDepth = maxDepth(root.right);
+
+                    // Current node's height = 1 + max height of its subtrees
+                    return 1 + Math.max(maxLeftDepth, maxRightDepth);
+                }
+            }
+
+     */
+
+    /* Using level order traversal
+
+            class Solution {
+
+            public int maxDepth(TreeNode root) {
+                if (root == null) {
+                    return 0;
+                }
+
+                Queue<TreeNode> traversalQueue = new ArrayDeque<>();
+                int maxDepth = 0;
+                traversalQueue.add(root);
+
+                while (!traversalQueue.isEmpty()) {
+                    int currentLevelSize = traversalQueue.size();
+                    maxDepth++;
+
+                    // Process all nodes at the current level
+                    for (int i = 0; i < currentLevelSize; i++) {
+                        TreeNode currentNode = traversalQueue.remove();
+
+                        if (currentNode.left != null) {
+                            traversalQueue.add(currentNode.left);
+                        }
+
+                        if (currentNode.right != null) {
+                            traversalQueue.add(currentNode.right);
+                        }
+                    }
+                }
+
+                return maxDepth;
+            }
+        }
+
+     */
+
+    // Balanced Binary Tree
+
+    /*
+
+            class Solution {
+
+            public boolean isBalanced(TreeNode root) {
+                // If checkHeight returns -1, the tree is unbalanced
+                return checkHeight(root) != -1;
+            }
+
+            private int checkHeight(TreeNode currentNode) {
+                // Base case: An empty subtree has height 0
+                if (currentNode == null) {
+                    return 0;
+                }
+
+                // Check left subtree
+                int leftSubtreeHeight = checkHeight(currentNode.left);
+                if (leftSubtreeHeight == -1) {
+                    return -1; // Left subtree is unbalanced
+                }
+
+                // Check right subtree
+                int rightSubtreeHeight = checkHeight(currentNode.right);
+                if (rightSubtreeHeight == -1) {
+                    return -1; // Right subtree is unbalanced
+                }
+
+                // Check current node's balance condition
+                if (Math.abs(leftSubtreeHeight - rightSubtreeHeight) > 1) {
+                    return -1; // Current node is unbalanced
+                }
+
+                // Return height of current node if balanced
+                return 1 + Math.max(leftSubtreeHeight, rightSubtreeHeight);
+            }
+        }
+
+     */
+
+    // Diameter of Binary Tree
+
+    /*
+
+     class Solution {
+
+            public int diameterOfBinaryTree(TreeNode root) {
+                int[] maxDiameter = new int[1];
+                calculateHeightAndDiameter(root, maxDiameter);
+                return maxDiameter[0];
+            }
+
+            private int calculateHeightAndDiameter(TreeNode currentNode, int[] maxDiameter) {
+                // Base case: An empty node has a height of 0
+                if (currentNode == null) {
+                    return 0;
+                }
+
+                // Recursively calculate heights of left and right subtrees
+                int leftSubtreeHeight = calculateHeightAndDiameter(currentNode.left, maxDiameter);
+                int rightSubtreeHeight = calculateHeightAndDiameter(currentNode.right, maxDiameter);
+
+                // Update maximum diameter assuming the current node is the highest point (turning point) of the path
+                maxDiameter[0] = Math.max(maxDiameter[0], leftSubtreeHeight + rightSubtreeHeight);
+
+                // Return height of current subtree
+                return 1 + Math.max(leftSubtreeHeight, rightSubtreeHeight);
+            }
+        }
+
+     */
+
+    /*
+
+     class Solution {
+
+            // Instance variable to track the global maximum diameter
+            private int maxDiameter = 0;
+
+            public int diameterOfBinaryTree(TreeNode root) {
+                maxDiameter = 0; // Reset for every new function call (good practice on LeetCode)
+                calculateHeight(root);
+                return maxDiameter;
+            }
+
+            private int calculateHeight(TreeNode currentNode) {
+                // Base case: An empty node has a height of 0
+                if (currentNode == null) {
+                    return 0;
+                }
+
+                // Recursively calculate heights of subtrees
+                int leftSubtreeHeight = calculateHeight(currentNode.left);
+                int rightSubtreeHeight = calculateHeight(currentNode.right);
+
+                // Update global max diameter if path through currentNode is longer
+                maxDiameter = Math.max(maxDiameter, leftSubtreeHeight + rightSubtreeHeight);
+
+                // Return height of current subtree
+                return 1 + Math.max(leftSubtreeHeight, rightSubtreeHeight);
+            }
+        }
+
+     */
+
 
 }
 
