@@ -1160,6 +1160,110 @@ public class binaryTree {
 
      */
 
+    // Binary Tree Zigzag Level Order Traversal
+
+    /*
+
+      class Solution {
+
+            public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+
+                List<List<Integer>> traversalOrder = new ArrayList<>();
+
+                if (root == null) {
+                    return traversalOrder;
+                }
+
+                Queue<TreeNode> traversalQueue = new ArrayDeque<>();
+                boolean leftToRight = true;
+
+                traversalQueue.add(root);
+
+                while (!traversalQueue.isEmpty()) {
+
+                    int currentLevelSize = traversalQueue.size();
+                    List<Integer> currentLevel = new ArrayList<>();
+
+                    for (int i = 0; i < currentLevelSize; i++) {
+
+                        TreeNode currentNode = traversalQueue.remove();
+                        currentLevel.add(currentNode.val);
+
+                        if (currentNode.left != null) {
+                            traversalQueue.add(currentNode.left);
+                        }
+                        if (currentNode.right != null) {
+                            traversalQueue.add(currentNode.right);
+                        }
+                    }
+
+                    // Reverse current level values if processing right-to-left
+                    if (!leftToRight) {
+                        Collections.reverse(currentLevel);
+                    }
+
+                    traversalOrder.add(currentLevel);
+                    leftToRight = !leftToRight; // Toggle flag for next level
+                }
+
+                return traversalOrder;
+            }
+        }
+
+     */
+
+    /* Slightly Optimised Version, here we won't have to reverse like we did in arraylist
+
+        class Solution {
+
+            public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+
+                List<List<Integer>> traversalOrder = new ArrayList<>();
+
+                if (root == null) {
+                    return traversalOrder;
+                }
+
+                Queue<TreeNode> traversalQueue = new ArrayDeque<>();
+                boolean leftToRight = true;
+
+                traversalQueue.add(root);
+
+                while (!traversalQueue.isEmpty()) {
+
+                    int currentLevelSize = traversalQueue.size();
+
+                    // Use LinkedList as a Deque to allow O(1) insertions at both ends
+                    LinkedList<Integer> currentLevel = new LinkedList<>();
+
+                    for (int i = 0; i < currentLevelSize; i++) {
+                        TreeNode currentNode = traversalQueue.remove();
+
+                        // Insert based on current level direction
+                        if (leftToRight) {
+                            currentLevel.addLast(currentNode.val);  // Normal order
+                        } else {
+                            currentLevel.addFirst(currentNode.val); // Reverse order
+                        }
+
+                        if (currentNode.left != null) {
+                            traversalQueue.add(currentNode.left);
+                        }
+                        if (currentNode.right != null) {
+                            traversalQueue.add(currentNode.right);
+                        }
+                    }
+
+                    traversalOrder.add(currentLevel);
+                    leftToRight = !leftToRight; // Toggle direction for the next level
+                }
+
+                return traversalOrder;
+            }
+        }
+
+     */
+
 
 }
 
