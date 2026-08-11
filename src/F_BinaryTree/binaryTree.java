@@ -63,127 +63,6 @@ public class binaryTree {
 
     /// ///////// MEDIUM PROBLEMS //////////////////
 
-    //MAXIMUM DEPTH OF A BINARY TREE
-    public int maxDepth(Node root) {
-        if (root == null) return 0;
-
-        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
-    }
-
-    //CHECK IF THE BINARY TREE IS BALANCED BINARY TREE
-
-    //brute tc = n^2, sc= height of tree
-    public boolean isBalancedBinaryTree(Node root) {
-        if (root == null) return true;
-
-        return (Math.abs(maxDepth(root.left) - maxDepth(root.right)) <= 1) && isBalancedBinaryTree(root.left) && isBalancedBinaryTree(root.right);
-    }
-
-    //optimal
-    public int[] isBalancedOptimal(Node root) { //[balanced,height]
-        if (root == null) return new int[]{1, 0};
-        int left[] = isBalancedOptimal(root.left);
-        int right[] = isBalancedOptimal(root.right);
-        int balancedFlag = (Math.abs(left[1] - right[1]) <= 1) && (left[0] == 1) && (right[0] == 1) ? 1 : 0;
-        int height = Math.max(left[1], right[1]) + 1;
-        return new int[]{balancedFlag, height};
-    }
-
-    //another optimal (just a wrapper over our logic)
-    //returns height if tree is balanced otherwise -1
-    public int dfsHeight(Node root) {
-        // returns balanced?height:-1
-        // Base case: if the current node is NULL, return 0 (height of an empty tree)
-        if (root == null) return 0;
-
-        // Recursively calculate the height of the left subtree
-        int leftHeight = dfsHeight(root.left);
-
-        // If the left subtree is unbalanced, propagate the unbalance status
-        if (leftHeight == -1)
-            return -1;
-
-        // Recursively calculate the height of the right subtree
-        int rightHeight = dfsHeight(root.right);
-
-        // If the right subtree is unbalanced, propagate the unbalance status
-        if (rightHeight == -1)
-            return -1;
-
-        // Check if the difference in height between left and right subtrees is greater than 1
-        // If it's greater, the tree is unbalanced, return -1 to propagate the unbalance status
-        if (Math.abs(leftHeight - rightHeight) > 1)
-            return -1;
-
-        // Return the maximum height of left and right subtrees plus 1 (for the current node)
-        return Math.max(leftHeight, rightHeight) + 1;
-    }
-
-    public boolean isBalanced(Node root) {
-        return dfsHeight(root) != -1;
-    }
-
-    //CALCULATE THE DIAMETER OF A BINARY TREE
-    int diameter = 0;
-
-    int heightForDia(Node root) {
-        if (root == null) return 0;
-        int leftHeight = heightForDia(root.left);
-        int rightHeight = heightForDia(root.right);
-        diameter = Math.max(diameter, leftHeight + rightHeight);
-        return Math.max(leftHeight, rightHeight) + 1;
-    }
-
-    int diameterOfTree(Node root) {
-        heightForDia(root);
-        return diameter;
-    }
-
-    //MAXIMUM SUM PATH IN BINARY TREE
-
-    // Returns the maximum path sum starting from this node and extending downward
-    int maxPathDown(Node root, int maxVal[]) {
-        if (root == null) return 0;
-
-        // Get max contribution from left subtree (ignore if negative)
-        int left = Math.max(0, maxPathDown(root.left, maxVal));
-
-        // Get max contribution from right subtree (ignore if negative)
-        int right = Math.max(0, maxPathDown(root.right, maxVal));
-
-        // Update global maximum:
-        // Case where current node is the highest point (path passes through it)
-        maxVal[0] = Math.max(maxVal[0], root.data + left + right);
-
-        // Return max path sum including current node and ONE subtree
-        // (only one branch can be extended upwards)
-        return root.data + Math.max(left, right);
-    }
-
-    int maxPathSum(Node root) {
-        if (root == null) return 0;
-
-        // Stores the overall maximum path sum across all nodes
-        int maxVal[] = new int[]{Integer.MIN_VALUE};
-
-        maxPathDown(root, maxVal);
-
-        return maxVal[0];
-    }
-
-    //CHECK IF TWO TREES ARE IDENTICAL
-    public boolean isIdentical(Node rootA, Node rootB) {
-        //check root
-        if (rootA == null || rootB == null) return rootA == rootB;
-        if (rootA.data != rootB.data) return false;
-
-        //check for subtrees
-        boolean leftSubtrees = isIdentical(rootA.left, rootB.left);
-        boolean rightSubtrees = isIdentical(rootA.right, rootB.right);
-
-        return leftSubtrees && rightSubtrees;
-    }
-
     //ZIG ZAG TRAVERSAL OF BINARY TREE
     public ArrayList<ArrayList<Integer>> zigZagTraversal(Node root) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
@@ -1049,6 +928,8 @@ public class binaryTree {
 
      */
 
+    /////////////////////// MEDIUM PROBLEMS ////////////////////////////
+
     // Maximum Depth of Binary Tree
 
     /* Using recursion
@@ -1218,6 +1099,62 @@ public class binaryTree {
 
                 // Return height of current subtree
                 return 1 + Math.max(leftSubtreeHeight, rightSubtreeHeight);
+            }
+        }
+
+     */
+
+    // Binary Tree Maximum Path Sum
+
+    /*
+
+        class Solution {
+
+            // Initialized to Integer.MIN_VALUE instead of 0 because the tree might contain only
+            // negative nodes, and the problem requires a non-empty path (returning the least
+            // negative node value rather than 0).
+            private int maxPathSum = Integer.MIN_VALUE;
+
+            public int maxPathSum(TreeNode root) {
+                calculateMaxPath(root);
+                return maxPathSum;
+            }
+
+            private int calculateMaxPath(TreeNode currentNode) {
+                if (currentNode == null) {
+                    return 0;
+                }
+
+                // Cap negative sums to 0 (ignore subtrees with negative totals)
+                int maxLeftPath = Math.max(0, calculateMaxPath(currentNode.left));
+                int maxRightPath = Math.max(0, calculateMaxPath(currentNode.right));
+
+                // Update maximum path sum treating currentNode as the turning point
+                maxPathSum = Math.max(maxPathSum, maxLeftPath + maxRightPath + currentNode.val);
+
+                // Return max path sum extending up to the parent
+                return currentNode.val + Math.max(maxLeftPath, maxRightPath);
+            }
+        }
+
+     */
+
+    // Check if two trees are identical or not
+
+    /*
+
+        class Solution {
+
+            public boolean isSameTree(TreeNode firstNode, TreeNode secondNode) {
+                // Base case: If either node is null, both must be null to be identical
+                if (firstNode == null || secondNode == null) {
+                    return firstNode == secondNode;
+                }
+
+                // Structural and value check: Values match and subtrees match
+                return (firstNode.val == secondNode.val)
+                        && isSameTree(firstNode.left, secondNode.left)
+                        && isSameTree(firstNode.right, secondNode.right);
             }
         }
 
