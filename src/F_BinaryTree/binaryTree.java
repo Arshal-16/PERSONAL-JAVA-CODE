@@ -1264,6 +1264,111 @@ public class binaryTree {
 
      */
 
+    // Boundary Traversal
+
+    /*
+
+        import java.util.*;
+
+        class Solution {
+
+            public ArrayList<Integer> boundaryTraversal(Node root) {
+
+                ArrayList<Integer> result = new ArrayList<>();
+
+                if (root == null) {
+                    return result;
+                }
+
+                // 1. Add root node if it's not a leaf node
+                if (!isLeaf(root)) {
+                    result.add(root.data);
+                }
+
+                // 2. Traverse left boundary (top-down, excluding leaves)
+                leftBoundary(root.left, result);
+
+                // 3. Traverse all leaf nodes from left to right
+                leafNodes(root, result);
+
+                // 4. Traverse right boundary (bottom-up, excluding leaves)
+                rightBoundary(root.right, result);
+
+                return result;
+            }
+
+            // Helper method to check if a node is a leaf
+            private boolean isLeaf(Node node) {
+                if (node == null) {
+                    return false;
+                }
+                return node.left == null && node.right == null;
+            }
+
+            // Traverse left boundary top-down (skipping leaf nodes)
+            private void leftBoundary(Node root, ArrayList<Integer> result) {
+
+                Node curr = root;
+
+                while (curr != null) {
+                    if (!isLeaf(curr)) {
+                        result.add(curr.data);
+                    }
+
+                    // Prefer left child over right child
+                    if (curr.left != null) {
+                        curr = curr.left;
+                    } else {
+                        curr = curr.right;
+                    }
+                }
+            }
+
+            // Inorder traversal to collect all leaf nodes from left to right
+            private void leafNodes(Node root, ArrayList<Integer> result) {
+                if (root == null) {
+                    return;
+                }
+
+                if (isLeaf(root)) {
+                    result.add(root.data);
+                    return;
+                }
+
+                leafNodes(root.left, result);
+                leafNodes(root.right, result);
+            }
+
+            // Traverse right boundary bottom-up (skipping leaf nodes)
+            private void rightBoundary(Node root, ArrayList<Integer> result) {
+                Node curr = root;
+                ArrayList<Integer> temp = new ArrayList<>();
+
+                // Traverse down the right side top-down first
+                while (curr != null) {
+                    if (!isLeaf(curr)) {
+                        temp.add(curr.data);
+                    }
+
+                    // Prefer right child over left child
+                    if (curr.right != null) {
+                        curr = curr.right;
+                    } else {
+                        curr = curr.left;
+                    }
+                }
+
+                // Add to result in reverse order (bottom-up)
+                for (int i = temp.size() - 1; i >= 0; i--) {
+                    result.add(temp.get(i));
+                }
+            }
+        }
+
+     */
+
+
+
 
 }
 
