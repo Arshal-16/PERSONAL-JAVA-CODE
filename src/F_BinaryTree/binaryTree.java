@@ -1367,7 +1367,174 @@ public class binaryTree {
 
      */
 
+    // Vertical Order Traversal of a Binary Tree
 
+    /*
+
+
+
+     */
+
+    // Top View of Binary Tree
+
+    /*
+
+
+         WHY BFS (LEVEL ORDER) IS BETTER THAN DFS (RECURSIVE) FOR TOP / BOTTOM VIEW:
+         ----------------------------------------------------------------------------
+         1. In Top View, for any vertical distance column, we want the node that appears FIRST
+            at the SMALLEST depth (height).
+         2. Level Order Traversal naturally visits nodes level-by-level from top to bottom.
+            Therefore, the first node we encounter at any vertical distance is GUARANTEED to be
+            the highest node.
+         3. If we used DFS, a deep node on the left branch could be processed before a higher node
+            on the right branch at the same vertical distance. To fix this in DFS, we would be
+            forced to track both vertical distance AND node height/depth, adding extra complexity.
+
+
+            class Solution {
+
+                // Helper tuple to track a node alongside its vertical column coordinate
+                static class QueueEntry {
+                    Node node;
+                    int hd; // Horizontal distance relative to root (0)
+
+                    QueueEntry(Node node, int hd) {
+                        this.node = node;
+                        this.hd = hd;
+                    }
+                }
+
+                public ArrayList<Integer> topView(Node root) {
+                    ArrayList<Integer> topViewResult = new ArrayList<>();
+
+                    if (root == null) {
+                        return topViewResult;
+                    }
+
+                    // Stores map of Horizontal Distance -> First Node's Value
+                    Map<Integer, Integer> topViewMap = new HashMap<>();
+
+                    // Tracks bounds of horizontal distance to avoid sorting keys later
+                    int minHd = 0;
+                    int maxHd = 0;
+
+                    Queue<QueueEntry> queue = new ArrayDeque<>();
+                    queue.add(new QueueEntry(root, 0));
+
+                    while (!queue.isEmpty()) {
+                        QueueEntry current = queue.remove();
+                        Node currentNode = current.node;
+                        int currentHd = current.hd;
+
+                        // Add value to map ONLY if this vertical column hasn't been seen yet
+                        if (!topViewMap.containsKey(currentHd)) {
+                            topViewMap.put(currentHd, currentNode.data);
+                            minHd = Math.min(minHd, currentHd);
+                            maxHd = Math.max(maxHd, currentHd);
+                        }
+
+                        // Process left child (moves left by -1)
+                        if (currentNode.left != null) {
+                            queue.add(new QueueEntry(currentNode.left, currentHd - 1));
+                        }
+
+                        // Process right child (moves right by +1)
+                        if (currentNode.right != null) {
+                            queue.add(new QueueEntry(currentNode.right, currentHd + 1));
+                        }
+                    }
+
+                    // Collect node values from leftmost to rightmost column
+                    for (int hd = minHd; hd <= maxHd; hd++) {
+                        topViewResult.add(topViewMap.get(hd));
+                    }
+
+                    return topViewResult;
+                }
+            }
+
+     */
+
+    // Bottom View of Binary Tree
+
+    /*
+
+
+         WHY BFS (LEVEL ORDER) IS BETTER THAN DFS (RECURSIVE) FOR BOTTOM VIEW:
+         ----------------------------------------------------------------------------
+         1. In Bottom View, for any horizontal distance column, we want the node that appears LAST
+            at the GREATEST depth (height).
+         2. Level Order Traversal processes nodes level-by-level from top to bottom.
+            Therefore, simply overwriting the value in our map as we process nodes top-to-bottom
+            GUARANTEES that the final stored value for each horizontal distance is the deepest node.
+         3. If we used DFS, a shallower node processed later in the recursion could overwrite
+            a deeper node processed earlier at the same horizontal distance. To prevent this in DFS,
+            we would be forced to explicitly track and compare node depth/height for every entry.
+
+
+            class Solution {
+
+                // Helper tuple to track a node alongside its horizontal distance
+                static class QueueEntry {
+                    Node node;
+                    int hd; // Horizontal distance relative to root (0)
+
+                    QueueEntry(Node node, int hd) {
+                        this.node = node;
+                        this.hd = hd;
+                    }
+                }
+
+                public ArrayList<Integer> bottomView(Node root) {
+                    ArrayList<Integer> bottomViewResult = new ArrayList<>();
+
+                    if (root == null) {
+                        return bottomViewResult;
+                    }
+
+                    // Stores map of Horizontal Distance -> Latest Node's Value
+                    Map<Integer, Integer> bottomViewMap = new HashMap<>();
+
+                    // Tracks bounds of horizontal distance to construct result in order without TreeMap
+                    int minHd = 0;
+                    int maxHd = 0;
+
+                    Queue<QueueEntry> queue = new ArrayDeque<>();
+                    queue.add(new QueueEntry(root, 0));
+
+                    while (!queue.isEmpty()) {
+                        QueueEntry current = queue.remove();
+                        Node currentNode = current.node;
+                        int currentHd = current.hd;
+
+                        // OVERWRITE map value every time so the lowest/latest node seen wins
+                        bottomViewMap.put(currentHd, currentNode.data);
+
+                        minHd = Math.min(minHd, currentHd);
+                        maxHd = Math.max(maxHd, currentHd);
+
+                        // Process left child (moves left by -1)
+                        if (currentNode.left != null) {
+                            queue.add(new QueueEntry(currentNode.left, currentHd - 1));
+                        }
+
+                        // Process right child (moves right by +1)
+                        if (currentNode.right != null) {
+                            queue.add(new QueueEntry(currentNode.right, currentHd + 1));
+                        }
+                    }
+
+                    // Collect node values from leftmost to rightmost column
+                    for (int hd = minHd; hd <= maxHd; hd++) {
+                        bottomViewResult.add(bottomViewMap.get(hd));
+                    }
+
+                    return bottomViewResult;
+                }
+            }
+
+     */
 
 
 }
