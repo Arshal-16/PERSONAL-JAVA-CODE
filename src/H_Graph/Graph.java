@@ -3830,6 +3830,120 @@ A regular Queue blindly processes paths as they appear, leading to a massive ava
 
      */
 
+    // Network Delay Time
+
+    // Optimal using Dijkstra's algo
+    /*
+
+
+        class Solution {
+
+            public int networkDelayTime(int[][] times, int n, int k) {
+
+                // 1. Build Adjacency List: O(V + E)
+                List<List<int[]>> adjList = new ArrayList<>();
+                for (int i = 0; i <= n; i++) {
+                    adjList.add(new ArrayList<>());
+                }
+
+                for (int[] edge : times) {
+                    int u = edge[0];
+                    int v = edge[1];
+                    int weight = edge[2];
+                    adjList.get(u).add(new int[]{v, weight});
+                }
+
+                // 2. Initialize Distances Array
+                int[] minTime = new int[n + 1];
+                Arrays.fill(minTime, Integer.MAX_VALUE);
+
+                // 3. Min-Priority Queue ordered by path time: [node, timeFromSource]
+                PriorityQueue<int[]> minHeap = new PriorityQueue<>((pairA, pairB) -> Integer.compare(pairA[1], pairB[1]));
+
+                minTime[k] = 0;
+                minHeap.add(new int[]{k, 0});
+
+                // 4. Dijkstra Traversal: O(E log V)
+                while (!minHeap.isEmpty()) {
+                    int[] current = minHeap.remove();
+                    int currNode = current[0];
+                    int currTime = current[1];
+
+                    // Skip stale priority queue entries
+                    if (currTime > minTime[currNode]) {
+                        continue;
+                    }
+
+                    for (int[] neighbor : adjList.get(currNode)) {
+                        int neighborNode = neighbor[0];
+                        int travelTime = neighbor[1];
+                        int nextTime = currTime + travelTime;
+
+                        // Edge relaxation
+                        if (nextTime < minTime[neighborNode]) {
+                            minTime[neighborNode] = nextTime;
+                            minHeap.add(new int[]{neighborNode, nextTime});
+                        }
+                    }
+                }
+
+                // 5. Find the bottleneck signal time (Max of all shortest path times)
+                int maxDelay = 0;
+                for (int node = 1; node <= n; node++) {
+                    if (minTime[node] == Integer.MAX_VALUE) {
+                        return -1; // Unreachable node exists
+                    }
+                    maxDelay = Math.max(maxDelay, minTime[node]);
+                }
+
+                return maxDelay;
+            }
+        }
+
+     */
+
+    // Using Bellman Ford algo
+    /*
+
+
+        class Solution {
+
+            public int networkDelayTime(int[][] times, int n, int k) {
+
+                int infinity = Integer.MAX_VALUE;
+                int[] minTime = new int[n + 1];
+                Arrays.fill(minTime, infinity);
+
+                minTime[k] = 0; // Distance to source is 0
+
+                // Bellman-Ford Algorithm: Relax edges (n - 1) times
+                for (int i = 1; i <= n - 1; i++) {
+                    for (int[] time : times) {
+                        int src = time[0];
+                        int dest = time[1];
+                        int weight = time[2];
+
+                        if (minTime[src] != infinity && minTime[src] + weight < minTime[dest]) {
+                            minTime[dest] = minTime[src] + weight;
+                        }
+                    }
+                }
+
+                // Find the maximum time among all reachable nodes (1 to n)
+                int maxDelay = 0;
+                for (int node = 1; node <= n; node++) {
+                    if (minTime[node] == infinity) {
+                        return -1; // Unreachable node found
+                    }
+                    maxDelay = Math.max(maxDelay, minTime[node]);
+                }
+
+                return maxDelay;
+            }
+        }
+
+     */
+
     // Number of Ways to Arrive at Destination
 
     /*
