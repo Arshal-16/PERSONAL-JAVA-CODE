@@ -1371,7 +1371,180 @@ public class binaryTree {
 
     /*
 
+         Goal: Group tree nodes by vertical column (col), ordered from left to right.
+         - Nodes in the same column are ordered from top to bottom by row (row).
+         - If nodes share both the same row AND column, they must be sorted in
+           ascending order by their values.
 
+
+            class Solution {
+
+                // Helper tuple to store node along with its 2D coordinates (row, col)
+                private static class NodeState {
+                    TreeNode node;
+                    int row;
+                    int col;
+
+                    NodeState(TreeNode node, int row, int col) {
+                        this.node = node;
+                        this.row = row;
+                        this.col = col;
+                    }
+                }
+
+                public List<List<Integer>> verticalTraversal(TreeNode root) {
+                    List<List<Integer>> verticalTraversalResult = new ArrayList<>();
+
+                    if (root == null) {
+                        return verticalTraversalResult;
+                    }
+
+                    // Data structure: Column -> (Row -> Min-Heap of Node Values)
+                    Map<Integer, Map<Integer, PriorityQueue<Integer>>> colMap = new HashMap<>();
+
+                    // Bounds tracking to iterate in column/row order without sorting
+                    int minCol = 0;
+                    int maxCol = 0;
+                    int maxRow = 0;
+
+                    Queue<NodeState> queue = new ArrayDeque<>();
+                    queue.add(new NodeState(root, 0, 0));
+
+                    // Step 1: BFS Traversal to collect coordinates and node values
+                    while (!queue.isEmpty()) {
+                        NodeState current = queue.poll();
+                        TreeNode currentNode = current.node;
+                        int currentRow = current.row;
+                        int currentCol = current.col;
+
+                        // Update global boundaries
+                        minCol = Math.min(minCol, currentCol);
+                        maxCol = Math.max(maxCol, currentCol);
+                        maxRow = Math.max(maxRow, currentRow);
+
+                        // Cleanly insert value into nested map structure
+                        colMap.computeIfAbsent(currentCol, k -> new HashMap<>())
+                                .computeIfAbsent(currentRow, k -> new PriorityQueue<>())
+                                .add(currentNode.val);
+
+                        // Process left child (moves down a row, left a column)
+                        if (currentNode.left != null) {
+                            queue.add(new NodeState(currentNode.left, currentRow + 1, currentCol - 1));
+                        }
+
+                        // Process right child (moves down a row, right a column)
+                        if (currentNode.right != null) {
+                            queue.add(new NodeState(currentNode.right, currentRow + 1, currentCol + 1));
+                        }
+                    }
+
+                    // Step 2: Build final result list from leftmost column to rightmost column
+                    for (int col = minCol; col <= maxCol; col++) {
+                        List<Integer> currentColumnList = new ArrayList<>();
+                        Map<Integer, PriorityQueue<Integer>> levelMap = colMap.get(col);
+
+                        // Skip if this vertical distance column contains no nodes
+                        if (levelMap == null) {
+                            continue;
+                        }
+
+                        for (int row = 0; row <= maxRow; row++) {
+                            if (!levelMap.containsKey(row)) {
+                                continue;
+                            }
+
+                            PriorityQueue<Integer> minHeap = levelMap.get(row);
+
+                            // Drain sorted elements for current (col, row) position
+                            while (!minHeap.isEmpty()) {
+                                currentColumnList.add(minHeap.poll());
+                            }
+                        }
+
+                        if (!currentColumnList.isEmpty()) {
+                            verticalTraversalResult.add(currentColumnList);
+                        }
+                    }
+
+                    return verticalTraversalResult;
+                }
+            }
+
+     */
+
+    /*
+
+         ----------------------------------------------------------------------------
+         Time Complexity: O(N log N) -> dominated by sorting nodes in the same column/row.
+         Space Complexity: O(N) -> to store all nodes in a flat list.
+
+         Why DFS + Sorting is optimal here:
+         1. Avoids expensive nested Map/PriorityQueue allocations.
+         2. Custom sorting handles column order, row order, AND node value tie-breaking
+            in a single pass.
+
+
+            class Solution {
+
+                private static class NodeInfo {
+                    int col;
+                    int row;
+                    int val;
+
+                    NodeInfo(int col, int row, int val) {
+                        this.col = col;
+                        this.row = row;
+                        this.val = val;
+                    }
+                }
+
+                public List<List<Integer>> verticalTraversal(TreeNode root) {
+                    List<NodeInfo> nodeList = new ArrayList<>();
+
+                    // Step 1: Collect all node coordinates via DFS
+                    dfs(root, 0, 0, nodeList);
+
+                    // Step 2: Sort based on problem rules
+                    // 1. Primary: Leftmost column first (col ASC)
+                    // 2. Secondary: Topmost row first (row ASC)
+                    // 3. Tertiary: Smaller value first (val ASC)
+                    Collections.sort(nodeList, (a, b) -> {
+                        if (a.col != b.col) return Integer.compare(a.col, b.col);
+                        if (a.row != b.row) return Integer.compare(a.row, b.row);
+                        return Integer.compare(a.val, b.val);
+                    });
+
+                    // Step 3: Group sorted nodes into columns
+                    List<List<Integer>> result = new ArrayList<>();
+                    if (nodeList.isEmpty()) return result;
+
+                    List<Integer> currentColumn = new ArrayList<>();
+                    int lastCol = nodeList.get(0).col;
+
+                    for (NodeInfo node : nodeList) {
+                        // New column reached -> flush previous column to result
+                        if (node.col != lastCol) {
+                            result.add(currentColumn);
+                            currentColumn = new ArrayList<>();
+                            lastCol = node.col;
+                        }
+                        currentColumn.add(node.val);
+                    }
+
+                    // Add the final column
+                    result.add(currentColumn);
+
+                    return result;
+                }
+
+                private void dfs(TreeNode node, int row, int col, List<NodeInfo> nodeList) {
+                    if (node == null) return;
+
+                    nodeList.add(new NodeInfo(col, row, node.val));
+                    dfs(node.left, row + 1, col - 1, nodeList);
+                    dfs(node.right, row + 1, col + 1, nodeList);
+                }
+            }
 
      */
 
