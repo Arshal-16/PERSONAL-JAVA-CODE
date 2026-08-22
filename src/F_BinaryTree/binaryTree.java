@@ -1709,6 +1709,95 @@ public class binaryTree {
 
      */
 
+    // Binary Tree Right Side View
+
+    /*
+
+         Approach: Root -> Right -> Left Recursive DFS
+
+         Why it works:
+         1. By visiting right children first, the first node encountered at any given
+            depth/level is guaranteed to be the rightmost node visible from that side.
+         2. We use `level == rightViewResult.size()` to detect if it's our first time
+            visiting this level.
+
+
+            class Solution {
+
+                public List<Integer> rightSideView(TreeNode root) {
+                    List<Integer> rightViewResult = new ArrayList<>();
+
+                    // Start DFS from root at level 0
+                    fetchRightSideViewDFS(root, 0, rightViewResult);
+
+                    return rightViewResult;
+                }
+
+                private void fetchRightSideViewDFS(TreeNode currentNode, int currentLevel, List<Integer> rightViewResult) {
+                    if (currentNode == null) {
+                        return;
+                    }
+
+                    // First time reaching this level -> current node is the rightmost node
+                    if (currentLevel == rightViewResult.size()) {
+                        rightViewResult.add(currentNode.val);
+                    }
+
+                    // Prioritize right branch first, then left branch
+                    fetchRightSideViewDFS(currentNode.right, currentLevel + 1, rightViewResult);
+                    fetchRightSideViewDFS(currentNode.left, currentLevel + 1, rightViewResult);
+                }
+            }
+
+     */
+
+    // Symmetric Tree
+
+    /*
+
+
+         Approach: Mirror Comparison via Recursive DFS
+
+         Logic:
+         Two subtrees are mirror images if:
+         1. Their root values are equal.
+         2. Left subtree of the left node is a mirror of the right subtree of the right node.
+         3. Right subtree of the left node is a mirror of the left subtree of the right node.
+
+
+            class Solution {
+
+                public boolean isSymmetric(TreeNode root) {
+
+                    if (root == null) {
+                        return true;
+                    }
+
+                    return isMirror(root.left, root.right);
+                }
+
+                private boolean isMirror(TreeNode leftNode, TreeNode rightNode) {
+
+                    // Base case: If either node is null, both must be null to be symmetric
+                    if (leftNode == null || rightNode == null) {
+                        return leftNode == rightNode;
+                    }
+
+                    // Values must match
+                    if (leftNode.val != rightNode.val) {
+                        return false;
+                    }
+
+                    // Cross-compare subtrees (Outer branches & Inner branches)
+                    boolean isOuterSymmetric = isMirror(leftNode.left, rightNode.right);
+                    boolean isInnerSymmetric = isMirror(leftNode.right, rightNode.left);
+
+                    return isOuterSymmetric && isInnerSymmetric;
+                }
+            }
+
+     */
+
 
 }
 
