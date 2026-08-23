@@ -565,6 +565,10 @@ public class binaryTree {
 
      */
 
+    // Preorder Inorder Postorder Traversals in One Traversal
+
+
+
     /////////////////////// MEDIUM PROBLEMS ////////////////////////////
 
     // Maximum Depth of Binary Tree
@@ -1434,6 +1438,171 @@ public class binaryTree {
             }
 
      */
+
+    // ROOT TO NODE PATH IN BINARY TREE
+
+    /*
+
+         ROOT TO NODE PATH IN BINARY TREE
+         ----------------------------------------------------------------------------
+         Approach: Backtracking via DFS
+
+         Logic:
+         1. Add current node to path list.
+         2. If current node is the target, return true.
+         3. Recursively search left and right subtrees.
+         4. If target is not found in either branch, backtrack by removing the node.
+
+
+            class Solution {
+
+                public List<Integer> rootToNodePath(TreeNode root, TreeNode targetNode) {
+                    List<Integer> pathResult = new ArrayList<>();
+
+                    if (root == null || targetNode == null) {
+                        return pathResult;
+                    }
+
+                    findPathDFS(root, targetNode, pathResult);
+                    return pathResult;
+                }
+
+                private boolean findPathDFS(TreeNode currentNode, TreeNode targetNode, List<Integer> path) {
+                    if (currentNode == null) {
+                        return false;
+                    }
+
+                    // Add current node data to tentative path
+                    path.add(currentNode.data);
+
+                    // Target reached
+                    if (currentNode == targetNode || currentNode.data == targetNode.data) {
+                        return true;
+                    }
+
+                    // Explore left and right branches
+                    if (findPathDFS(currentNode.left, targetNode, path) ||
+                            findPathDFS(currentNode.right, targetNode, path)) {
+                        return true;
+                    }
+
+                    // Backtrack if target node is not found in subtrees
+                    path.remove(path.size() - 1);
+                    return false;
+                }
+            }
+
+     */
+
+    // Lowest Common Ancestor of a Binary Tree
+
+    /* OPTIMAL SOLUTION
+
+
+         Logic:
+         1. Base Case: If root is null, or matches either target node (p or q), return root.
+         2. Recursively search left and right subtrees.
+         3. Evaluation:
+            - If left is null -> return right result.
+            - If right is null -> return left result.
+            - If both left and right are non-null -> current node is the LCA split point!
+
+
+            class Solution {
+
+                public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+
+                    // Base case: empty node or found one of the target nodes
+                    if (root == null || root == p || root == q) {
+                        return root;
+                    }
+
+                    TreeNode leftLca = lowestCommonAncestor(root.left, p, q);
+                    TreeNode rightLca = lowestCommonAncestor(root.right, p, q);
+
+                    // If target node is missing in left branch, return right result
+                    if (leftLca == null) {
+                        return rightLca;
+                    }
+
+                    // If target node is missing in right branch, return left result
+                    if (rightLca == null) {
+                        return leftLca;
+                    }
+
+                    // Both branches returned non-null -> root is the lowest common ancestor
+                    return root;
+                }
+            }
+
+     */
+
+    /*
+
+         Approach: Path Finding + Array Comparison
+
+         Logic:
+         1. Find the sequence of nodes from root to p (pathP).
+         2. Find the sequence of nodes from root to q (pathQ).
+         3. Compare pathP and pathQ from start to finish.
+         4. The last matching node before divergence is the Lowest Common Ancestor.
+
+         Time Complexity  : O(N) - Two DFS traversals O(N) + path comparison O(H)
+         Space Complexity : O(H) - Lists to store path nodes up to tree height H
+
+
+            class Solution {
+
+                public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+
+                    List<TreeNode> pathP = new ArrayList<>();
+                    List<TreeNode> pathQ = new ArrayList<>();
+
+                    // Generate paths from root to both nodes
+                    getPath(root, p, pathP);
+                    getPath(root, q, pathQ);
+
+                    // Find the last common node in both paths
+                    TreeNode lcaNode = null;
+                    int minPathLength = Math.min(pathP.size(), pathQ.size());
+
+                    for (int i = 0; i < minPathLength; i++) {
+                        if (pathP.get(i) == pathQ.get(i)) {
+                            lcaNode = pathP.get(i);
+                        } else {
+                            break; // Paths diverged
+                        }
+                    }
+
+                    return lcaNode;
+                }
+
+                private boolean getPath(TreeNode currentNode, TreeNode targetNode, List<TreeNode> currentPath) {
+                    if (currentNode == null) {
+                        return false;
+                    }
+
+                    currentPath.add(currentNode);
+
+                    if (currentNode == targetNode) {
+                        return true;
+                    }
+
+                    // Search left and right subtrees
+                    if (getPath(currentNode.left, targetNode, currentPath) ||
+                            getPath(currentNode.right, targetNode, currentPath)) {
+                        return true;
+                    }
+
+                    // Backtrack if target is not found in this path
+                    currentPath.remove(currentPath.size() - 1);
+                    return false;
+                }
+            }
+
+     */
+
+    
 
 
 }
