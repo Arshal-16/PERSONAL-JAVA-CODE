@@ -1602,6 +1602,101 @@ public class binaryTree {
 
      */
 
+    // Maximum Width of Binary Tree
+
+    /*
+
+         CONCEPT: BINARY TREE INDEXING & LEVEL WIDTH
+         ----------------------------------------------------------------------------
+         1. Complete Binary Tree Indexing:
+            We can map binary tree nodes to array indices as if it were a Complete Binary Tree.
+
+            - 0-Based Indexing (Current node = i):
+              * Left Child  = 2 * i + 1
+              * Right Child = 2 * i + 2
+
+            - 1-Based Indexing (Current node = i):
+              * Left Child  = 2 * i
+              * Right Child = 2 * i + 1
+
+         2. Overflow Problem in Skewed Trees:
+            If a tree is deeply skewed (e.g., up to 10^5 nodes), calculating `2 * i + 1`
+            repetitively will exponentially blow past `Integer.MAX_VALUE` and cause integer overflow.
+
+         3. Solution (Level-Wise Index Normalization):
+            To prevent overflow, we normalize node indices at every level.
+            Before generating child indices, we subtract the level's minimum index (`startIdx`)
+            from the current node's index:
+              `normalizedIdx = currentIndex - startIdx`
+
+            This resets the first node of every level to index `0`, keeping indices small
+            and safe while preserving relative distances between nodes.
+
+         4. Width Definition:
+            Width of any level = `(endIdx - startIdx) + 1`
+            (including null node spaces between the leftmost and rightmost non-null nodes).
+         ----------------------------------------------------------------------------
+
+
+            class Solution {
+
+                // Helper tuple storing node reference and its index at the current level
+                private static class NodeInfo {
+                    TreeNode node;
+                    int index;
+
+                    NodeInfo(TreeNode node, int index) {
+                        this.node = node;
+                        this.index = index;
+                    }
+                }
+
+                public int widthOfBinaryTree(TreeNode root) {
+
+                    if (root == null) {
+                        return 0;
+                    }
+
+                    int maxWidth = 0;
+                    ArrayDeque<NodeInfo> queue = new ArrayDeque<>();
+                    // Following 0-based indexing
+                    queue.add(new NodeInfo(root, 0));
+
+                    while (!queue.isEmpty()) {
+                        int levelSize = queue.size();
+
+                        // First and last node indices at the current level
+                        int startIdx = queue.getFirst().index;
+                        int endIdx = queue.getLast().index;
+
+                        // Calculate width for current level
+                        maxWidth = Math.max(maxWidth, (endIdx - startIdx) + 1);
+
+                        for (int i = 0; i < levelSize; i++) {
+                            NodeInfo current = queue.remove();
+                            TreeNode currentNode = current.node;
+
+                            // Subtract startIdx to reset index origin to 0 (prevents integer overflow)
+                            int normalizedIdx = current.index - startIdx;
+
+                            if (currentNode.left != null) {
+                                queue.add(new NodeInfo(currentNode.left, 2 * normalizedIdx + 1));
+                            }
+
+                            if (currentNode.right != null) {
+                                queue.add(new NodeInfo(currentNode.right, 2 * normalizedIdx + 2));
+                            }
+                        }
+                    }
+
+                    return maxWidth;
+                }
+            }
+
+     */
+
+
+
     
 
 
