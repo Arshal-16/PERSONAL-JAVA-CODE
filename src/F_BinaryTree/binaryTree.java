@@ -1695,9 +1695,88 @@ public class binaryTree {
 
      */
 
+    // Children Sum in a Binary Tree
+
+    /*
+
+         CONCEPT: CONVERT ARBITRARY BINARY TREE TO CHILDREN SUM PROPERTY
+         ----------------------------------------------------------------------------
+         Rule: Node value MUST equal sum of its left and right children values:
+               `node.data = node.left.data + node.right.data`
+         Constraint: You can ONLY INCREASE node values (decrementing is NOT allowed).
+
+         Strategy (Top-Down Increment + Bottom-Up Backpropagation):
+         1. Top-Down Phase:
+            - Compare parent (`root.data`) with child sum (`childSum`).
+            - If `childSum >= root.data`: Update parent value `root.data = childSum`.
+            - If `childSum < root.data`: Push the larger parent value DOWN to both children
+              (`root.left.data = root.data`, `root.right.data = root.data`). This ensures children
+              never decrease in value.
+         2. Recursive Step:
+            - Recursively process left and right subtrees.
+         3. Bottom-Up Backpropagation Phase:
+            - On the return journey up the recursion stack, re-calculate the exact sum
+              of updated children and update the parent `root.data = left.data + right.data`.
+         ----------------------------------------------------------------------------
 
 
-    
+            class Solution {
+
+                public void changeTreeToChildrenSumTree(Node root) {
+                    if (root == null) {
+                        return;
+                    }
+
+                    // Step 1: Top-Down Phase - Ensure children values are sufficient
+                    int childSum = 0;
+
+                    if (root.left != null) {
+                        childSum += root.left.data;
+                    }
+
+                    if (root.right != null) {
+                        childSum += root.right.data;
+                    }
+
+                    if (childSum >= root.data) {
+                        root.data = childSum;
+                    } else {
+                        // Push parent value down to children to avoid decreasing values
+                        if (root.left != null) {
+                            root.left.data = root.data;
+                        }
+                        if (root.right != null) {
+                            root.right.data = root.data;
+                        }
+                    }
+
+                    // Step 2: Recurse into subtrees
+                    changeTreeToChildrenSumTree(root.left);
+                    changeTreeToChildrenSumTree(root.right);
+
+                    // Step 3: Bottom-Up Phase - Sum up subtrees to set exact parent value
+                    int totalChildSum = 0;
+
+                    if (root.left != null) {
+                        totalChildSum += root.left.data;
+                    }
+
+                    if (root.right != null) {
+                        totalChildSum += root.right.data;
+                    }
+
+                    // Only update non-leaf nodes (leaves must retain their increased values)
+                    if (root.left != null || root.right != null) {
+                        root.data = totalChildSum;
+                    }
+                }
+            }
+
+     */
+
+    //
+
+
 
 
 }
