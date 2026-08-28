@@ -1774,7 +1774,272 @@ public class binaryTree {
 
      */
 
-    //
+    // All Nodes Distance K in Binary Tree
+
+    /*
+
+         ----------------------------------------------------------------------------
+         Approach: Graph Transformation + BFS
+
+         Logic:
+         1. Convert directed binary tree into an undirected graph by populating a parent map.
+         2. Perform BFS level-by-level starting from the `target` node up to distance K.
+         3. Use a `visited` set to avoid traversing backward to already processed nodes.
+
+         Time Complexity  : O(N) - Builds parent map in O(N) and visits each node at most once in BFS
+         Space Complexity : O(N) - Stores parent relationships, visited set, and BFS queue
+
+
+            class Solution {
+
+                public List<Integer> distanceK(TreeNode root, TreeNode target, int k) {
+
+                    List<Integer> resultNodes = new ArrayList<>();
+
+                    if (root == null || target == null) {
+                        return resultNodes;
+                    }
+
+                    // Map child value -> parent node reference
+                    Map<Integer, TreeNode> parentMap = new HashMap<>();
+                    mapParentToChild(root, null, parentMap);
+
+                    // BFS to find all nodes at distance K
+                    Queue<TreeNode> queue = new ArrayDeque<>();
+                    Set<Integer> visited = new HashSet<>();
+
+                    queue.add(target);
+                    visited.add(target.val);
+
+                    int currentDistance = 0;
+
+                    while (!queue.isEmpty()) {
+                        int levelSize = queue.size();
+
+                        // When distance matches K, collect all nodes in current BFS level
+                        if (currentDistance == k) {
+                            for (int i = 0; i < levelSize; i++) {
+                                resultNodes.add(queue.poll().val);
+                            }
+                            return resultNodes;
+                        }
+
+                        for (int i = 0; i < levelSize; i++) {
+                            TreeNode currentNode = queue.poll();
+
+                            // 1. Explore left child
+                            if (currentNode.left != null && !visited.contains(currentNode.left.val)) {
+                                visited.add(currentNode.left.val);
+                                queue.add(currentNode.left);
+                            }
+
+                            // 2. Explore right child
+                            if (currentNode.right != null && !visited.contains(currentNode.right.val)) {
+                                visited.add(currentNode.right.val);
+                                queue.add(currentNode.right);
+                            }
+
+                            // 3. Explore parent node
+                            TreeNode parentNode = parentMap.get(currentNode.val);
+                            if (parentNode != null && !visited.contains(parentNode.val)) {
+                                visited.add(parentNode.val);
+                                queue.add(parentNode);
+                            }
+                        }
+
+                        currentDistance++;
+                    }
+
+                    return resultNodes;
+                }
+
+                private void mapParentToChild(TreeNode currentNode, TreeNode parent, Map<Integer, TreeNode> parentMap) {
+                    if (currentNode == null) {
+                        return;
+                    }
+
+                    if (parent != null) {
+                        parentMap.put(currentNode.val, parent);
+                    }
+
+                    mapParentToChild(currentNode.left, currentNode, parentMap);
+                    mapParentToChild(currentNode.right, currentNode, parentMap);
+                }
+            }
+
+     */
+
+    // Minimum time taken to burn the BT from a given Node
+
+    /*
+
+         LEETCODE 2385: AMOUNT OF TIME FOR BINARY TREE TO BE INFECTED
+         ----------------------------------------------------------------------------
+         Approach: Parent Mapping (DFS) + Level-Order Infection Propagation (BFS)
+
+         Logic:
+         1. DFS Pass: Build a parent map and locate the TreeNode corresponding to `start`.
+         2. BFS Pass: Perform level-order traversal starting from `startNode`, spreading
+            infection to left child, right child, and parent in each unit of time.
+         3. Return the maximum time steps taken until all reachable nodes are infected.
+
+         Time Complexity  : O(N) - Single DFS traversal to map parents + BFS traversal
+         Space Complexity : O(N) - Storage for parent map, visited set, and BFS queue
+
+            class Solution {
+
+                private TreeNode startNode = null;
+
+                public int amountOfTime(TreeNode root, int start) {
+
+                    if (root == null) {
+                        return 0;
+                    }
+
+                    // Step 1: Map each child to its parent node and find the target start node
+                    Map<TreeNode, TreeNode> parentMap = new HashMap<>();
+                    findStartAndMapParents(root, null, start, parentMap);
+
+                    // Step 2: BFS starting from startNode to simulate infection spread
+                    Queue<TreeNode> queue = new ArrayDeque<>();
+                    Set<TreeNode> visited = new HashSet<>();
+
+                    queue.add(startNode);
+                    visited.add(startNode);
+
+                    int minutesElapsed = 0;
+
+                    while (!queue.isEmpty()) {
+
+                        int levelSize = queue.size();
+                        boolean infectionSpreadThisMinute = false;
+
+                        for (int i = 0; i < levelSize; i++) {
+                            TreeNode current = queue.remove();
+
+                            // Spread to Left Child
+                            if (current.left != null && !visited.contains(current.left)) {
+                                visited.add(current.left);
+                                queue.add(current.left);
+                                infectionSpreadThisMinute = true;
+                            }
+
+                            // Spread to Right Child
+                            if (current.right != null && !visited.contains(current.right)) {
+                                visited.add(current.right);
+                                queue.add(current.right);
+                                infectionSpreadThisMinute = true;
+                            }
+
+                            // Spread to Parent Node
+                            TreeNode parent = parentMap.get(current);
+                            if (parent != null && !visited.contains(parent)) {
+                                visited.add(parent);
+                                queue.add(parent);
+                                infectionSpreadThisMinute = true;
+                            }
+                        }
+
+                        // Increment time only if the infection expanded to new nodes
+                        if (infectionSpreadThisMinute) {
+                            minutesElapsed++;
+                        }
+                    }
+
+                    return minutesElapsed;
+                }
+
+                private void findStartAndMapParents(TreeNode currentNode, TreeNode parentNode, int startVal, Map<TreeNode, TreeNode> parentMap) {
+                    if (currentNode == null) {
+                        return;
+                    }
+
+                    if (currentNode.val == startVal) {
+                        startNode = currentNode;
+                    }
+
+                    if (parentNode != null) {
+                        parentMap.put(currentNode, parentNode);
+                    }
+
+                    findStartAndMapParents(currentNode.left, currentNode, startVal, parentMap);
+                    findStartAndMapParents(currentNode.right, currentNode, startVal, parentMap);
+                }
+            }
+
+     */
+
+    /*
+
+         LEETCODE 2385: AMOUNT OF TIME FOR BINARY TREE TO BE INFECTED (DFS APPROACH)
+         ----------------------------------------------------------------------------
+         Approach: Parent Mapping + DFS Longest Path Search
+
+         Logic:
+         1. Map parent relationships to convert tree into an undirected graph.
+         2. Perform DFS starting from `startNode` traversing left, right, and parent pointers.
+         3. Find the maximum depth/distance reachable from `startNode`.
+
+         Time Complexity  : O(N) - O(N) parent mapping + O(N) single DFS traversal
+         Space Complexity : O(N) - Parent map + Visited set + Recursion stack depth
+
+            class Solution {
+
+                private TreeNode startNode = null;
+
+                public int amountOfTime(TreeNode root, int start) {
+                    if (root == null) {
+                        return 0;
+                    }
+
+                    // Step 1: Populate parent mappings and locate startNode
+                    Map<TreeNode, TreeNode> parentMap = new HashMap<>();
+                    findStartAndMapParents(root, null, start, parentMap);
+
+                    // Step 2: Perform DFS starting from startNode to find maximum distance
+                    Set<TreeNode> visited = new HashSet<>();
+                    return maxDistanceDFS(startNode, parentMap, visited);
+                }
+
+                private int maxDistanceDFS(TreeNode currentNode, Map<TreeNode, TreeNode> parentMap, Set<TreeNode> visited) {
+                    if (currentNode == null || visited.contains(currentNode)) {
+                        return -1; // Base case: return -1 so edge adds 0 to distance
+                    }
+
+                    visited.add(currentNode);
+
+                    // 1. Explore Left Child
+                    int leftDist = maxDistanceDFS(currentNode.left, parentMap, visited);
+
+                    // 2. Explore Right Child
+                    int rightDist = maxDistanceDFS(currentNode.right, parentMap, visited);
+
+                    // 3. Explore Parent Node
+                    int parentDist = maxDistanceDFS(parentMap.get(currentNode), parentMap, visited);
+
+                    // Total distance from this node is 1 + max distance of its 3 directions
+                    return 1 + Math.max(leftDist, Math.max(rightDist, parentDist));
+                }
+
+                private void findStartAndMapParents(TreeNode currentNode, TreeNode parentNode, int startVal, Map<TreeNode, TreeNode> parentMap) {
+                    if (currentNode == null) {
+                        return;
+                    }
+
+                    if (currentNode.val == startVal) {
+                        startNode = currentNode;
+                    }
+
+                    if (parentNode != null) {
+                        parentMap.put(currentNode, parentNode);
+                    }
+
+                    findStartAndMapParents(currentNode.left, currentNode, startVal, parentMap);
+                    findStartAndMapParents(currentNode.right, currentNode, startVal, parentMap);
+                }
+            }
+
+     */
 
 
 
