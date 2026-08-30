@@ -2041,6 +2041,69 @@ public class binaryTree {
 
      */
 
+    // Count total nodes in a complete BT
+
+    /*
+
+         COUNT COMPLETE TREE NODES (LEETCODE 222)
+         ----------------------------------------------------------------------------
+         Approach: Binary Tree Height Comparison (Divide & Conquer)
+
+         Logic:
+         1. Compare the extreme left height and extreme right height of the tree starting from `root`.
+         2. If `leftHeight == rightHeight`, the subtree is a Perfect Binary Tree:
+            - Node Count = 2^(height) - 1  --->  Calculated cleanly as `(1 << leftHeight) - 1`
+         3. If `leftHeight != rightHeight`, recurse on left and right subtrees:
+            - Return `1 + countNodes(root.left) + countNodes(root.right)`
+
+         Time Complexity  : O((log N)^2) - Tree height is O(log N). At each recursion level, height calculation takes O(log N).
+         Space Complexity : O(log N) - Recursion stack bounded by tree height log N.
+
+            class Solution {
+
+                public int countNodes(TreeNode root) {
+
+                    if (root == null) {
+                        return 0;
+                    }
+
+                    int leftHeight = getLeftHeight(root);
+                    int rightHeight = getRightHeight(root);
+
+                    // If extreme left and extreme right heights match, it's a Perfect Binary Tree
+                    if (leftHeight == rightHeight) {
+                        return (1 << leftHeight) - 1; // Equivalent to 2^leftHeight - 1
+                    }
+
+                    // Otherwise, recursively count subtrees
+                    return 1 + countNodes(root.left) + countNodes(root.right);
+                }
+
+                // Traverses leftmost path to get total height including current node
+                private int getLeftHeight(TreeNode node) {
+                    int height = 0;
+                    while (node != null) {
+                        height++;
+                        node = node.left;
+                    }
+                    return height;
+                }
+
+                // Traverses rightmost path to get total height including current node
+                private int getRightHeight(TreeNode node) {
+                    int height = 0;
+                    while (node != null) {
+                        height++;
+                        node = node.right;
+                    }
+                    return height;
+                }
+            }
+
+     */
+
+    //
+
 
 
 
