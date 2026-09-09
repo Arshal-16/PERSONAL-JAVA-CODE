@@ -2102,6 +2102,65 @@ public class binaryTree {
 
      */
 
+    // Construct Binary Tree from Preorder and Inorder Traversal
+
+    /*
+         ----------------------------------------------------------------------------
+         Approach: Divide and Conquer via Map Lookups
+
+         Logic:
+         1. Preorder traversal visits nodes in [Root, Left Subtree, Right Subtree] order.
+            Therefore, `preorder[preStart]` is always the root of the current subtree.
+         2. Find `rootVal`'s index in `inorder` using `inMap`. Elements to the left of this
+            index form the left subtree; elements to the right form the right subtree.
+         3. Compute `leftElementCount = rootIdx - inStart` to accurately partition `preorder`.
+         4. Recursively construct left and right subtrees.
+
+         Time Complexity  : O(N) - O(N) map setup + O(1) per node build step across N nodes
+         Space Complexity : O(N) - HashMap storing N values + O(H) recursion stack
+
+            class Solution {
+
+                public TreeNode buildTree(int[] preorder, int[] inorder) {
+                    Map<Integer, Integer> inMap = new HashMap<>();
+
+                    for (int idx = 0; idx < inorder.length; idx++) {
+                        inMap.put(inorder[idx], idx);
+                    }
+
+                    return buildTree(preorder, 0, preorder.length - 1, inorder, 0, inorder.length - 1, inMap);
+                }
+
+                private TreeNode buildTree(int[] preorder, int preStart, int preEnd,
+                                           int[] inorder, int inStart, int inEnd,
+                                           Map<Integer, Integer> inMap) {
+
+                    if (preStart > preEnd || inStart > inEnd) {
+                        return null;
+                    }
+
+                    // Current root value is always the first element in current preorder segment
+                    int rootVal = preorder[preStart];
+                    TreeNode root = new TreeNode(rootVal);
+
+                    // Find root's position in the inorder traversal
+                    int rootIdx = inMap.get(rootVal);
+                    int leftElementCount = rootIdx - inStart;
+
+                    // Construct Left Subtree
+                    root.left = buildTree(preorder, preStart + 1, preStart + leftElementCount,
+                            inorder, inStart, rootIdx - 1, inMap);
+
+                    // Construct Right Subtree
+                    root.right = buildTree(preorder, preStart + leftElementCount + 1, preEnd,
+                            inorder, rootIdx + 1, inEnd, inMap);
+
+                    return root;
+                }
+            }
+
+     */
+
     //
 
 
