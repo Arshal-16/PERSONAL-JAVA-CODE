@@ -2161,7 +2161,64 @@ public class binaryTree {
 
      */
 
-    //
+    // Construct Binary Tree from Inorder and Postorder Traversal
+
+    /*
+
+            import java.util.*;
+
+         ----------------------------------------------------------------------------
+         Approach: Recursive Divide & Conquer with Hash Mapping
+
+         Logic:
+         1. Last element of postorder slice (`postorder[pe]`) is always the root of the current subtree.
+         2. Find `root.val` index (`rootIdx`) in the inorder array using HashMap.
+         3. Elements to the left of `rootIdx` in inorder form the left subtree.
+         4. Calculate `leftElementsCount = rootIdx - is` to slice postorder ranges correctly.
+         5. Left subtree postorder range  : `[ps, ps + leftEleCount - 1]`
+            Right subtree postorder range : `[ps + leftEleCount, pe - 1]`
+
+         Time Complexity  : O(N) - O(N) map setup + O(1) per recursive call
+         Space Complexity : O(N) - Hash map storage + O(H) recursion stack depth
+
+            class Solution {
+
+                public TreeNode buildTree(int[] inorder, int[] postorder) {
+                    Map<Integer, Integer> inMap = new HashMap<>();
+
+                    for (int idx = 0; idx < inorder.length; idx++) {
+                        inMap.put(inorder[idx], idx);
+                    }
+
+                    return buildTree(postorder, 0, postorder.length - 1, inorder, 0, inorder.length - 1, inMap);
+                }
+
+                private TreeNode buildTree(int[] postorder, int ps, int pe,
+                                           int[] inorder, int is, int ie,
+                                           Map<Integer, Integer> inMap) {
+
+                    if (ps > pe || is > ie) {
+                        return null;
+                    }
+
+                    // Root is always the last element in postorder range
+                    TreeNode root = new TreeNode(postorder[pe]);
+
+                    int rootIdx = inMap.get(root.val);
+                    int leftEleCount = rootIdx - is;
+
+                    // Build left and right subtrees
+                    root.left = buildTree(postorder, ps, ps + leftEleCount - 1,
+                            inorder, is, rootIdx - 1, inMap);
+
+                    root.right = buildTree(postorder, ps + leftEleCount, pe - 1,
+                            inorder, rootIdx + 1, ie, inMap);
+
+                    return root;
+                }
+            }
+
+     */
 
 
 
