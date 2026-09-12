@@ -2220,6 +2220,98 @@ public class binaryTree {
 
      */
 
+    // Serialize and Deserialize Binary Tree
+
+    /*
+
+    import java.util.*;
+
+ ----------------------------------------------------------------------------
+ Approach: Level-Order Traversal (BFS)
+
+ Logic:
+ 1. Serialize:
+    - Perform BFS using a Queue.
+    - Append node values separated by space (`" "`).
+    - Append `"null "` for missing left/right children.
+ 2. Deserialize:
+    - Split encoded string by space into `String[] nodes`.
+    - Use a Queue to rebuild tree level-by-level.
+    - Pointer `idx` processes children in pairs (`idx` for left child, `idx + 1` for right child)
+      and increments by 2 for each dequeued parent.
+
+ Time Complexity  : O(N) - Single pass for both serialization and deserialization
+ Space Complexity : O(N) - Storage for Queue and String array representing N nodes
+
+    public class Codec {
+
+        // Encodes a tree to a single string.
+        public String serialize(TreeNode root) {
+            if (root == null) {
+                return "";
+            }
+
+            StringBuilder data = new StringBuilder();
+            // use LL instead of arrayDeque because AD doesn't allow storing null value
+            Queue<TreeNode> queue = new LinkedList<>();
+            queue.add(root);
+
+            while (!queue.isEmpty()) {
+                TreeNode current = queue.remove();
+
+                if (current == null) {
+                    data.append("null ");
+                    continue;
+                }
+
+                data.append(current.val).append(" ");
+                queue.add(current.left);
+                queue.add(current.right);
+            }
+
+            return data.toString().trim();
+        }
+
+        // Decodes your encoded data to tree.
+        public TreeNode deserialize(String data) {
+
+            if (data == null || data.isEmpty()) {
+                return null;
+            }
+
+            String[] nodes = data.split(" ");
+
+            TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));
+            Queue<TreeNode> queue = new ArrayDeque<>();
+            queue.add(root);
+
+            int idx = 1; // Start from first child of root
+
+            while (!queue.isEmpty() && idx < nodes.length) {
+
+                TreeNode current = queue.remove();
+
+                // Process Left Child
+                if (!nodes[idx].equals("null")) {
+                    current.left = new TreeNode(Integer.parseInt(nodes[idx]));
+                    queue.add(current.left);
+                }
+                idx++;
+
+                // Process Right Child
+                if (idx < nodes.length && !nodes[idx].equals("null")) {
+                    current.right = new TreeNode(Integer.parseInt(nodes[idx]));
+                    queue.add(current.right);
+                }
+                idx++;
+            }
+
+            return root;
+        }
+    }
+
+     */
+
 
 
 
