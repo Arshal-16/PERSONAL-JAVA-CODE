@@ -2312,6 +2312,165 @@ public class binaryTree {
 
      */
 
+    // Morris Inorder Traversal Of Binary Tree
+
+    /*
+
+         MORRIS INORDER TRAVERSAL
+         ----------------------------------------------------------------------------
+         Concept:
+         Standard DFS traversal uses O(H) call stack or explicit stack space to remember
+         ancestor nodes. Morris Traversal achieves O(1) auxiliary space by establishing
+         temporary pointers ("threads") from the rightmost node of a left subtree
+         back to the current root node.
+
+         Algorithm Breakdown:
+         ----------------------------------------------------------------------------
+         Set `current = root`. While `current != null`:
+
+         Case 1: `current.left == null`
+           - No left subtree exists.
+           - Visit `current` (add to result).
+           - Move to `current.right` (either a right child or a threaded return link).
+
+         Case 2 & 3: `current.left != null`
+           - Find `inorder predecessor` (the rightmost node in `current.left` subtree).
+
+           - Sub-case A (Thread Creation): `predecessor.right == null`
+             - Thread `predecessor.right = current` (creates back-link).
+             - Move `current = current.left` to process left subtree.
+
+           - Sub-case B (Thread Destruction): `predecessor.right == current`
+             - Remove thread `predecessor.right = null` (restores original tree structure).
+             - Left subtree is completely processed, so visit `current` (add to result).
+             - Move `current = current.right`.
+
+         Time Complexity  : O(N) - Every edge is traversed at most 3 times.
+         Space Complexity : O(1) - Amortized constant auxiliary space (excluding result list).
+
+            class Solution {
+
+                public List<Integer> inorderTraversal(TreeNode root) {
+                    List<Integer> result = new ArrayList<>();
+                    TreeNode current = root;
+
+                    while (current != null) {
+
+                        // CASE 1: No left subtree exists. Process current node and move right.
+                        if (current.left == null) {
+                            result.add(current.val);
+                            current = current.right;
+                        }
+                        // CASE 2 & 3: Left subtree exists. Find the rightmost node of left subtree.
+                        else {
+                            TreeNode predecessor = current.left;
+
+                            // Move to the rightmost node of the left subtree (or until thread is encountered)
+                            while (predecessor.right != null && predecessor.right != current) {
+                                predecessor = predecessor.right;
+                            }
+
+                            // CASE 2: Thread does not exist yet -> Create Thread & Go Left
+                            if (predecessor.right == null) {
+                                predecessor.right = current; // Make temporary thread to current root
+                                current = current.left;       // Continue moving down left subtree
+                            }
+                            // CASE 3: Thread already exists -> Remove Thread, Process Current Node & Go Right
+                            else {
+                                predecessor.right = null;    // Break the temporary thread
+                                result.add(current.val);     // Left subtree done -> Visit current root
+                                current = current.right;     // Move to right subtree
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+            }
+
+     */
+
+    // Morris Inorder Traversal Of Binary Tree
+
+    /*
+
+
+         MORRIS PREORDER TRAVERSAL
+         ----------------------------------------------------------------------------
+         Concept:
+         Achieves O(1) auxiliary space traversal without recursion or stack by
+         establishing temporary threads from the inorder predecessor back to `current`.
+
+         Key Difference from Inorder:
+         Preorder visits Root -> Left -> Right.
+         Therefore, we record `current.val` BEFORE moving to the left subtree
+         (i.e., at the time of creating the thread, NOT when removing it).
+
+         Algorithm Breakdown:
+         ----------------------------------------------------------------------------
+         Set `current = root`. While `current != null`:
+
+         Case 1: `current.left == null`
+           - Visit `current` (add to result).
+           - Move to `current.right`.
+
+         Case 2 & 3: `current.left != null`
+           - Find `inorder predecessor` (rightmost node in `current.left` subtree).
+
+           - Case 2 (Thread Creation): `predecessor.right == null`
+             - Visit `current` (add to result HERE for Preorder).
+             - Set `predecessor.right = current` (create temporary thread).
+             - Move `current = current.left`.
+
+           - Case 3 (Thread Destruction): `predecessor.right == current`
+             - Set `predecessor.right = null` (restore original tree structure).
+             - Do NOT visit `current` here (it was already visited in Case 2).
+             - Move `current = current.right`.
+
+         Time Complexity  : O(N) - Every edge is traversed at most 3 times.
+         Space Complexity : O(1) - Constant auxiliary space.
+
+            class Solution {
+
+                public List<Integer> preorderTraversal(TreeNode root) {
+                    List<Integer> result = new ArrayList<>();
+                    TreeNode current = root;
+
+                    while (current != null) {
+
+                        // CASE 1: No left child exists -> Visit current root and move right
+                        if (current.left == null) {
+                            result.add(current.val);
+                            current = current.right;
+                        }
+                        // CASE 2 & 3: Left child exists -> Find inorder predecessor
+                        else {
+                            TreeNode predecessor = current.left;
+
+                            while (predecessor.right != null && predecessor.right != current) {
+                                predecessor = predecessor.right;
+                            }
+
+                            // CASE 2: Thread does not exist yet -> VISIT CURRENT, Create Thread & Go Left
+                            if (predecessor.right == null) {
+                                result.add(current.val);     // <-- PREORDER: Process root before left subtree
+                                predecessor.right = current; // Make temporary return thread
+                                current = current.left;       // Go to left subtree
+                            }
+                            // CASE 3: Thread exists -> Remove Thread & Go Right
+                            else {
+                                predecessor.right = null;    // Restore original tree structure
+                                current = current.right;     // Move to right subtree
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+            }
+
+     */
+
 
 
 
