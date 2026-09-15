@@ -2471,6 +2471,114 @@ public class binaryTree {
 
      */
 
+    // Flatten Binary Tree to Linked List
+
+    /* REVERSE PREORDER APPROACH
+
+    import java.util.*;
+
+ ----------------------------------------------------------------------------
+ Approach: Reverse Preorder Traversal (Right -> Left -> Root)
+
+ Logic:
+ 1. A standard preorder traversal processes nodes in Root -> Left -> Right order.
+ 2. To build the linked list in-place without losing left/right child references,
+    we traverse the tree in REVERSE Preorder: Right -> Left -> Root.
+ 3. We maintain a global `prev` pointer initialized to `null`.
+ 4. As we process each node bottom-up:
+    - Set `root.right = prev` (links current node to the head of the already flattened list).
+    - Set `root.left = null` (nullifies left pointer per problem spec).
+    - Update `prev = root` (current node becomes head of the list for parent calls).
+
+ Time Complexity  : O(N) - Every node is visited exactly once.
+ Space Complexity : O(H) - Recursion call stack depth bounded by tree height H.
+                    (O(log N) for balanced trees, O(N) for skewed trees)
+
+    class Solution {
+
+        // Tracks the previously processed node in reverse preorder execution
+        private TreeNode prev = null;
+
+        public void flatten(TreeNode root) {
+            // Base case: empty subtree
+            if (root == null) {
+                return;
+            }
+
+            // 1. Recurse down the right subtree first
+            flatten(root.right);
+
+            // 2. Recurse down the left subtree second
+            flatten(root.left);
+
+            // 3. Process current node: attach right to previously processed node
+            root.right = prev;
+            root.left = null;
+
+            // 4. Update prev to current node for the caller in the call stack
+            prev = root;
+        }
+    }
+
+     */
+
+    /*
+
+    import java.util.*;
+
+ ----------------------------------------------------------------------------
+ Approach: Iterative Preorder Traversal with Explicit Stack
+
+ Logic:
+ 1. A standard iterative preorder traversal uses a stack to visit nodes in
+    Root -> Left -> Right order.
+ 2. We push `root` to the stack. While the stack is not empty:
+    - Pop the top node as `current`.
+    - Push `current.right` onto the stack first, then `current.left` second
+      (ensuring left is processed first due to LIFO order).
+    - If the stack is not empty, the node at `traversalStack.peek()` is the
+      next node in the preorder sequence. Set `current.right = traversalStack.peek()`.
+    - Set `current.left = null` to satisfy linked list format.
+
+ Time Complexity  : O(N) - Every node is pushed and popped from stack exactly once.
+ Space Complexity : O(H) - Stack space bounded by tree height H.
+                    (O(log N) for balanced trees, O(N) for skewed trees)
+
+    class Solution {
+
+        public void flatten(TreeNode root) {
+            if (root == null) {
+                return;
+            }
+
+            Stack<TreeNode> traversalStack = new Stack<>();
+            traversalStack.push(root);
+
+            while (!traversalStack.isEmpty()) {
+                TreeNode current = traversalStack.pop();
+
+                // Push right child first so left child is popped first (LIFO)
+                if (current.right != null) {
+                    traversalStack.push(current.right);
+                }
+
+                if (current.left != null) {
+                    traversalStack.push(current.left);
+                }
+
+                // Top of stack is the immediate next node in preorder sequence
+                if (!traversalStack.isEmpty()) {
+                    current.right = traversalStack.peek();
+                }
+
+                // Nullify left child pointer
+                current.left = null;
+            }
+        }
+    }
+
+     */
+
 
 
 
