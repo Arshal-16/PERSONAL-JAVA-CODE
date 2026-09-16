@@ -2579,6 +2579,59 @@ public class binaryTree {
 
      */
 
+    /*
+
+    import java.util.*;
+
+ ----------------------------------------------------------------------------
+ Approach: Morris-like Iterative Pointer Manipulation (Constant Auxiliary Space)
+
+ Logic:
+ 1. We iterate through the tree starting at `root` using a `current` pointer.
+ 2. For each node, if `current.left` exists:
+    - Find the inorder predecessor: the rightmost node of `current.left`'s subtree.
+    - Attach `current.right` to `predecessor.right` (saving the original right chain).
+    - Move `current.left` over to `current.right`.
+    - Nullify `current.left = null`.
+ 3. Advance `current = current.right` to process the next node in the linked list chain.
+ 4. If `current.left` is null, we simply move to `current.right`.
+
+ Time Complexity  : O(N) - Each node/edge is visited at most twice.
+ Space Complexity : O(1) Auxiliary Space - Restructures pointers in-place without recursion stack or explicit data structures.
+
+    class Solution {
+
+        public void flatten(TreeNode root) {
+            if (root == null) {
+                return;
+            }
+
+            TreeNode current = root;
+
+            while (current != null) {
+                if (current.left != null) {
+                    // Find the rightmost node of the left subtree (inorder predecessor)
+                    TreeNode prev = current.left;
+                    while (prev.right != null) {
+                        prev = prev.right;
+                    }
+
+                    // Splice: connect original right subtree to predecessor's right
+                    prev.right = current.right;
+
+                    // Move left subtree to right side and clear left pointer
+                    current.right = current.left;
+                    current.left = null;
+                }
+
+                // Move to next node in the right chain
+                current = current.right;
+            }
+        }
+    }
+
+     */
+
 
 
 
