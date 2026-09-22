@@ -411,6 +411,168 @@ public class BinarySearchTrees {
 
      */
 
+    // KTH SMALLEST ELEMENT IN A BST
+
+    /*
+
+         Approach: Iterative Inorder Traversal using Explicit Stack
+
+         Logic:
+         1. An Inorder Traversal (Left -> Root -> Right) of a BST visits nodes in
+            strictly ascending order.
+         2. We use an explicit stack to simulate the recursive call stack:
+            - Push all left descendants of `current` until reaching `null`.
+            - Pop the top node from stack (this is the next smallest element in BST).
+            - Increment `counter`.
+            - If `counter == k`, we have found our answer; return `node.val`.
+            - Set `current = node.right` and repeat.
+
+         Time Complexity  : O(H + K) - Traverses down to the left leaf O(H), then pops K nodes.
+         Space Complexity : O(H) Auxiliary Space - Stack holds at most H nodes (tree height).
+
+            class Solution {
+
+                public int kthSmallest(TreeNode root, int k) {
+                    Stack<TreeNode> traversalStack = new Stack<>();
+                    TreeNode current = root;
+                    int counter = 0;
+
+                    while (current != null || !traversalStack.isEmpty()) {
+                        // 1. Go to the leftmost node
+                        if (current != null) {
+                            traversalStack.push(current);
+                            current = current.left;
+                        } else {
+                            // 2. Process node (pop from stack)
+                            TreeNode node = traversalStack.pop();
+                            counter++;
+
+                            if (counter == k) {
+                                return node.val;
+                            }
+
+                            // 3. Move to right subtree
+                            current = node.right;
+                        }
+                    }
+
+                    return -1; // Fallback for invalid input
+                }
+            }
+
+     */
+
+    /*
+
+         Approach: Morris Inorder Traversal (O(1) Auxiliary Space)
+
+         Logic:
+         1. For current node, if `left` is null, process current node, increment `counter`,
+            check if `counter == k`, and move `current = current.right`.
+         2. If `left` is not null, find predecessor (rightmost node in left subtree).
+            - If `predecessor.right == null`: establish temporary thread (`predecessor.right = current`),
+              move `current = current.left`.
+            - If `predecessor.right == current`: break thread (`predecessor.right = null`),
+              process current node, increment `counter`, check `k`, move `current = current.right`.
+         3. Continue loop to completely restore all modified pointers before returning.
+
+         Time Complexity  : O(N) - Every node/edge is visited at most twice.
+         Space Complexity : O(1) Auxiliary Space - Modifies tree pointers in-place without recursion stack.
+
+            class Solution {
+
+                public int kthSmallest(TreeNode root, int k) {
+                    TreeNode current = root;
+                    int counter = 0;
+                    int result = -1;
+
+                    while (current != null) {
+                        if (current.left == null) {
+                            counter++;
+                            if (counter == k) {
+                                result = current.val;
+                            }
+                            current = current.right;
+                        } else {
+                            // Find the inorder predecessor (rightmost node in left subtree)
+                            TreeNode predecessor = current.left;
+                            while (predecessor.right != null && predecessor.right != current) {
+                                predecessor = predecessor.right;
+                            }
+
+                            if (predecessor.right == null) {
+                                predecessor.right = current; // Establish temporary thread
+                                current = current.left;
+                            } else {
+                                predecessor.right = null; // Remove thread to restore tree structure
+                                counter++;
+                                if (counter == k) {
+                                    result = current.val;
+                                }
+                                current = current.right;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+            }
+
+     */
+
+    /*
+
+         Approach: Recursive Inorder Traversal (Replicating Iterative Left-First Logic)
+
+         Logic:
+         1. An Inorder Traversal (Left -> Root -> Right) visits nodes in strictly
+            ascending order.
+         2. We maintain two global state variables:
+            - `counter`: tracks how many nodes have been processed.
+            - `result`: stores the k-th smallest value once found.
+         3. Helper function `inorder(root, k)`:
+            - Base Case: if `root == null` or `counter >= k`, return early.
+            - Traverse left subtree: `inorder(root.left, k)` (simulates pushing lefts onto stack).
+            - Process current node:
+                * `counter++`
+                * if (`counter == k`), record `result = root.val` and stop processing.
+            - Traverse right subtree: `inorder(root.right, k)` (simulates moving to root.right).
+
+         Time Complexity  : O(H + K) - Traverses down to leftmost leaf O(H), then visits K nodes.
+         Space Complexity : O(H) - Call stack depth equals tree height H.
+
+            class Solution {
+
+                private int counter = 0;
+                private int result = -1;
+
+                public int kthSmallest(TreeNode root, int k) {
+                    inorder(root, k);
+                    return result;
+                }
+
+                private void inorder(TreeNode node, int k) {
+                    if (node == null || counter >= k) {
+                        return;
+                    }
+
+                    // 1. Traverse left subtree (equivalent to stack.push(left))
+                    inorder(node.left, k);
+
+                    // 2. Process current node (equivalent to stack.pop())
+                    counter++;
+                    if (counter == k) {
+                        result = node.val;
+                        return; // Target found, stop further recursion
+                    }
+
+                    // 3. Traverse right subtree (equivalent to current = node.right)
+                    inorder(node.right, k);
+                }
+            }
+
+     */
+
 
 
 }
