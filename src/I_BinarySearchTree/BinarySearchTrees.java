@@ -573,6 +573,50 @@ public class BinarySearchTrees {
 
      */
 
+    // Validate Binary Search Tree
+
+    /*
+         Approach: Min/Max Range Boundaries (Top-Down Constraint Propagation)
+
+         Logic:
+         1. Every node in a BST must satisfy a specific range constraint:
+            `lowerBound < node.val < upperBound`.
+         2. When recursing left: The upper bound decreases to `current.val`.
+         3. When recursing right: The lower bound increases to `current.val`.
+         4. We use `Long.MIN_VALUE` and `Long.MAX_VALUE` as initial bounds to prevent
+            overflow when node values equal `Integer.MIN_VALUE` or `Integer.MAX_VALUE`.
+         5. Strict inequalities (`<=` and `>=`) are required because BSTs disallow duplicate keys.
+
+         Time Complexity  : O(N) - Visits every node once.
+         Space Complexity : O(H) - Recursion call stack bounded by tree height H.
+                            (O(log N) for balanced trees, O(N) for skewed trees)
+
+            class Solution {
+
+                public boolean isValidBST(TreeNode root) {
+                    return isBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+                }
+
+                private boolean isBST(TreeNode root, long minBound, long maxBound) {
+                    // Base case: empty subtree is a valid BST
+                    if (root == null) {
+                        return true;
+                    }
+
+                    // Strict boundary check (disallows values outside range and duplicates)
+                    if (root.val <= minBound || root.val >= maxBound) {
+                        return false;
+                    }
+
+                    // Left child bounded by (minBound, root.val)
+                    // Right child bounded by (root.val, maxBound)
+                    return isBST(root.left, minBound, root.val)
+                            && isBST(root.right, root.val, maxBound);
+                }
+            }
+
+     */
+
 
 
 }
