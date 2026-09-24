@@ -617,6 +617,86 @@ public class BinarySearchTrees {
 
      */
 
+    // Lowest Common Ancestor of a Binary Search Tree
+
+    /*
+
+
+         Approach 1: Recursive BST Decision Traversal
+
+         Logic:
+         1. Leverage the BST property:
+            - If both `p.val` and `q.val` are strictly GREATER than `root.val`,
+              both nodes lie in the right subtree. Recurse right.
+            - If both `p.val` and `q.val` are strictly LESS than `root.val`,
+              both nodes lie in the left subtree. Recurse left.
+            - Otherwise (split point): One node is on the left and the other is on the right,
+              OR `root` equals `p` or `q`. This `root` is the Lowest Common Ancestor (LCA).
+
+         Time Complexity  : O(H) - Traverses down a single path bounded by tree height H.
+                            (O(log N) for balanced BSTs, O(N) for skewed BSTs)
+         Space Complexity : O(H) - Recursion call stack depth.
+
+            class Solution {
+
+                public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+                    if (root == null) {
+                        return null;
+                    }
+
+                    // Both target nodes lie in the right subtree
+                    if (p.val > root.val && q.val > root.val) {
+                        return lowestCommonAncestor(root.right, p, q);
+                    }
+
+                    // Both target nodes lie in the left subtree (FIXED: pass p and q nodes)
+                    if (p.val < root.val && q.val < root.val) {
+                        return lowestCommonAncestor(root.left, p, q);
+                    }
+
+                    // Split point reached: root is the LCA
+                    return root;
+                }
+            }
+
+     */
+
+    /*
+
+
+         Approach: Iterative Traversal (O(1) Auxiliary Space)
+
+         Logic:
+         Move a `curr` pointer down the tree:
+         - If `p.val > curr.val` AND `q.val > curr.val`, move `curr = curr.right`.
+         - If `p.val < curr.val` AND `q.val < curr.val`, move `curr = curr.left`.
+         - Otherwise, `curr` is the split point (LCA), return `curr`.
+
+         Time Complexity  : O(H) - Traverses a single path down tree height H.
+                            (O(log N) for balanced BSTs, O(N) for skewed BSTs)
+         Space Complexity : O(1) Auxiliary Space - Pure pointer movement without call stack.
+
+            class Solution {
+
+                public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+                    TreeNode curr = root;
+
+                    while (curr != null) {
+                        if (p.val > curr.val && q.val > curr.val) {
+                            curr = curr.right;
+                        } else if (p.val < curr.val && q.val < curr.val) {
+                            curr = curr.left;
+                        } else {
+                            return curr; // LCA found at split point
+                        }
+                    }
+
+                    return null;
+                }
+            }
+
+     */
+
 
 
 }
