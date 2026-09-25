@@ -697,6 +697,121 @@ public class BinarySearchTrees {
 
      */
 
+    // Construct Binary Search Tree from Preorder Traversal
+
+    /*
+
+
+         Approach: Sort Preorder -> Inorder + Standard Preorder/Inorder Construction
+
+         Logic:
+         1. Generate `inorder` Array:
+            - By BST invariant, Inorder traversal yields elements in strictly sorted order.
+            - Clone `preorder` array and sort it to produce `inorder`.
+         2. HashMap Optimization:
+            - Store element-to-index mappings of `inorder` in a `HashMap` to achieve O(1)
+              root index lookups.
+         3. Recursive Subtree Construction:
+            - First element in current `preorder` range `[pStart, pEnd]` is the root.
+            - Find root index `inRoot` in `inorder` range `[iStart, iEnd]`.
+            - `numsLeft = inRoot - iStart` determines left subtree node count.
+            - Recurse left:  preorder `[pStart + 1, pStart + numsLeft]`, inorder `[iStart, inRoot - 1]`
+            - Recurse right: preorder `[pStart + numsLeft + 1, pEnd]`,  inorder `[inRoot + 1, iEnd]`
+
+         Time Complexity  : O(N log N) - Sorting the preorder array dominates time complexity.
+         Space Complexity : O(N) - Storing cloned inorder array, HashMap, and O(H) recursion stack.
+
+            class Solution {
+
+                private int pIndex = 0;
+
+                public TreeNode bstFromPreorder(int[] preorder) {
+                    int n = preorder.length;
+
+                    // Step 1: Generate inorder array by sorting preorder
+                    int[] inorder = preorder.clone();
+                    Arrays.sort(inorder);
+
+                    // Step 2: Build HashMap for O(1) index lookups in inorder array
+                    Map<Integer, Integer> inMap = new HashMap<>();
+                    for (int i = 0; i < n; i++) {
+                        inMap.put(inorder[i], i);
+                    }
+
+                    // Step 3: Construct BST recursively using preorder and inorder
+                    return buildTree(preorder, 0, n - 1, inorder, 0, n - 1, inMap);
+                }
+
+                private TreeNode buildTree(
+                        int[] preorder, int pStart, int pEnd,
+                        int[] inorder, int iStart, int iEnd,
+                        Map<Integer, Integer> inMap) {
+
+                    if (pStart > pEnd || iStart > iEnd) {
+                        return null;
+                    }
+
+                    // The first element in preorder range is the root
+                    TreeNode root = new TreeNode(preorder[pStart]);
+
+                    // Find root index in inorder array
+                    int inRoot = inMap.get(root.val);
+                    int numsLeft = inRoot - iStart;
+
+                    // Recurse left and right subtrees
+                    root.left = buildTree(preorder, pStart + 1, pStart + numsLeft, inorder, iStart, inRoot - 1, inMap);
+                    root.right = buildTree(preorder, pStart + numsLeft + 1, pEnd, inorder, inRoot + 1, iEnd, inMap);
+
+                    return root;
+                }
+            }
+
+     */
+
+    /*
+
+         Approach: Upper Bound Constraint Propagation (Optimal O(N) Time)
+
+         Logic:
+         1. A single array index `i` scans through `preorder` sequentially.
+         2. We pass a `maxBound` parameter down the recursive call stack:
+            - Base Case: Return `null` if `i == preorder.length` or `preorder[i] > maxBound`.
+         3. Construct current `root` node with `preorder[i++]`.
+         4. Recurse left: Upper bound becomes `root.val` (since all left children < root.val).
+         5. Recurse right: Upper bound remains `maxBound` (since all right children < maxBound).
+
+         Time Complexity  : O(N) - Every element in the array is processed exactly once.
+         Space Complexity : O(H) - Recursion call stack bounded by tree height H.
+                            (O(log N) for balanced trees, O(N) for skewed trees)
+
+            class Solution {
+
+                private int i = 0;
+
+                public TreeNode bstFromPreorder(int[] preorder) {
+                    return buildBST(preorder, Integer.MAX_VALUE);
+                }
+
+                private TreeNode buildBST(int[] preorder, int maxBound) {
+                    // Stop if array bounds exceeded or value breaks BST constraint for this branch
+                    if (i == preorder.length || preorder[i] > maxBound) {
+                        return null;
+                    }
+
+                    TreeNode root = new TreeNode(preorder[i++]);
+
+                    // Left subtree must stay strictly smaller than root.val
+                    root.left = buildBST(preorder, root.val);
+
+                    // Right subtree must stay strictly smaller than inherited maxBound
+                    root.right = buildBST(preorder, maxBound);
+
+                    return root;
+                }
+            }
+
+     */
+
 
 
 }
